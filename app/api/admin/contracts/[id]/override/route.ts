@@ -5,9 +5,9 @@ import { getServerSession } from "@/lib/auth-server"
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const session = await getServerSession(req)
+    const session = await getServerSession()
 
-    if (!session?.user || session.user.role !== "ADMIN") {
+    if (!session || session.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Action and reason are required" }, { status: 400 })
     }
 
-    const result = await ContractShieldService.adminOverrideWithConsent(id, action, session.user.id, reason)
+    const result = await ContractShieldService.adminOverrideWithConsent(id, action, session.userId, reason)
 
     return NextResponse.json({
       success: true,

@@ -64,12 +64,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ auct
         metrics: {
           total_offers: offerCount || 0,
           valid_offers: validOfferCount || 0,
-          best_price_options_count: options.length,
-        },
-        options: options.map((opt) => ({
-          id: opt.id,
-          type: opt.type,
-          rank: opt.rank,
+      best_price_options_count: options.length,
+    },
+    options: options.map((opt: any) => ({
+      id: opt.id,
+      type: opt.type,
+      rank: opt.rank,
           score: opt.score,
           is_declined: opt.is_declined,
           declined_at: opt.declined_at,

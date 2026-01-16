@@ -1,76 +1,12 @@
-/**
- * Application Logger
- * Replaces console.log with structured logging
- * Supports different log levels and structured data
- */
-
-type LogLevel = "debug" | "info" | "warn" | "error"
-
-interface LogContext {
-  [key: string]: unknown
+// Lightweight logger used across server utilities and route handlers.
+// Falls back to console methods to avoid build failures when structured logging isn't available.
+export const logger = {
+  info: (...args: any[]) => console.info(...args),
+  warn: (...args: any[]) => console.warn(...args),
+  error: (...args: any[]) => console.error(...args),
+  debug: (...args: any[]) => {
+    if (process.env.NODE_ENV !== "production") {
+      console.debug(...args)
+    }
+  },
 }
-
-class Logger {
-  private prefix: string
-  private isDevelopment: boolean
-
-  constructor(prefix = "") {
-    this.prefix = prefix
-    this.isDevelopment = process.env.NODE_ENV === "development"
-  }
-
-  private log(level: LogLevel, message: string, context?: LogContext) {
-    // In production, we'd send to a logging service (e.g., Datadog, LogRocket)
-    // For now, only log in development or for errors
-    if (!this.isDevelopment && level !== "error") {
-      return
-    }
-
-    const timestamp = new Date().toISOString()
-    const logPrefix = this.prefix ? `[${this.prefix}]` : ""
-    const fullMessage = `${timestamp} ${level.toUpperCase()} ${logPrefix} ${message}`
-
-    if (context) {
-      console[level](fullMessage, context)
-    } else {
-      console[level](fullMessage)
-    }
-  }
-
-  debug(message: string, context?: LogContext) {
-    this.log("debug", message, context)
-  }
-
-  info(message: string, context?: LogContext) {
-    this.log("info", message, context)
-  }
-
-  warn(message: string, context?: LogContext) {
-    this.log("warn", message, context)
-  }
-
-  error(message: string, error?: Error | unknown, context?: LogContext) {
-    const errorContext = {
-      ...context,
-      error:
-        error instanceof Error
-          ? {
-              message: error.message,
-              stack: error.stack,
-              name: error.name,
-            }
-          : error,
-    }
-    this.log("error", message, errorContext)
-  }
-}
-
-// Export logger instances for different modules
-export const logger = new Logger()
-export const authLogger = new Logger("Auth")
-export const apiLogger = new Logger("API")
-export const dbLogger = new Logger("DB")
-export const emailLogger = new Logger("Email")
-export const adminLogger = new Logger("Admin")
-
-export default logger

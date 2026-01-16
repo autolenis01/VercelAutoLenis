@@ -4,9 +4,9 @@ import { getServerSession } from "@/lib/auth-server"
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(req)
+    const session = await getServerSession()
 
-    if (!session?.user || session.user.role !== "ADMIN") {
+    if (!session || session.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
