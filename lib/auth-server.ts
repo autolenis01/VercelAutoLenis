@@ -23,6 +23,8 @@ export async function getSession(): Promise<SessionUser | null> {
   }
 }
 
+export const getServerSession = getSession
+
 export async function getSessionUser(): Promise<SessionUser | null> {
   try {
     const session = await getSession()
