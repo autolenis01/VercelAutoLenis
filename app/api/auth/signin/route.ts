@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     logger.debug("Signin input validated, calling AuthService")
 
     const result = await AuthService.signIn(validated)
-    logger.info("Sign in successful", { userId: result.user.id, email: result.user.email })
+    logger.info("Sign in successful", { userId: result.user.userId, email: result.user.email })
 
     const { user, token } = result
 
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
       success: true,
       data: {
         user: {
-          id: user.id,
+          id: user.userId,
           email: user.email,
           role: user.role,
         },

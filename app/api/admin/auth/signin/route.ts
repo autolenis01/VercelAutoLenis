@@ -33,13 +33,13 @@ export async function POST(request: Request) {
     }
 
     const token = await createSession({
-      userId: user.id,
+      userId: user.userId,
       email: user.email,
       role: user.role,
     })
     await setSessionCookie(token)
 
-    await logAdminAction("LOGIN_SUCCESS", { email: identifier, userId: user.id })
+    await logAdminAction("LOGIN_SUCCESS", { email: identifier, userId: user.userId })
 
     return NextResponse.json({
       success: true,

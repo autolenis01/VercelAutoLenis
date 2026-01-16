@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Process the referral with 5-level chain building
-    const referrals = await affiliateService.processSignupReferral(user.id, codeToUse, cookieId)
+    const referrals = await affiliateService.processSignupReferral(user.userId, codeToUse, cookieId)
 
     if (!referrals || referrals.length === 0) {
       return NextResponse.json({
