@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { requireAuth } from "@/lib/auth-server"
-import prequalService from "@/lib/services/prequal.service"
+import { prequalService } from "@/lib/services/prequal.service"
 
 // POST /api/admin/buyers/:userId/prequal/revoke - Admin revoke prequal
 export async function POST(request: Request, { params }: { params: Promise<{ userId: string }> }) {

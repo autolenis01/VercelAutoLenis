@@ -104,10 +104,10 @@ model Dealer {
   // Relations
   inventory             InventoryItem[]
   auctionParticipations AuctionParticipant[]
-  contracts             ContractDocument[]
-  pickups               PickupAppointment[]
-  contractShieldScans   ContractShieldScan[] @relation("DealerToContractShieldScan")
-
+  contracts         ContractDocument[]
+  pickups           PickupAppointment[]
+  contractScans     ContractShieldScan[]
+  
   @@index([licenseNumber])
 }
 
@@ -450,15 +450,15 @@ model SelectedDeal {
   updatedAt DateTime @updatedAt
 
   // Relations
-  financingOffer     FinancingOffer?
-  serviceFeePayment  ServiceFeePayment?
-  insurancePolicy    InsurancePolicy?
-  contracts          ContractDocument[]
-  eSignEnvelope      ESignEnvelope?
-  pickup             PickupAppointment?
-  tradeIn            TradeIn? // Added relation to TradeIn
-  contractShieldScan ContractShieldScan? @relation("SelectedDealToScan")
-
+  financingOffer    FinancingOffer?
+  serviceFeePayment ServiceFeePayment?
+  insurancePolicy   InsurancePolicy?
+  contracts         ContractDocument[]
+  eSignEnvelope     ESignEnvelope?
+  pickup            PickupAppointment?
+  tradeIn           TradeIn?      // Added relation to TradeIn
+  contractShieldScan ContractShieldScan?
+  
   @@index([buyerId])
   @@index([status])
 }
@@ -578,22 +578,21 @@ model ContractDocument {
   uploadedAt DateTime @default(now())
 
   // Relations
-  scan ContractShieldScan? @relation("ContractDocumentToScan")
-
+  scan              ContractShieldScan? @relation(fields: [scanId], references: [id])
+  scanId            String?
+  
   @@index([dealId])
   @@index([dealerId])
+  @@index([scanId])
 }
 
 model ContractShieldScan {
   id     String       @id @default(cuid())
   dealId String       @unique
-  deal   SelectedDeal @relation("SelectedDealToScan", fields: [dealId], references: [id])
+  deal   SelectedDeal @relation(fields: [dealId], references: [id])
 
   dealerId String
-  dealer   Dealer @relation("DealerToContractShieldScan", fields: [dealerId], references: [id])
-
-  contractDocumentId String?           @unique
-  contractDocument   ContractDocument? @relation("ContractDocumentToScan", fields: [contractDocumentId], references: [id])
+  dealer   Dealer @relation(fields: [dealerId], references: [id])
 
   status ContractStatus @default(SCANNING)
 
@@ -608,10 +607,11 @@ model ContractShieldScan {
   scannedAt DateTime @default(now())
 
   // Relations
-  overrides     ContractShieldOverride[]
-  notifications ContractShieldNotification[]
-  fixList       FixListItem[]
-
+  overrides         ContractShieldOverride[]
+  notifications     ContractShieldNotification[]
+  fixList           FixListItem[]
+  documents         ContractDocument[]
+  
   @@index([dealId])
   @@index([dealerId])
   @@index([status])

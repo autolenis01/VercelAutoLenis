@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { requireAuth } from "@/lib/auth-server"
-import prequalService from "@/lib/services/prequal.service"
+import { prequalService } from "@/lib/services/prequal.service"
 
 // GET /api/admin/buyers/:userId/prequal - Admin view of buyer prequal history
 export async function GET(request: Request, { params }: { params: Promise<{ userId: string }> }) {

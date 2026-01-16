@@ -31,15 +31,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-  const { action, dealerId, reason } = await request.json()
+    const { action, dealerId, reason } = await request.json()
 
-  if (action === "approve") {
-    const result = await adminService.approveDealer(dealerId, user.userId)
-    return NextResponse.json(result)
-  } else if (action === "suspend") {
-    const result = await adminService.suspendDealer(dealerId, reason, user.userId)
-    return NextResponse.json(result)
-  }
+    if (action === "approve") {
+      const result = await adminService.approveDealer(dealerId, user.userId)
+      return NextResponse.json(result)
+    } else if (action === "suspend") {
+      const result = await adminService.suspendDealer(dealerId, reason, user.userId)
+      return NextResponse.json(result)
+    }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 })
   } catch (error) {

@@ -38,6 +38,7 @@ const formatDate = (date: string) => {
   })
 }
 
+
 // Reason code to human-readable labels
 const reasonLabels: Record<string, string> = {
   lender_vehicle_too_old: "Vehicle too old",

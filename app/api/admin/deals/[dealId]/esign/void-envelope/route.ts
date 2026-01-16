@@ -18,7 +18,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ dea
     const body = await req.json()
     const { reason } = schema.parse(body)
 
-    const result = await esignService.voidEnvelope(dealId, user.id, reason)
+    const result = await esignService.voidEnvelope(dealId, user.userId, reason)
 
     return NextResponse.json({ success: true, ...result })
   } catch (error: any) {

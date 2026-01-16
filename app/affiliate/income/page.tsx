@@ -462,7 +462,7 @@ export default function AffiliateIncomePage() {
                     <div className="bg-[#7ED321]/10 rounded-2xl p-6 flex flex-col justify-center border-2 border-[#7ED321]/30">
                       <div className="text-center">
                         <div className="text-sm text-[#666] mb-2">Direct Referrals Needed</div>
-                        <div className="text-6xl font-bold text-[#7ED321] mb-2">{salesForGoal[0] ?? 0}</div>
+                        <div className="text-6xl font-bold text-[#7ED321] mb-2">{(salesForGoal[0] ?? 0)}</div>
                         <div className="text-sm text-[#666] mb-4">car sales per month</div>
                         <div className="text-xs text-[#999]">
                           That's about {Math.ceil((salesForGoal[0] ?? 0) / 4)} per week using your direct link
