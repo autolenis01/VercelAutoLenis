@@ -124,7 +124,7 @@
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^4.0.16",
     "@vitest/ui": "^4.0.16",
-    "happy-dom": "^15.11.7",
+    "happy-dom": "^20.0.0",
     "postcss": "^8.5",
     "prisma": "6.10.0",
     "tailwindcss": "^4.1.9",
