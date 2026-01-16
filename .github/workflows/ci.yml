@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  install-and-security:
+    name: Install and Security Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          # Prisma generate runs in postinstall with placeholder URL fallback
+          POSTGRES_PRISMA_URL: ""
+
+      - name: Verify Prisma schema is valid
+        run: |
+          echo "Validating Prisma schema..."
+          pnpm prisma validate
+        env:
+          POSTGRES_PRISMA_URL: "postgresql://user:password@localhost:5432/placeholder?schema=public"
+
+      - name: Verify security patches
+        run: |
+          echo "Verifying happy-dom version..."
+          HAPPY_DOM_VERSION=$(pnpm list happy-dom --json | jq -r '.[0].devDependencies["happy-dom"].version')
+          echo "happy-dom version: $HAPPY_DOM_VERSION"
+          
+          # Check if version is >= 20.0.0
+          if [ "$(printf '%s\n' "20.0.0" "$HAPPY_DOM_VERSION" | sort -V | head -n1)" = "20.0.0" ]; then
+            echo "✓ happy-dom is patched (>= 20.0.0)"
+          else
+            echo "✗ happy-dom version is vulnerable (< 20.0.0)"
+            exit 1
+          fi
+
+  # Note: Full build and typecheck skipped due to known issues
+  # 
+  # Build fails in CI due to Google Fonts network requirement:
+  #   - Next.js tries to fetch Geist fonts from fonts.googleapis.com
+  #   - Restricted environments cannot access external font CDNs
+  #   - Build works locally: POSTGRES_PRISMA_URL="" pnpm build
+  #
+  # TypeCheck has pre-existing errors in the codebase:
+  #   - 50+ TS4111 errors (index signature access)
+  #   - Several TS7006 errors (implicit any)
+  #   - Not introduced by this PR
+
