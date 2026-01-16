@@ -104,10 +104,10 @@ model Dealer {
   // Relations
   inventory             InventoryItem[]
   auctionParticipations AuctionParticipant[]
-  contracts             ContractDocument[]
-  pickups               PickupAppointment[]
-  contractScans         ContractShieldScan[]
-
+  contracts         ContractDocument[]
+  pickups           PickupAppointment[]
+  contractScans     ContractShieldScan[]
+  
   @@index([licenseNumber])
 }
 
@@ -456,9 +456,9 @@ model SelectedDeal {
   contracts         ContractDocument[]
   eSignEnvelope     ESignEnvelope?
   pickup            PickupAppointment?
-  tradeIn           TradeIn? // Added relation to TradeIn
-  contractScan      ContractShieldScan?
-
+  tradeIn           TradeIn?      // Added relation to TradeIn
+  contractShieldScan ContractShieldScan?
+  
   @@index([buyerId])
   @@index([status])
 }
@@ -578,11 +578,12 @@ model ContractDocument {
   uploadedAt DateTime @default(now())
 
   // Relations
-  scan   ContractShieldScan? @relation(fields: [scanId], references: [id])
-  scanId String?             @unique
-
+  scan              ContractShieldScan? @relation(fields: [scanId], references: [id])
+  scanId            String?
+  
   @@index([dealId])
   @@index([dealerId])
+  @@index([scanId])
 }
 
 model ContractShieldScan {
@@ -606,11 +607,11 @@ model ContractShieldScan {
   scannedAt DateTime @default(now())
 
   // Relations
-  document      ContractDocument?
-  overrides     ContractShieldOverride[]
-  notifications ContractShieldNotification[]
-  fixList       FixListItem[]
-
+  overrides         ContractShieldOverride[]
+  notifications     ContractShieldNotification[]
+  fixList           FixListItem[]
+  documents         ContractDocument[]
+  
   @@index([dealId])
   @@index([dealerId])
   @@index([status])

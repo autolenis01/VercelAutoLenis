@@ -7,7 +7,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const user = await requireAuth(["ADMIN"])
     const { id } = await params
 
-    await dealerApprovalService.approveApplication(id, user.id)
+    await dealerApprovalService.approveApplication(id, user.userId)
 
     return NextResponse.json({ success: true, message: "Dealer approved successfully" })
   } catch (error: any) {

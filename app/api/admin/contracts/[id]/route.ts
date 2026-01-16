@@ -51,7 +51,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Reason required for override" }, { status: 400 })
     }
 
-    const scan = await ContractShieldService.adminOverride(id, action, user.id, reason)
+    const scan = await ContractShieldService.adminOverride(id, action, user.userId, reason)
 
     return NextResponse.json({
       success: true,
