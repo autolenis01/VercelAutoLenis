@@ -214,6 +214,23 @@ export class DealerService {
     return data || []
   }
 
+  // Get single inventory item by ID
+  async getInventoryItemById(itemId: string, dealerId: string) {
+    const supabase = getSupabase()
+
+    const { data } = await supabase
+      .from("InventoryItem")
+      .select(`
+        *,
+        vehicle:Vehicle(*)
+      `)
+      .eq("id", itemId)
+      .eq("dealerId", dealerId)
+      .maybeSingle()
+
+    return data
+  }
+
   // Add vehicle to inventory
   async addVehicleToInventory(
     dealerId: string,
