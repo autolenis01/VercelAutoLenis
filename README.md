@@ -78,6 +78,8 @@ AutoLenis is a comprehensive automotive marketplace connecting buyers, dealers, 
 The project uses PostgreSQL with Supabase. Follow these steps:
 
 1. **Create Supabase Project**
+
+<!-- Trigger Vercel rebuild -->
    - Go to [supabase.com](https://supabase.com)
    - Create a new project
    - Copy connection strings to `.env`
