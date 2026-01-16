@@ -22,13 +22,40 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 
+interface InventoryItem {
+  id: string
+  price: number
+  stockNumber: string
+  status: string
+  createdAt: string
+  updatedAt: string
+  vehicle: {
+    vin: string
+    make: string
+    model: string
+    year: number
+    trim?: string
+    bodyStyle?: string
+    mileage?: number
+    exteriorColor?: string
+    interiorColor?: string
+    engine?: string
+    transmission?: string
+    drivetrain?: string
+    fuelType?: string
+    isNew?: boolean
+    locationCity?: string
+    locationState?: string
+  }
+}
+
 export default function InventoryDetailPage() {
   const params = useParams()
   const inventoryId = params.id as string
   const router = useRouter()
   const { toast } = useToast()
 
-  const [item, setItem] = useState<any>(null)
+  const [item, setItem] = useState<InventoryItem | null>(null)
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(false)
 
@@ -218,7 +245,9 @@ export default function InventoryDetailPage() {
                 <Gauge className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">Mileage</div>
-                  <div className="text-base font-semibold">{vehicle.mileage?.toLocaleString() || "N/A"} miles</div>
+                  <div className="text-base font-semibold">
+                    {vehicle.mileage != null ? `${vehicle.mileage.toLocaleString()} miles` : "N/A"}
+                  </div>
                 </div>
               </div>
 

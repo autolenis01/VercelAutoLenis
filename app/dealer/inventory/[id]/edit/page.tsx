@@ -202,7 +202,7 @@ export default function EditInventoryPage() {
                 <Label htmlFor="year">Year *</Label>
                 <Select
                   value={formData.year.toString()}
-                  onValueChange={(v) => setFormData({ ...formData, year: Number.parseInt(v) })}
+                  onValueChange={(v) => setFormData({ ...formData, year: Number.parseInt(v) || new Date().getFullYear() })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -274,7 +274,7 @@ export default function EditInventoryPage() {
                   id="mileage"
                   type="number"
                   value={formData.mileage}
-                  onChange={(e) => setFormData({ ...formData, mileage: Number.parseInt(e.target.value) || 0 })}
+                  onChange={(e) => setFormData({ ...formData, mileage: Number(e.target.value) || 0 })}
                   placeholder="25000"
                   required
                 />
@@ -387,8 +387,9 @@ export default function EditInventoryPage() {
                   <Input
                     id="price"
                     type="number"
+                    step="0.01"
                     value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: Number.parseInt(e.target.value) || 0 })}
+                    onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) || 0 })}
                     className="pl-8"
                     placeholder="25000"
                     required
