@@ -3,7 +3,7 @@ import { requireAuth } from "@/lib/auth-server"
 import { createClient } from "@/lib/supabase/server"
 import { BestPriceService } from "@/lib/services/best-price.service"
 
-export async function POST(_request: Request, { params }: { params: Promise<{ auctionId: string }> }) {
+export async function POST(request: Request, { params }: { params: Promise<{ auctionId: string }> }) {
   try {
     const { auctionId } = await params
     const session = await requireAuth(["ADMIN"])

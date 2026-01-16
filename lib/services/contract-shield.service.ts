@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db"
-import { logger } from "@/lib/logger"
+import { logger } from "@/lib/utils/logger"
 import { emailService } from "@/lib/services/email.service"
 
 // Contract Shield Service - Automated contract review assistant
