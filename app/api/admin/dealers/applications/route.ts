@@ -4,7 +4,7 @@ import { dealerApprovalService } from "@/lib/services/dealer-approval.service"
 
 export async function GET() {
   try {
-    const user = await requireAuth(["ADMIN"])
+    await requireAuth(["ADMIN"])
 
     const applications = await dealerApprovalService.getPendingApplications()
 

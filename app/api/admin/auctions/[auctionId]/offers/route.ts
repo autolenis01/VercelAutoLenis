@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic"
 export async function GET(req: NextRequest, { params }: { params: Promise<{ auctionId: string }> }) {
   try {
     const { auctionId } = await params
-    const user = await requireAuth(["ADMIN"])
+    await requireAuth(["ADMIN"])
 
     const offers = await offerService.getAuctionOffers(auctionId)
     return NextResponse.json({ offers })
