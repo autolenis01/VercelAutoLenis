@@ -1,8 +1,8 @@
 ## Summary
-- _
+- Briefly describe the change and intent.
 
 ## Root Cause
-- _
+- What gap or issue motivated this change?
 
 ## Acceptance Criteria
 - [ ] Scope is governance/docs only; no functional refactors

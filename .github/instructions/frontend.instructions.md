@@ -3,7 +3,7 @@
 
 ## Do
 - Prefer server components; add `"use client"` only when hooks or browser APIs are required.
-- Reuse primitives from `components/ui` and existing patterns for forms (react-hook-form + zod) and theming (`theme-provider`, `skip-link` for accessibility).
+- Reuse primitives from `components/ui` and existing patterns for forms (`react-hook-form` + `zod`) and theming components like `theme-provider` and `skip-link` for accessibility.
 - Keep styling in Tailwind utility classes or shared styles; co-locate small helpers in `components` or `hooks` instead of new design systems.
 - Ensure client-facing code never embeds secrets; reference env vars only via safe `NEXT_PUBLIC_*` values defined in `.env.example`.
 
