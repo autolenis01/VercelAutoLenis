@@ -91,6 +91,9 @@ export async function getCurrentUser() {
   }
 }
 
+// Alias for handlers expecting NextAuth-like helper
+export const getServerSession = getSession
+
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 10)
 }

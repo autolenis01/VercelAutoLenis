@@ -34,10 +34,10 @@ export async function POST(request: NextRequest) {
     const { action, dealerId, reason } = await request.json()
 
     if (action === "approve") {
-      const result = await adminService.approveDealer(dealerId, user.id)
+      const result = await adminService.approveDealer(dealerId, user.userId)
       return NextResponse.json(result)
     } else if (action === "suspend") {
-      const result = await adminService.suspendDealer(dealerId, reason, user.id)
+      const result = await adminService.suspendDealer(dealerId, reason, user.userId)
       return NextResponse.json(result)
     }
 

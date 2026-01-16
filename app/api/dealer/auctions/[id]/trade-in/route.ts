@@ -17,7 +17,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const { data: dealer, error: dealerError } = await supabase
       .from("Dealer")
       .select("id")
-      .eq("userId", user.id)
+      .eq("userId", user.userId)
       .maybeSingle()
 
     if (dealerError) {
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     if (!dealer) {
-      console.error("[Dealer TradeIn API] Dealer not found for user:", user.id)
+      console.error("[Dealer TradeIn API] Dealer not found for user:", user.userId)
       return NextResponse.json({ success: false, error: "Dealer profile not found" }, { status: 404 })
     }
 

@@ -10,7 +10,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ deal
     }
 
     const { dealId } = await params
-    const result = await pickupService.getPickupForBuyer(dealId, user.id)
+    const result = await pickupService.getPickupForBuyer(dealId, user.userId)
 
     return NextResponse.json({ success: true, ...result })
   } catch (error: any) {

@@ -23,7 +23,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ dea
     const body = await req.json().catch(() => ({}))
     const { provider, options } = schema.parse(body)
 
-    const envelope = await esignService.createEnvelope(dealId, user.id, {
+    const envelope = await esignService.createEnvelope(dealId, user.userId, {
       provider,
       embeddedSigning: options?.embedded_signing,
     })
