@@ -23,127 +23,128 @@ enum UserRole {
 }
 
 model User {
-  id                String       @id @default(cuid())
-  email             String       @unique
-  passwordHash      String       @map("passwordHash")
-  role              UserRole
-  is_email_verified Boolean      @default(false)
-  first_name        String?
-  last_name         String?
+  id                   String   @id @default(cuid())
+  email                String   @unique
+  passwordHash         String   @map("passwordHash")
+  role                 UserRole
+  is_email_verified    Boolean  @default(false)
+  first_name           String?
+  last_name            String?
   // MFA fields - mapped to snake_case database columns
-  mfa_enrolled      Boolean      @default(false)
-  mfa_factor_id     String?
-  mfa_secret        String?
-  force_password_reset Boolean   @default(false)
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
+  mfa_enrolled         Boolean  @default(false)
+  mfa_factor_id        String?
+  mfa_secret           String?
+  force_password_reset Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   // Relations
-  buyerProfile      BuyerProfile?
-  dealerProfile     Dealer?
-  adminProfile      AdminUser?
-  affiliateProfile  Affiliate?
-  contractOverrides ContractShieldOverride[]
+  buyerProfile        BuyerProfile?
+  dealerProfile       Dealer?
+  adminProfile        AdminUser?
+  affiliateProfile    Affiliate?
+  contractOverrides   ContractShieldOverride[]
   shieldNotifications ContractShieldNotification[]
-  
+
   @@index([email])
   @@map("User")
 }
 
 model BuyerProfile {
-  id                String    @id @default(cuid())
-  userId            String    @unique
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  firstName         String
-  lastName          String
-  phone             String?   // Made phone optional to fix signup
-  address           String
-  city              String
-  state             String
-  zip               String
-  
-  employment        String?
-  employer          String?
-  annualIncome      Float?
-  housingStatus     String?
-  monthlyHousing    Float?
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  firstName String
+  lastName  String
+  phone     String? // Made phone optional to fix signup
+  address   String
+  city      String
+  state     String
+  zip       String
+
+  employment     String?
+  employer       String?
+  annualIncome   Float?
+  housingStatus  String?
+  monthlyHousing Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  preQualification  PreQualification?
-  preferences       BuyerPreferences?
-  shortlists        Shortlist[]
-  auctions          Auction[]
-  deals             SelectedDeal[]
-  pickups           PickupAppointment[]
-  referrals         Referral[]
+  preQualification PreQualification?
+  preferences      BuyerPreferences?
+  shortlists       Shortlist[]
+  auctions         Auction[]
+  deals            SelectedDeal[]
+  pickups          PickupAppointment[]
+  referrals        Referral[]
 }
 
 model Dealer {
-  id                String    @id @default(cuid())
-  userId            String    @unique
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  businessName      String
-  licenseNumber     String    @unique
-  phone             String
-  address           String
-  city              String
-  state             String
-  zip               String
-  
-  integrityScore    Float     @default(100)
-  verified          Boolean   @default(false)
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  businessName  String
+  licenseNumber String @unique
+  phone         String
+  address       String
+  city          String
+  state         String
+  zip           String
+
+  integrityScore Float   @default(100)
+  verified       Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  inventory         InventoryItem[]
+  inventory             InventoryItem[]
   auctionParticipations AuctionParticipant[]
-  contracts         ContractDocument[]
-  pickups           PickupAppointment[]
-  
+  contracts             ContractDocument[]
+  pickups               PickupAppointment[]
+  contractScans         ContractShieldScan[]
+
   @@index([licenseNumber])
 }
 
 model AdminUser {
-  id                String    @id @default(cuid())
-  userId            String    @unique
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  firstName         String
-  lastName          String
-  role              String    @default("ADMIN")
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  firstName String
+  lastName  String
+  role      String @default("ADMIN")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Affiliate {
-  id                String    @id @default(cuid())
-  userId            String    @unique
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  referralCode      String    @unique
-  firstName         String?
-  lastName          String?
-  
-  totalEarnings     Float     @default(0)
-  pendingEarnings   Float     @default(0)
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  referralCode String  @unique
+  firstName    String?
+  lastName     String?
+
+  totalEarnings   Float @default(0)
+  pendingEarnings Float @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  referrals         Referral[]
-  clicks            Click[]
-  commissions       Commission[]
-  payouts           Payout[]
-  
+  referrals   Referral[]
+  clicks      Click[]
+  commissions Commission[]
+  payouts     Payout[]
+
   @@index([referralCode])
 }
 
@@ -160,27 +161,27 @@ enum CreditTier {
 }
 
 model PreQualification {
-  id                String       @id @default(cuid())
-  buyerId           String       @unique
-  buyer             BuyerProfile @relation(fields: [buyerId], references: [id], onDelete: Cascade)
-  
-  creditScore       Int?
-  creditTier        CreditTier
-  maxOtd            Float
+  id      String       @id @default(cuid())
+  buyerId String       @unique
+  buyer   BuyerProfile @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+
+  creditScore         Int?
+  creditTier          CreditTier
+  maxOtd              Float
   estimatedMonthlyMin Float
   estimatedMonthlyMax Float
-  
+
   dti               Float?
-  softPullCompleted Boolean      @default(false)
+  softPullCompleted Boolean   @default(false)
   softPullDate      DateTime?
-  consentGiven      Boolean      @default(false)
+  consentGiven      Boolean   @default(false)
   consentDate       DateTime?
-  
-  expiresAt         DateTime
-  
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
-  
+
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([buyerId])
 }
 
@@ -189,97 +190,97 @@ model PreQualification {
 // ============================================
 
 model BuyerPreferences {
-  id                String       @id @default(cuid())
-  buyerId           String       @unique
-  buyer             BuyerProfile @relation(fields: [buyerId], references: [id], onDelete: Cascade)
-  
-  makes             String[]
-  bodyStyles        String[]
-  minYear           Int?
-  maxYear           Int?
-  maxMileage        Int?
-  maxDistance       Int?
-  
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
+  id      String       @id @default(cuid())
+  buyerId String       @unique
+  buyer   BuyerProfile @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+
+  makes       String[]
+  bodyStyles  String[]
+  minYear     Int?
+  maxYear     Int?
+  maxMileage  Int?
+  maxDistance Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Vehicle {
-  id                String    @id @default(cuid())
-  vin               String    @unique
-  
-  year              Int
-  make              String
-  model             String
-  trim              String?
-  bodyStyle         String
-  
-  mileage           Int
-  exteriorColor     String?
-  interiorColor     String?
-  transmission      String?
-  fuelType          String?
-  
-  images            String[]
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
+  id  String @id @default(cuid())
+  vin String @unique
+
+  year      Int
+  make      String
+  model     String
+  trim      String?
+  bodyStyle String
+
+  mileage       Int
+  exteriorColor String?
+  interiorColor String?
+  transmission  String?
+  fuelType      String?
+
+  images String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  inventoryItems    InventoryItem[]
-  
+  inventoryItems InventoryItem[]
+
   @@index([vin])
   @@index([make, model])
 }
 
 model InventoryItem {
-  id                String    @id @default(cuid())
-  dealerId          String
-  dealer            Dealer    @relation(fields: [dealerId], references: [id], onDelete: Cascade)
-  
-  vehicleId         String
-  vehicle           Vehicle   @relation(fields: [vehicleId], references: [id])
-  
-  price             Float
-  status            String    @default("AVAILABLE")
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
+  id       String @id @default(cuid())
+  dealerId String
+  dealer   Dealer @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+
+  vehicleId String
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+
+  price  Float
+  status String @default("AVAILABLE")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  shortlistItems    ShortlistItem[]
-  
+  shortlistItems ShortlistItem[]
+
   @@index([dealerId])
   @@index([vehicleId])
 }
 
 model Shortlist {
-  id                String    @id @default(cuid())
-  buyerId           String
-  buyer             BuyerProfile @relation(fields: [buyerId], references: [id], onDelete: Cascade)
-  
-  name              String?
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
+  id      String       @id @default(cuid())
+  buyerId String
+  buyer   BuyerProfile @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+
+  name String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  items             ShortlistItem[]
-  auctions          Auction[]
-  
+  items    ShortlistItem[]
+  auctions Auction[]
+
   @@index([buyerId])
 }
 
 model ShortlistItem {
-  id                String    @id @default(cuid())
-  shortlistId       String
-  shortlist         Shortlist @relation(fields: [shortlistId], references: [id], onDelete: Cascade)
-  
-  inventoryItemId   String
-  inventoryItem     InventoryItem @relation(fields: [inventoryItemId], references: [id])
-  
-  addedAt           DateTime  @default(now())
-  
+  id          String    @id @default(cuid())
+  shortlistId String
+  shortlist   Shortlist @relation(fields: [shortlistId], references: [id], onDelete: Cascade)
+
+  inventoryItemId String
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id])
+
+  addedAt DateTime @default(now())
+
   @@unique([shortlistId, inventoryItemId])
   @@index([shortlistId])
 }
@@ -297,81 +298,81 @@ enum AuctionStatus {
 }
 
 model Auction {
-  id                String       @id @default(cuid())
-  buyerId           String
-  buyer             BuyerProfile @relation(fields: [buyerId], references: [id])
-  
-  shortlistId       String
-  shortlist         Shortlist    @relation(fields: [shortlistId], references: [id])
-  
-  status            AuctionStatus @default(PENDING_DEPOSIT)
-  
-  startsAt          DateTime?
-  endsAt            DateTime?
-  closedAt          DateTime?
-  
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
-  
+  id      String       @id @default(cuid())
+  buyerId String
+  buyer   BuyerProfile @relation(fields: [buyerId], references: [id])
+
+  shortlistId String
+  shortlist   Shortlist @relation(fields: [shortlistId], references: [id])
+
+  status AuctionStatus @default(PENDING_DEPOSIT)
+
+  startsAt DateTime?
+  endsAt   DateTime?
+  closedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  participants      AuctionParticipant[]
-  offers            AuctionOffer[]
-  bestPriceOptions  BestPriceOption[]
-  
+  participants     AuctionParticipant[]
+  offers           AuctionOffer[]
+  bestPriceOptions BestPriceOption[]
+
   @@index([buyerId])
   @@index([status])
 }
 
 model AuctionParticipant {
-  id                String    @id @default(cuid())
-  auctionId         String
-  auction           Auction   @relation(fields: [auctionId], references: [id], onDelete: Cascade)
-  
-  dealerId          String
-  dealer            Dealer    @relation(fields: [dealerId], references: [id])
-  
-  invitedAt         DateTime  @default(now())
-  viewedAt          DateTime?
-  
+  id        String  @id @default(cuid())
+  auctionId String
+  auction   Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+
+  dealerId String
+  dealer   Dealer @relation(fields: [dealerId], references: [id])
+
+  invitedAt DateTime  @default(now())
+  viewedAt  DateTime?
+
   @@unique([auctionId, dealerId])
   @@index([auctionId])
   @@index([dealerId])
 }
 
 model AuctionOffer {
-  id                String    @id @default(cuid())
-  auctionId         String
-  auction           Auction   @relation(fields: [auctionId], references: [id], onDelete: Cascade)
-  
-  participantId     String
-  
-  inventoryItemId   String
-  
-  cashOtd           Float
-  taxAmount         Float
-  feesBreakdown     Json
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
+  id        String  @id @default(cuid())
+  auctionId String
+  auction   Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+
+  participantId String
+
+  inventoryItemId String
+
+  cashOtd       Float
+  taxAmount     Float
+  feesBreakdown Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  financingOptions  AuctionOfferFinancingOption[]
-  
+  financingOptions AuctionOfferFinancingOption[]
+
   @@index([auctionId])
 }
 
 model AuctionOfferFinancingOption {
-  id                String       @id @default(cuid())
-  offerId           String
-  offer             AuctionOffer @relation(fields: [offerId], references: [id], onDelete: Cascade)
-  
-  apr               Float
-  termMonths        Int
-  downPayment       Float
-  monthlyPayment    Float
-  
-  createdAt         DateTime     @default(now())
-  
+  id      String       @id @default(cuid())
+  offerId String
+  offer   AuctionOffer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+
+  apr            Float
+  termMonths     Int
+  downPayment    Float
+  monthlyPayment Float
+
+  createdAt DateTime @default(now())
+
   @@index([offerId])
 }
 
@@ -386,23 +387,23 @@ enum BestPriceType {
 }
 
 model BestPriceOption {
-  id                String        @id @default(cuid())
-  auctionId         String
-  auction           Auction       @relation(fields: [auctionId], references: [id], onDelete: Cascade)
-  
-  type              BestPriceType
-  
-  offerId           String
-  inventoryItemId   String
-  dealerId          String
-  
-  cashOtd           Float
-  monthlyPayment    Float?
-  
-  score             Float
-  
-  createdAt         DateTime      @default(now())
-  
+  id        String  @id @default(cuid())
+  auctionId String
+  auction   Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+
+  type BestPriceType
+
+  offerId         String
+  inventoryItemId String
+  dealerId        String
+
+  cashOtd        Float
+  monthlyPayment Float?
+
+  score Float
+
+  createdAt DateTime @default(now())
+
   @@index([auctionId])
   @@index([type])
 }
@@ -430,24 +431,24 @@ enum DealStatus {
 }
 
 model SelectedDeal {
-  id                String       @id @default(cuid())
-  buyerId           String
-  buyer             BuyerProfile @relation(fields: [buyerId], references: [id])
-  
-  auctionId         String
-  offerId           String
-  inventoryItemId   String
-  dealerId          String
-  
-  status            DealStatus   @default(SELECTED)
-  
-  cashOtd           Float
-  taxAmount         Float
-  feesBreakdown     Json
-  
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
-  
+  id      String       @id @default(cuid())
+  buyerId String
+  buyer   BuyerProfile @relation(fields: [buyerId], references: [id])
+
+  auctionId       String
+  offerId         String
+  inventoryItemId String
+  dealerId        String
+
+  status DealStatus @default(SELECTED)
+
+  cashOtd       Float
+  taxAmount     Float
+  feesBreakdown Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
   financingOffer    FinancingOffer?
   serviceFeePayment ServiceFeePayment?
@@ -455,42 +456,43 @@ model SelectedDeal {
   contracts         ContractDocument[]
   eSignEnvelope     ESignEnvelope?
   pickup            PickupAppointment?
-  tradeIn           TradeIn?      // Added relation to TradeIn
-  
+  tradeIn           TradeIn? // Added relation to TradeIn
+  contractScan      ContractShieldScan?
+
   @@index([buyerId])
   @@index([status])
 }
 
 model FinancingOffer {
-  id                String       @id @default(cuid())
-  dealId            String       @unique
-  deal              SelectedDeal @relation(fields: [dealId], references: [id])
-  
-  lenderName        String
-  apr               Float
-  termMonths        Int
-  downPayment       Float
-  monthlyPayment    Float
-  totalFinanced     Float
-  
-  approved          Boolean      @default(false)
-  
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
+  id     String       @id @default(cuid())
+  dealId String       @unique
+  deal   SelectedDeal @relation(fields: [dealId], references: [id])
+
+  lenderName     String
+  apr            Float
+  termMonths     Int
+  downPayment    Float
+  monthlyPayment Float
+  totalFinanced  Float
+
+  approved Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ExternalPreApproval {
-  id                String    @id @default(cuid())
-  buyerId           String
-  
-  lenderName        String
-  approvedAmount    Float
-  apr               Float?
-  termMonths        Int?
-  
-  documentUrl       String?
-  
-  createdAt         DateTime  @default(now())
+  id      String @id @default(cuid())
+  buyerId String
+
+  lenderName     String
+  approvedAmount Float
+  apr            Float?
+  termMonths     Int?
+
+  documentUrl String?
+
+  createdAt DateTime @default(now())
 }
 
 // ============================================
@@ -506,45 +508,45 @@ enum InsuranceStatus {
 }
 
 model InsuranceQuote {
-  id                String    @id @default(cuid())
-  buyerId           String
-  vehicleId         String
-  
-  carrier           String
-  coverageType      String
-  monthlyPremium    Float
-  sixMonthPremium   Float
-  
-  coverageLimits    Json
-  deductibles       Json
-  
-  expiresAt         DateTime
-  
-  createdAt         DateTime  @default(now())
-  
+  id        String @id @default(cuid())
+  buyerId   String
+  vehicleId String
+
+  carrier         String
+  coverageType    String
+  monthlyPremium  Float
+  sixMonthPremium Float
+
+  coverageLimits Json
+  deductibles    Json
+
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+
   @@index([buyerId])
 }
 
 model InsurancePolicy {
-  id                String          @id @default(cuid())
-  dealId            String          @unique
-  deal              SelectedDeal    @relation(fields: [dealId], references: [id])
-  
-  status            InsuranceStatus @default(QUOTE_REQUESTED)
-  
-  carrier           String?
-  policyNumber      String?
-  coverageType      String?
-  monthlyPremium    Float?
-  
-  effectiveDate     DateTime?
-  expirationDate    DateTime?
-  
-  documentUrl       String?
-  
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  
+  id     String       @id @default(cuid())
+  dealId String       @unique
+  deal   SelectedDeal @relation(fields: [dealId], references: [id])
+
+  status InsuranceStatus @default(QUOTE_REQUESTED)
+
+  carrier        String?
+  policyNumber   String?
+  coverageType   String?
+  monthlyPremium Float?
+
+  effectiveDate  DateTime?
+  expirationDate DateTime?
+
+  documentUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([dealId])
 }
 
@@ -561,160 +563,162 @@ enum ContractStatus {
 }
 
 model ContractDocument {
-  id                String         @id @default(cuid())
-  dealId            String
-  deal              SelectedDeal   @relation(fields: [dealId], references: [id])
-  
-  dealerId          String
-  dealer            Dealer         @relation(fields: [dealerId], references: [id])
-  
-  documentUrl       String
-  documentType      String
-  
-  version           Int            @default(1)
-  
-  uploadedAt        DateTime       @default(now())
-  
+  id     String       @id @default(cuid())
+  dealId String
+  deal   SelectedDeal @relation(fields: [dealId], references: [id])
+
+  dealerId String
+  dealer   Dealer @relation(fields: [dealerId], references: [id])
+
+  documentUrl  String
+  documentType String
+
+  version Int @default(1)
+
+  uploadedAt DateTime @default(now())
+
   // Relations
-  scan              ContractShieldScan?
-  
+  scan   ContractShieldScan? @relation(fields: [scanId], references: [id])
+  scanId String?             @unique
+
   @@index([dealId])
   @@index([dealerId])
 }
 
 model ContractShieldScan {
-  id                String            @id @default(cuid())
-  dealId            String            @unique
-  deal              SelectedDeal      @relation(fields: [dealId], references: [id])
-  
-  dealerId          String
-  dealer            Dealer            @relation(fields: [dealerId], references: [id])
-  
-  status            ContractStatus    @default(SCANNING)
-  
-  aprMatch          Boolean?
-  paymentMatch      Boolean?
-  otdMatch          Boolean?
-  junkFeesDetected  Boolean?
-  missingAddendums  String[]
-  
-  overallScore      Float?
-  
-  scannedAt         DateTime          @default(now())
-  
+  id     String       @id @default(cuid())
+  dealId String       @unique
+  deal   SelectedDeal @relation(fields: [dealId], references: [id])
+
+  dealerId String
+  dealer   Dealer @relation(fields: [dealerId], references: [id])
+
+  status ContractStatus @default(SCANNING)
+
+  aprMatch         Boolean?
+  paymentMatch     Boolean?
+  otdMatch         Boolean?
+  junkFeesDetected Boolean?
+  missingAddendums String[]
+
+  overallScore Float?
+
+  scannedAt DateTime @default(now())
+
   // Relations
-  overrides         ContractShieldOverride[]
-  notifications     ContractShieldNotification[]
-  fixList           FixListItem[]
-  
+  document      ContractDocument?
+  overrides     ContractShieldOverride[]
+  notifications ContractShieldNotification[]
+  fixList       FixListItem[]
+
   @@index([dealId])
   @@index([dealerId])
   @@index([status])
 }
 
 model FixListItem {
-  id                String              @id @default(cuid())
-  scanId            String
-  scan              ContractShieldScan  @relation(fields: [scanId], references: [id], onDelete: Cascade)
-  
-  category          String
-  description       String
-  severity          String
-  expectedFix       String
-  
-  resolved          Boolean             @default(false)
-  
-  createdAt         DateTime            @default(now())
-  
+  id     String             @id @default(cuid())
+  scanId String
+  scan   ContractShieldScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+
+  category    String
+  description String
+  severity    String
+  expectedFix String
+
+  resolved Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
   @@index([scanId])
 }
 
 model ContractShieldOverride {
-  id                String   @id @default(cuid())
-  scanId            String
-  scan              ContractShieldScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
-  
-  adminId           String
-  admin             User     @relation(fields: [adminId], references: [id])
-  
-  action            String   // FORCE_PASS, FORCE_FAIL
-  reason            String   @db.Text
-  
-  buyerAcknowledged Boolean  @default(false)
+  id     String             @id @default(cuid())
+  scanId String
+  scan   ContractShieldScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+
+  adminId String
+  admin   User   @relation(fields: [adminId], references: [id])
+
+  action String // FORCE_PASS, FORCE_FAIL
+  reason String @db.Text
+
+  buyerAcknowledged Boolean   @default(false)
   buyerAckAt        DateTime?
-  buyerAckComment   String?  @db.Text
-  
-  previousStatus    String
-  newStatus         String
-  
-  createdAt         DateTime @default(now())
-  
+  buyerAckComment   String?   @db.Text
+
+  previousStatus String
+  newStatus      String
+
+  createdAt DateTime @default(now())
+
   @@index([scanId])
   @@index([adminId])
 }
 
 model ContractShieldRule {
-  id                String   @id @default(cuid())
-  
-  ruleKey           String   @unique  // APR_THRESHOLD, DOC_FEE_MAX, etc.
-  ruleName          String
-  ruleDescription   String   @db.Text
-  
-  ruleType          String   // THRESHOLD, VALIDATION, ALERT
-  severity          String   // INFO, REVIEW, IMPORTANT, CRITICAL
-  
-  enabled           Boolean  @default(true)
-  
-  thresholdValue    Float?
-  configJson        Json?
-  
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  
+  id String @id @default(cuid())
+
+  ruleKey         String @unique // APR_THRESHOLD, DOC_FEE_MAX, etc.
+  ruleName        String
+  ruleDescription String @db.Text
+
+  ruleType String // THRESHOLD, VALIDATION, ALERT
+  severity String // INFO, REVIEW, IMPORTANT, CRITICAL
+
+  enabled Boolean @default(true)
+
+  thresholdValue Float?
+  configJson     Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([ruleKey])
 }
 
 model ContractShieldNotification {
-  id                String   @id @default(cuid())
-  scanId            String
-  scan              ContractShieldScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
-  
-  recipientId       String
-  recipient         User     @relation(fields: [recipientId], references: [id])
-  
-  notificationType  String   // EMAIL, SMS, IN_APP
-  status            String   // PENDING, SENT, FAILED
-  
-  subject           String
-  message           String   @db.Text
-  
-  sentAt            DateTime?
-  failedReason      String?
-  
-  createdAt         DateTime @default(now())
-  
+  id     String             @id @default(cuid())
+  scanId String
+  scan   ContractShieldScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+
+  recipientId String
+  recipient   User   @relation(fields: [recipientId], references: [id])
+
+  notificationType String // EMAIL, SMS, IN_APP
+  status           String // PENDING, SENT, FAILED
+
+  subject String
+  message String @db.Text
+
+  sentAt       DateTime?
+  failedReason String?
+
+  createdAt DateTime @default(now())
+
   @@index([scanId])
   @@index([recipientId])
   @@index([status])
 }
 
 model ContractShieldReconciliation {
-  id                String   @id @default(cuid())
-  
-  jobType           String   // SYNC_STATUSES, CHECK_STALE_SCANS, NOTIFY_PENDING
-  status            String   // PENDING, RUNNING, COMPLETED, FAILED
-  
-  itemsProcessed    Int      @default(0)
-  itemsUpdated      Int      @default(0)
-  itemsFailed       Int      @default(0)
-  
-  errorLog          String?  @db.Text
-  resultSummary     Json?
-  
-  startedAt         DateTime?
-  completedAt       DateTime?
-  createdAt         DateTime @default(now())
-  
+  id String @id @default(cuid())
+
+  jobType String // SYNC_STATUSES, CHECK_STALE_SCANS, NOTIFY_PENDING
+  status  String // PENDING, RUNNING, COMPLETED, FAILED
+
+  itemsProcessed Int @default(0)
+  itemsUpdated   Int @default(0)
+  itemsFailed    Int @default(0)
+
+  errorLog      String? @db.Text
+  resultSummary Json?
+
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
   @@index([jobType])
   @@index([status])
   @@index([createdAt])
@@ -735,26 +739,26 @@ enum ESignStatus {
 }
 
 model ESignEnvelope {
-  id                String       @id @default(cuid())
-  dealId            String       @unique
-  deal              SelectedDeal @relation(fields: [dealId], references: [id])
-  
-  providerId        String?
+  id     String       @id @default(cuid())
+  dealId String       @unique
+  deal   SelectedDeal @relation(fields: [dealId], references: [id])
+
+  providerId         String?
   providerEnvelopeId String?
-  
-  status            ESignStatus  @default(CREATED)
-  
-  documentsUrl      String[]
-  signUrl           String?
-  
-  sentAt            DateTime?
-  viewedAt          DateTime?
-  signedAt          DateTime?
-  completedAt       DateTime?
-  
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
-  
+
+  status ESignStatus @default(CREATED)
+
+  documentsUrl String[]
+  signUrl      String?
+
+  sentAt      DateTime?
+  viewedAt    DateTime?
+  signedAt    DateTime?
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([dealId])
   @@index([status])
 }
@@ -772,29 +776,29 @@ enum PickupStatus {
 }
 
 model PickupAppointment {
-  id                String       @id @default(cuid())
-  dealId            String       @unique
-  deal              SelectedDeal @relation(fields: [dealId], references: [id])
-  
-  buyerId           String
-  buyer             BuyerProfile @relation(fields: [buyerId], references: [id])
-  
-  dealerId          String
-  dealer            Dealer       @relation(fields: [dealerId], references: [id])
-  
-  status            PickupStatus @default(SCHEDULED)
-  
-  scheduledDate     DateTime
-  scheduledTime     String
-  
-  qrCode            String       @unique
-  
-  arrivedAt         DateTime?
-  completedAt       DateTime?
-  
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
-  
+  id     String       @id @default(cuid())
+  dealId String       @unique
+  deal   SelectedDeal @relation(fields: [dealId], references: [id])
+
+  buyerId String
+  buyer   BuyerProfile @relation(fields: [buyerId], references: [id])
+
+  dealerId String
+  dealer   Dealer @relation(fields: [dealerId], references: [id])
+
+  status PickupStatus @default(SCHEDULED)
+
+  scheduledDate DateTime
+  scheduledTime String
+
+  qrCode String @unique
+
+  arrivedAt   DateTime?
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([dealId])
   @@index([qrCode])
   @@index([scheduledDate])
@@ -805,90 +809,90 @@ model PickupAppointment {
 // ============================================
 
 model Referral {
-  id                String       @id @default(cuid())
-  affiliateId       String
-  affiliate         Affiliate    @relation(fields: [affiliateId], references: [id])
-  
-  referredUserId    String?
-  referredBuyerId   String?
-  referredBuyer     BuyerProfile? @relation(fields: [referredBuyerId], references: [id])
-  
-  level             Int          @default(1)
-  
-  dealCompleted     Boolean      @default(false)
-  dealId            String?
-  
-  commissionPaid    Boolean      @default(false)
-  
-  createdAt         DateTime     @default(now())
-  
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+
+  referredUserId  String?
+  referredBuyerId String?
+  referredBuyer   BuyerProfile? @relation(fields: [referredBuyerId], references: [id])
+
+  level Int @default(1)
+
+  dealCompleted Boolean @default(false)
+  dealId        String?
+
+  commissionPaid Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
   // Relations
-  commissions       Commission[]
-  
+  commissions Commission[]
+
   @@index([affiliateId])
   @@index([referredBuyerId])
 }
 
 model Click {
-  id                String    @id @default(cuid())
-  affiliateId       String
-  affiliate         Affiliate @relation(fields: [affiliateId], references: [id])
-  
-  ipAddress         String?
-  userAgent         String?
-  referer           String?
-  
-  clickedAt         DateTime  @default(now())
-  
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+
+  ipAddress String?
+  userAgent String?
+  referer   String?
+
+  clickedAt DateTime @default(now())
+
   @@index([affiliateId])
   @@index([clickedAt])
 }
 
 model Commission {
-  id                String    @id @default(cuid())
-  affiliateId       String
-  affiliate         Affiliate @relation(fields: [affiliateId], references: [id])
-  
-  referralId        String
-  referral          Referral  @relation(fields: [referralId], references: [id])
-  
-  level             Int
-  dealId            String
-  
-  baseAmount        Float
-  commissionRate    Float
-  commissionAmount  Float
-  
-  status            String    @default("PENDING")
-  
-  createdAt         DateTime  @default(now())
-  
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+
+  referralId String
+  referral   Referral @relation(fields: [referralId], references: [id])
+
+  level  Int
+  dealId String
+
+  baseAmount       Float
+  commissionRate   Float
+  commissionAmount Float
+
+  status String @default("PENDING")
+
+  createdAt DateTime @default(now())
+
   // Relations
-  payout            Payout?   @relation(fields: [payoutId], references: [id])
-  payoutId          String?
-  
+  payout   Payout? @relation(fields: [payoutId], references: [id])
+  payoutId String?
+
   @@index([affiliateId])
   @@index([status])
 }
 
 model Payout {
-  id                String      @id @default(cuid())
-  affiliateId       String
-  affiliate         Affiliate   @relation(fields: [affiliateId], references: [id])
-  
-  amount            Float
-  status            String      @default("PENDING")
-  
-  paymentMethod     String?
-  paymentId         String?
-  
-  paidAt            DateTime?
-  
-  createdAt         DateTime    @default(now())
-  
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+
+  amount Float
+  status String @default("PENDING")
+
+  paymentMethod String?
+  paymentId     String?
+
+  paidAt DateTime?
+
+  createdAt DateTime @default(now())
+
   // Relations
-  commissions       Commission[]
-  
+  commissions Commission[]
+
   @@index([affiliateId])
   @@index([status])
 }
@@ -906,22 +910,22 @@ enum PaymentStatus {
 }
 
 model DepositPayment {
-  id                String        @id @default(cuid())
-  buyerId           String
-  auctionId         String
-  
-  amount            Float
-  status            PaymentStatus @default(PENDING)
-  
-  stripePaymentIntentId String?   @unique
-  
-  refunded          Boolean       @default(false)
-  refundedAt        DateTime?
-  refundReason      String?
-  
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  
+  id        String @id @default(cuid())
+  buyerId   String
+  auctionId String
+
+  amount Float
+  status PaymentStatus @default(PENDING)
+
+  stripePaymentIntentId String? @unique
+
+  refunded     Boolean   @default(false)
+  refundedAt   DateTime?
+  refundReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([buyerId])
   @@index([auctionId])
   @@index([status])
@@ -933,84 +937,84 @@ enum FeePaymentMethod {
 }
 
 model ServiceFeePayment {
-  id                String           @id @default(cuid())
-  dealId            String           @unique
-  deal              SelectedDeal     @relation(fields: [dealId], references: [id])
-  
-  baseFee           Float
-  depositCredit     Float            @default(0)
-  finalAmount       Float
-  
-  paymentMethod     FeePaymentMethod?
-  status            PaymentStatus    @default(PENDING)
-  
-  stripePaymentIntentId String?      @unique
-  
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
-  
+  id     String       @id @default(cuid())
+  dealId String       @unique
+  deal   SelectedDeal @relation(fields: [dealId], references: [id])
+
+  baseFee       Float
+  depositCredit Float @default(0)
+  finalAmount   Float
+
+  paymentMethod FeePaymentMethod?
+  status        PaymentStatus     @default(PENDING)
+
+  stripePaymentIntentId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
   lenderDisbursement LenderFeeDisbursement?
   disclosure         FeeFinancingDisclosure?
-  
+
   @@index([dealId])
   @@index([status])
 }
 
 model FeeFinancingDisclosure {
-  id                String            @id @default(cuid())
-  feePaymentId      String            @unique
-  feePayment        ServiceFeePayment @relation(fields: [feePaymentId], references: [id])
-  
-  feeAmount         Float
-  apr               Float
-  termMonths        Int
-  
-  monthlyIncrease   Float
-  totalExtraCost    Float
-  
-  consentGiven      Boolean           @default(false)
-  consentTimestamp  DateTime?
-  
-  ipAddress         String?
-  userAgent         String?
-  
-  createdAt         DateTime          @default(now())
-  
+  id           String            @id @default(cuid())
+  feePaymentId String            @unique
+  feePayment   ServiceFeePayment @relation(fields: [feePaymentId], references: [id])
+
+  feeAmount  Float
+  apr        Float
+  termMonths Int
+
+  monthlyIncrease Float
+  totalExtraCost  Float
+
+  consentGiven     Boolean   @default(false)
+  consentTimestamp DateTime?
+
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+
   @@index([feePaymentId])
 }
 
 model LenderFeeDisbursement {
-  id                String            @id @default(cuid())
-  feePaymentId      String            @unique
-  feePayment        ServiceFeePayment @relation(fields: [feePaymentId], references: [id])
-  
-  lenderName        String
+  id           String            @id @default(cuid())
+  feePaymentId String            @unique
+  feePayment   ServiceFeePayment @relation(fields: [feePaymentId], references: [id])
+
+  lenderName         String
   disbursementAmount Float
-  
-  status            String            @default("PENDING")
-  
-  requestedAt       DateTime          @default(now())
-  disbursedAt       DateTime?
-  
+
+  status String @default("PENDING")
+
+  requestedAt DateTime  @default(now())
+  disbursedAt DateTime?
+
   @@index([feePaymentId])
   @@index([status])
 }
 
 model PaymentMethod {
-  id                String    @id @default(cuid())
-  userId            String
-  
+  id     String @id @default(cuid())
+  userId String
+
   stripePaymentMethodId String @unique
-  
-  type              String
-  last4             String?
-  brand             String?
-  
-  isDefault         Boolean   @default(false)
-  
-  createdAt         DateTime  @default(now())
-  
+
+  type  String
+  last4 String?
+  brand String?
+
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
   @@index([userId])
 }
 
@@ -1019,45 +1023,45 @@ model PaymentMethod {
 // ============================================
 
 model TradeIn {
-  id                  String    @id @default(cuid())
-  buyerId             String
-  shortlistId         String?
-  auctionId           String?
-  selectedDealId      String?   @unique
-  
-  hasTrade            Boolean   @default(false)
-  
+  id             String  @id @default(cuid())
+  buyerId        String
+  shortlistId    String?
+  auctionId      String?
+  selectedDealId String? @unique
+
+  hasTrade Boolean @default(false)
+
   // Vehicle details
-  vin                 String?
-  year                Int?
-  make                String?
-  model               String?
-  trim                String?
-  mileage             Int?
-  condition           String?   // EXCELLENT, GOOD, FAIR, POOR
-  
+  vin       String?
+  year      Int?
+  make      String?
+  model     String?
+  trim      String?
+  mileage   Int?
+  condition String? // EXCELLENT, GOOD, FAIR, POOR
+
   // Photos
-  photoUrls           String[]
-  
+  photoUrls String[]
+
   // Loan info
-  hasLoan             Boolean?
-  lenderName          String?
+  hasLoan              Boolean?
+  lenderName           String?
   estimatedPayoffCents Int?
-  
+
   // Valuation
   estimatedValueCents Int?
   kbbValueCents       Int?
-  
+
   // Flow tracking
-  stepCompleted       Boolean   @default(false)
-  completedAt         DateTime?
-  
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-  
+  stepCompleted Boolean   @default(false)
+  completedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  selectedDeal        SelectedDeal? @relation(fields: [selectedDealId], references: [id])
-  
+  selectedDeal SelectedDeal? @relation(fields: [selectedDealId], references: [id])
+
   @@index([buyerId])
   @@index([shortlistId])
   @@index([auctionId])
@@ -1068,41 +1072,41 @@ model TradeIn {
 // ============================================
 
 model ComplianceEvent {
-  id                String    @id @default(cuid())
-  
-  eventType         String
-  userId            String?
-  buyerId           String?
-  dealId            String?
-  
-  action            String
-  details           Json
-  
-  ipAddress         String?
-  userAgent         String?
-  
-  createdAt         DateTime  @default(now())
-  
+  id String @id @default(cuid())
+
+  eventType String
+  userId    String?
+  buyerId   String?
+  dealId    String?
+
+  action  String
+  details Json
+
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+
   @@index([eventType])
   @@index([userId])
   @@index([createdAt])
 }
 
 model PaymentProviderEvent {
-  id                String    @id @default(cuid())
-  
-  provider          String
-  eventType         String
-  eventId           String    @unique
-  
-  paymentIntentId   String?
-  
-  payload           Json
-  
-  processed         Boolean   @default(false)
-  
-  createdAt         DateTime  @default(now())
-  
+  id String @id @default(cuid())
+
+  provider  String
+  eventType String
+  eventId   String @unique
+
+  paymentIntentId String?
+
+  payload Json
+
+  processed Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
   @@index([eventType])
   @@index([paymentIntentId])
 }
@@ -1112,12 +1116,12 @@ model PaymentProviderEvent {
 // ============================================
 
 model AdminSetting {
-  id                String    @id @default(cuid())
-  key               String    @unique
-  value             Json
-  
-  updatedAt         DateTime  @updatedAt
-  
+  id    String @id @default(cuid())
+  key   String @unique
+  value Json
+
+  updatedAt DateTime @updatedAt
+
   @@index([key])
 }
 
@@ -1144,55 +1148,55 @@ enum MarketingRestriction {
 }
 
 model RefinanceLead {
-  id                      String                       @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   // Lead Type & Partner
-  leadType                String                       @default("refinance")
-  partner                 String                       @default("OpenRoad")
-  
+  leadType String @default("refinance")
+  partner  String @default("OpenRoad")
+
   // Personal Info
-  firstName               String
-  lastName                String
-  email                   String
-  phone                   String
-  state                   String
-  tcpaConsent             Boolean                      @default(false)
-  
+  firstName   String
+  lastName    String
+  email       String
+  phone       String
+  state       String
+  tcpaConsent Boolean @default(false)
+
   // Vehicle Info
-  vehicleYear             Int
-  vehicleMake             String
-  vehicleModel            String
-  mileage                 Int
-  vehicleCondition        VehicleCondition
-  
+  vehicleYear      Int
+  vehicleMake      String
+  vehicleModel     String
+  mileage          Int
+  vehicleCondition VehicleCondition
+
   // Loan Info
-  loanBalance             Float
-  currentMonthlyPayment   Float
-  monthlyIncome           Float
-  
+  loanBalance           Float
+  currentMonthlyPayment Float
+  monthlyIncome         Float
+
   // Qualification
-  qualificationStatus     RefinanceQualificationStatus @default(PENDING)
-  qualificationReasons    Json                         @default("[]")
-  
+  qualificationStatus  RefinanceQualificationStatus @default(PENDING)
+  qualificationReasons Json                         @default("[]")
+
   // Partner Redirect
-  redirectedToPartnerAt   DateTime?
-  
+  redirectedToPartnerAt DateTime?
+
   // Funding (Manual Tracking)
-  openroadFunded          Boolean                      @default(false)
-  fundedAt                DateTime?
-  fundedAmount            Float?
-  commissionAmount        Float?
-  
+  openroadFunded   Boolean   @default(false)
+  fundedAt         DateTime?
+  fundedAmount     Float?
+  commissionAmount Float?
+
   // Compliance
-  marketingRestriction    MarketingRestriction         @default(NONE)
-  
+  marketingRestriction MarketingRestriction @default(NONE)
+
   // Timestamps
-  createdAt               DateTime                     @default(now())
-  updatedAt               DateTime                     @updatedAt
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  fundedLoan              FundedLoan?
-  
+  fundedLoan FundedLoan?
+
   @@index([email])
   @@index([qualificationStatus])
   @@index([openroadFunded])
@@ -1202,27 +1206,27 @@ model RefinanceLead {
 }
 
 model FundedLoan {
-  id                    String    @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   // Lead Reference
-  leadId                String    @unique
-  lead                  RefinanceLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  
+  leadId String        @unique
+  lead   RefinanceLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
   // Partner Info
-  partner               String    @default("OpenRoad")
-  
+  partner String @default("OpenRoad")
+
   // Funding Details
-  fundedAt              DateTime
-  fundedAmount          Float
-  commissionAmount      Float
-  
+  fundedAt         DateTime
+  fundedAmount     Float
+  commissionAmount Float
+
   // Optional Partner Reference
-  rawPartnerReference   String?
-  
+  rawPartnerReference String?
+
   // Timestamps
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([leadId])
   @@index([fundedAt])
   @@index([partner])
