@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const session = await getSessionUser(authOptions)
 
-    if (!session?.user?.id) {
+    if (!session?.id) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
     }
 
@@ -36,7 +36,7 @@ export async function GET() {
         ),
         insurancePolicy:InsurancePolicy(*)
       `)
-      .eq("buyerId", session.user.id)
+      .eq("buyerId", session.userId)
       .in("status", [
         "SELECTED",
         "FINANCING_APPROVED",
