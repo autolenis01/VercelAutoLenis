@@ -48,39 +48,35 @@ export default function EditInventoryPage() {
 
   const loadInventoryItem = async () => {
     try {
-      const res = await fetch("/api/dealer/inventory")
+      const res = await fetch(`/api/dealer/inventory/${inventoryId}`)
       const data = await res.json()
 
-      if (data.success) {
-        const item = data.inventory.find((i: any) => i.id === inventoryId)
-        if (item) {
-          const vehicle = item.vehicle
-          setFormData({
-            vin: vehicle.vin || "",
-            make: vehicle.make || "",
-            model: vehicle.model || "",
-            year: vehicle.year || new Date().getFullYear(),
-            trim: vehicle.trim || "",
-            bodyStyle: vehicle.bodyStyle || "",
-            mileage: vehicle.mileage || 0,
-            exteriorColor: vehicle.exteriorColor || "",
-            interiorColor: vehicle.interiorColor || "",
-            engine: vehicle.engine || "",
-            transmission: vehicle.transmission || "Automatic",
-            drivetrain: vehicle.drivetrain || "FWD",
-            fuelType: vehicle.fuelType || "Gasoline",
-            price: item.price || 0,
-            stockNumber: item.stockNumber || "",
-            isNew: vehicle.isNew || false,
-            locationCity: vehicle.locationCity || "",
-            locationState: vehicle.locationState || "",
-            status: item.status || "AVAILABLE",
-          })
-        } else {
-          throw new Error("Vehicle not found")
-        }
+      if (data.success && data.inventoryItem) {
+        const item = data.inventoryItem
+        const vehicle = item.vehicle
+        setFormData({
+          vin: vehicle.vin || "",
+          make: vehicle.make || "",
+          model: vehicle.model || "",
+          year: vehicle.year || new Date().getFullYear(),
+          trim: vehicle.trim || "",
+          bodyStyle: vehicle.bodyStyle || "",
+          mileage: vehicle.mileage || 0,
+          exteriorColor: vehicle.exteriorColor || "",
+          interiorColor: vehicle.interiorColor || "",
+          engine: vehicle.engine || "",
+          transmission: vehicle.transmission || "Automatic",
+          drivetrain: vehicle.drivetrain || "FWD",
+          fuelType: vehicle.fuelType || "Gasoline",
+          price: item.price || 0,
+          stockNumber: item.stockNumber || "",
+          isNew: vehicle.isNew || false,
+          locationCity: vehicle.locationCity || "",
+          locationState: vehicle.locationState || "",
+          status: item.status || "AVAILABLE",
+        })
       } else {
-        throw new Error(data.error || "Failed to load vehicle")
+        throw new Error(data.error || "Vehicle not found")
       }
     } catch (error: any) {
       toast({

@@ -65,19 +65,14 @@ export default function InventoryDetailPage() {
 
   const loadInventoryItem = async () => {
     try {
-      // Fetch from the main inventory list and find the specific item
-      const res = await fetch("/api/dealer/inventory")
+      // Fetch the specific inventory item
+      const res = await fetch(`/api/dealer/inventory/${inventoryId}`)
       const data = await res.json()
 
-      if (data.success) {
-        const foundItem = data.inventory.find((i: any) => i.id === inventoryId)
-        if (foundItem) {
-          setItem(foundItem)
-        } else {
-          throw new Error("Vehicle not found")
-        }
+      if (data.success && data.inventoryItem) {
+        setItem(data.inventoryItem)
       } else {
-        throw new Error(data.error || "Failed to load vehicle")
+        throw new Error(data.error || "Vehicle not found")
       }
     } catch (error: any) {
       toast({
