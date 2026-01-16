@@ -5,7 +5,8 @@
 ## Acceptance Criteria
 - [ ] Requirements in the linked issue are satisfied.
 - [ ] No secrets committed (.env stays local; update `.env.example` when adding envs).
-- [ ] Prisma schema changes are formatted and generated (`pnpm prisma format && pnpm prisma generate`) or explicitly state no schema changes.
+- [ ] Prisma schema changes are formatted (`pnpm prisma format`).
+- [ ] Prisma client is regenerated after validation passes (`pnpm prisma generate`) or explicitly state no schema changes.
 - [ ] CI-ready: deterministic install/build using `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm test`/`pnpm vitest`, and `pnpm build` where applicable.
 
 ## Verification
