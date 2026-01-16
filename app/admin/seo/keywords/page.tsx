@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Search, Plus, Trash2, TrendingUp } from "lucide-react"
 
 export default function SEOKeywordsPage() {
-  const [keywords, setKeywords] = useState([
+  const [keywords] = useState([
     { id: "1", keyword: "car financing", volume: "12,000", difficulty: 65, pages: ["/", "/how-it-works"] },
     { id: "2", keyword: "auto loan", volume: "18,000", difficulty: 72, pages: ["/", "/pricing"] },
     { id: "3", keyword: "used car purchase", volume: "8,500", difficulty: 58, pages: ["/how-it-works"] },

@@ -4,16 +4,15 @@ import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Clock, Users, Car, DollarSign, Calendar, Building2 } from "lucide-react"
+import { ArrowLeft, Clock, Car, DollarSign, Calendar, Building2 } from "lucide-react"
 import useSWR from "swr"
-import Link from "next/link"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function AuctionDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const auctionId = params.id as string
+  const auctionId = params["id"] as string
 
   const { data: auction, error, isLoading } = useSWR(`/api/admin/auctions/${auctionId}`, fetcher)
 
