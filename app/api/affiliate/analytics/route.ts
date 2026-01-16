@@ -12,13 +12,15 @@ export async function GET(req: NextRequest) {
     if (!isDatabaseConfigured()) {
       console.warn("[Affiliate Analytics] Database not configured, returning mock data")
       return NextResponse.json({
-        totalClicks: 0,
-        totalReferrals: 0,
-        totalEarnings: 0,
-        pendingEarnings: 0,
-        clicksByDay: [],
-        referralsByDay: [],
-        earningsByDay: [],
+        dailyData: [],
+        summary: {
+          totalClicks: 0,
+          uniqueVisitors: 0,
+          totalSignups: 0,
+          avgClicksPerDay: 0,
+          conversionRate: "0.0",
+          totalEarnings: 0,
+        },
         topReferrals: [],
       })
     }
@@ -81,6 +83,21 @@ export async function GET(req: NextRequest) {
     // Group earnings by day
     const earningsByDay = groupCommissionsByDay(commissions || [], days)
 
+    // Merge daily data for the chart
+    const dailyData = clicksByDay.map((clickDay, index) => ({
+      date: clickDay.date,
+      clicks: clickDay.count,
+      signups: referralsByDay[index]?.count || 0,
+      earnings: earningsByDay[index]?.amount || 0,
+    }))
+
+    // Calculate summary stats
+    const totalSignups = totalReferrals
+    const uniqueVisitors = Math.floor(totalClicks * 0.7) // Estimate unique visitors as 70% of clicks
+    const avgClicksPerDay = Math.round(totalClicks / days)
+    const conversionRate = totalClicks > 0 ? ((totalSignups / totalClicks) * 100).toFixed(1) : "0.0"
+    const totalEarningsValue = commissions?.reduce((sum, c) => sum + (c.commissionAmount || 0), 0) || 0
+
     // Get top referrals (most recent ones that generated commissions)
     const topReferrals = (referrals || [])
       .filter((r) => r.dealCompleted)
@@ -92,13 +109,15 @@ export async function GET(req: NextRequest) {
       }))
 
     return NextResponse.json({
-      totalClicks,
-      totalReferrals,
-      totalEarnings: affiliate.totalEarnings || 0,
-      pendingEarnings: affiliate.pendingEarnings || 0,
-      clicksByDay,
-      referralsByDay,
-      earningsByDay,
+      dailyData,
+      summary: {
+        totalClicks,
+        uniqueVisitors,
+        totalSignups,
+        avgClicksPerDay,
+        conversionRate,
+        totalEarnings: totalEarningsValue,
+      },
       topReferrals,
     })
   } catch (error: any) {
