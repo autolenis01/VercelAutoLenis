@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 
 export const dynamic = "force-dynamic"
 
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || user.role !== "ADMIN") {
@@ -18,7 +18,7 @@ export async function GET(_request: NextRequest) {
     const status = searchParams.get("status") || undefined
 
     const skip = (page - 1) * limit
-    const supabase = createClient()
+    const supabase = await createClient()
 
     let query = supabase.from("Affiliate").select(
       `
