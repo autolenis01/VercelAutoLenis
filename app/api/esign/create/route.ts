@@ -1,0 +1,26 @@
+import { type NextRequest, NextResponse } from "next/server"
+import { getCurrentUser } from "@/lib/auth-server"
+import { esignService } from "@/lib/services/esign.service"
+import { z } from "zod"
+
+const schema = z.object({
+  dealId: z.string(),
+})
+
+export async function POST(req: NextRequest) {
+  try {
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const body = await req.json()
+    const { dealId } = schema.parse(body)
+
+    const envelope = await esignService.createEnvelope(dealId)
+
+    return NextResponse.json(envelope)
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || "Failed to create e-sign envelope" }, { status: 400 })
+  }
+}
