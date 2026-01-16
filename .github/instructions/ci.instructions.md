@@ -2,7 +2,7 @@
 - Keep CI/CD deterministic for the Next.js + pnpm + Prisma stack and protect credentials for Vercel deploys.
 
 ## Do
-- Use `pnpm install --frozen-lockfile` (via `corepack pnpm` if pnpm is unavailable) and commit lockfile-only dependency changes; reserve `bun` for scripts that explicitly call it (e.g., database helpers).
+- Use `pnpm install --frozen-lockfile` (via `corepack pnpm` if pnpm is unavailable) and commit lockfile-only dependency changes; reserve `bun` for scripts that explicitly call it (e.g., `bun run scripts/setup-database.mjs`), while CI installs/tests/builds run with pnpm.
 - Run `pnpm lint`, `pnpm test`, and `pnpm build` npm scripts (build runs `prisma generate` before `next build`) with required envs from `.env.example`; stub or guard `POSTGRES_PRISMA_URL` so builds don’t hard-fail when DB access is unavailable.
 - Fail fast on missing envs or schema drift; surface clear messaging instead of proceeding with partial state.
 - Keep CI logs free of secrets; prefer masked env vars and minimal output.
