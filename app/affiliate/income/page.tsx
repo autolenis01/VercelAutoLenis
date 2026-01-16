@@ -36,8 +36,8 @@ export default function AffiliateIncomePage() {
     const targetIncome = 2500
     const sales: number[] = []
     for (let i = 0; i < 3; i++) {
-      const levelIncome = targetIncome * (INCOME_DISTRIBUTION[i] ?? 0)
-      const commissionPerSale = pkg * (COMMISSION_RATES[i] ?? 0)
+      const levelIncome = targetIncome * INCOME_DISTRIBUTION[i]
+      const commissionPerSale = pkg * COMMISSION_RATES[i]
       sales.push(Math.round(levelIncome / commissionPerSale))
     }
     return sales
@@ -49,7 +49,7 @@ export default function AffiliateIncomePage() {
   // Calculate total income
   const calculateIncome = () => {
     return salesByLevel.reduce((total, sales, index) => {
-      return total + sales * selectedPackage * (COMMISSION_RATES[index] ?? 0)
+      return total + sales * selectedPackage * COMMISSION_RATES[index]
     }, 0)
   }
 
@@ -57,8 +57,8 @@ export default function AffiliateIncomePage() {
   const calculateSalesForGoal = () => {
     const sales: number[] = []
     for (let i = 0; i < 3; i++) {
-      const levelIncome = goalIncome * (INCOME_DISTRIBUTION[i] ?? 0)
-      const commissionPerSale = selectedPackage * (COMMISSION_RATES[i] ?? 0)
+      const levelIncome = goalIncome * INCOME_DISTRIBUTION[i]
+      const commissionPerSale = selectedPackage * COMMISSION_RATES[i]
       sales.push(Math.ceil(levelIncome / commissionPerSale))
     }
     return sales
@@ -384,17 +384,17 @@ export default function AffiliateIncomePage() {
                         <div key={index} className="space-y-2">
                           <div className="flex justify-between items-center">
                             <span className="text-sm font-medium" style={{ color: LEVEL_COLORS[index] }}>
-                              {LEVEL_NAMES[index]} ({((COMMISSION_RATES[index] ?? 0) * 100).toFixed(0)}%)
+                              {LEVEL_NAMES[index]} ({(COMMISSION_RATES[index] * 100).toFixed(0)}%)
                             </span>
                             <span className="text-sm text-[#666]">
-                              {sales} sales = ${(sales * selectedPackage * (COMMISSION_RATES[index] ?? 0)).toFixed(2)}
+                              {sales} sales = ${(sales * selectedPackage * COMMISSION_RATES[index]).toFixed(2)}
                             </span>
                           </div>
                           <Slider
                             value={[sales]}
                             onValueChange={(value) => {
                               const newSales = [...salesByLevel]
-                              newSales[index] = value[0] ?? 0
+                              newSales[index] = value[0]
                               setSalesByLevel(newSales)
                             }}
                             max={index === 0 ? 50 : 100}
@@ -418,7 +418,7 @@ export default function AffiliateIncomePage() {
                           <div key={index} className="flex justify-between text-sm">
                             <span className="text-white/70">{LEVEL_NAMES[index]}:</span>
                             <span style={{ color: LEVEL_COLORS[index] }}>
-                              ${(sales * selectedPackage * (COMMISSION_RATES[index] ?? 0)).toFixed(2)}
+                              ${(sales * selectedPackage * COMMISSION_RATES[index]).toFixed(2)}
                             </span>
                           </div>
                         ))}
@@ -451,7 +451,7 @@ export default function AffiliateIncomePage() {
                         {salesForGoal.map((sales, index) => (
                           <div key={index} className="flex justify-between items-center">
                             <span className="text-sm" style={{ color: LEVEL_COLORS[index] }}>
-                              {LEVEL_NAMES[index]} ({((INCOME_DISTRIBUTION[index] ?? 0) * 100).toFixed(0)}% of income):
+                              {LEVEL_NAMES[index]} ({(INCOME_DISTRIBUTION[index] * 100).toFixed(0)}% of income):
                             </span>
                             <span className="font-bold text-[#3d2066]">{sales} sales</span>
                           </div>
@@ -462,10 +462,10 @@ export default function AffiliateIncomePage() {
                     <div className="bg-[#7ED321]/10 rounded-2xl p-6 flex flex-col justify-center border-2 border-[#7ED321]/30">
                       <div className="text-center">
                         <div className="text-sm text-[#666] mb-2">Direct Referrals Needed</div>
-                        <div className="text-6xl font-bold text-[#7ED321] mb-2">{(salesForGoal[0] ?? 0)}</div>
+                        <div className="text-6xl font-bold text-[#7ED321] mb-2">{salesForGoal[0]}</div>
                         <div className="text-sm text-[#666] mb-4">car sales per month</div>
                         <div className="text-xs text-[#999]">
-                          That's about {Math.ceil((salesForGoal[0] ?? 0) / 4)} per week using your direct link
+                          That's about {Math.ceil(salesForGoal[0] / 4)} per week using your direct link
                         </div>
                       </div>
                       <div className="mt-6 pt-6 border-t border-[#7ED321]/30">

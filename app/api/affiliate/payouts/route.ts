@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     }
 
     const supabase = createAdminClient()
-    const { data: affiliate, error } = await supabase.from("Affiliate").select("*").eq("userId", user.userId).maybeSingle()
+    const { data: affiliate, error } = await supabase.from("Affiliate").select("*").eq("userId", user.id).maybeSingle()
 
     if (error) {
       console.error("[Affiliate Payouts] DB error:", error)
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = createAdminClient()
-    const { data: affiliate, error } = await supabase.from("Affiliate").select("*").eq("userId", user.userId).maybeSingle()
+    const { data: affiliate, error } = await supabase.from("Affiliate").select("*").eq("userId", user.id).maybeSingle()
 
     if (error) {
       console.error("[Affiliate Payouts] DB error:", error)

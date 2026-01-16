@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
 import { requireAuth } from "@/lib/auth-server"
-import { prequalService } from "@/lib/services/prequal.service"
+import { PreQualService } from "@/lib/services/prequal.service"
 import { buyerProfileSchema } from "@/lib/validators/prequal"
 
 export async function GET() {
   try {
     const session = await requireAuth(["BUYER"])
 
-    const profile = await prequalService.getBuyerProfile(session.userId)
+    const profile = await PreQualService.getBuyerProfile(session.userId)
 
     return NextResponse.json({
       success: true,
@@ -25,7 +25,7 @@ export async function PUT(request: Request) {
     const body = await request.json()
     const validated = buyerProfileSchema.parse(body)
 
-    const profile = await prequalService.updateBuyerProfile(session.userId, validated)
+    const profile = await PreQualService.updateBuyerProfile(session.userId, validated)
 
     return NextResponse.json({
       success: true,

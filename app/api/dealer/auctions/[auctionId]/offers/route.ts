@@ -14,7 +14,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ auc
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const dealer = await dealerService.getDealerByUserId(user.userId)
+    const dealer = await dealerService.getDealerByUserId(user.id)
     if (!dealer) {
       return NextResponse.json({ error: "Dealer profile not found" }, { status: 404 })
     }
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ auc
       offer_notes: body.offer_notes,
     }
 
-    const result = await offerService.submitOffer(auctionId, dealer.id, user.userId, input)
+    const result = await offerService.submitOffer(auctionId, dealer.id, user.id, input)
 
     if (!result.success) {
       return NextResponse.json({ success: false, errors: result.errors }, { status: 400 })

@@ -9,7 +9,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const status = await dealerApprovalService.getApplicationStatus(user.userId)
+    const status = await dealerApprovalService.getApplicationStatus(user.id)
 
     return NextResponse.json({ success: true, data: status })
   } catch (error: any) {

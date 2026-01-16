@@ -14,7 +14,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const dealer = await dealerService.getDealerByUserId(user.userId)
+    const dealer = await dealerService.getDealerByUserId(user.id)
     if (!dealer) {
       return NextResponse.json({ error: "Dealer not found" }, { status: 404 })
     }

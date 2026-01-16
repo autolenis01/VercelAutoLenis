@@ -40,7 +40,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: user.userId,
+          id: user.id,
           email: user.email,
           role: user.role,
           name: `${user.first_name || ""} ${user.last_name || ""}`.trim() || user.email,
@@ -59,15 +59,15 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.userId
+        token.id = user.id
         token.role = user.role
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
-        session.userId = token.id as string
-        session.role = token.role as string
+        session.user.id = token.id as string
+        session.user.role = token.role as string
       }
       return session
     },

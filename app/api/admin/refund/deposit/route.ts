@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { depositId, reason } = schema.parse(body)
 
-    const result = await adminService.refundDeposit(depositId, reason, user.userId)
+    const result = await adminService.refundDeposit(depositId, reason, user.id)
 
     return NextResponse.json(result)
   } catch (error: any) {

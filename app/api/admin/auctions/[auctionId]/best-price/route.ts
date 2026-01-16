@@ -66,7 +66,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ auct
           valid_offers: validOfferCount || 0,
           best_price_options_count: options.length,
         },
-        options: options.map((opt: any) => ({
+        options: options.map((opt) => ({
           id: opt.id,
           type: opt.type,
           rank: opt.rank,

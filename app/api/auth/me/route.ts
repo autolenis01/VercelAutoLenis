@@ -35,18 +35,18 @@ export async function GET() {
     let affiliateProfile = null
 
     if (user.role === "BUYER") {
-      const { data } = await supabase.from("BuyerProfile").select("*").eq("userId", user.userId).maybeSingle()
+      const { data } = await supabase.from("BuyerProfile").select("*").eq("userId", user.id).maybeSingle()
       buyerProfile = data
 
       if (user.is_affiliate) {
-        const { data: affData } = await supabase.from("Affiliate").select("*").eq("userId", user.userId).maybeSingle()
+        const { data: affData } = await supabase.from("Affiliate").select("*").eq("userId", user.id).maybeSingle()
         affiliateProfile = affData
       }
     } else if (user.role === "DEALER" || user.role === "DEALER_USER") {
-      const { data } = await supabase.from("Dealer").select("*").eq("userId", user.userId).maybeSingle()
+      const { data } = await supabase.from("Dealer").select("*").eq("userId", user.id).maybeSingle()
       dealerProfile = data
     } else if (user.role === "AFFILIATE" || user.role === "AFFILIATE_ONLY") {
-      const { data } = await supabase.from("Affiliate").select("*").eq("userId", user.userId).maybeSingle()
+      const { data } = await supabase.from("Affiliate").select("*").eq("userId", user.id).maybeSingle()
       affiliateProfile = data
     }
 
@@ -54,7 +54,7 @@ export async function GET() {
       success: true,
       data: {
         user: {
-          id: user.userId,
+          id: user.id,
           email: user.email,
           role: user.role,
           is_affiliate: user.is_affiliate || false,

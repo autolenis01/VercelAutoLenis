@@ -2,33 +2,6 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getSessionUser } from "@/lib/auth-server"
 import { dealerService } from "@/lib/services/dealer.service"
 
-// Get single inventory item
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params
-    const user = await getSessionUser()
-    if (!user || !["DEALER", "DEALER_USER"].includes(user.role)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    const dealer = await dealerService.getDealerByUserId(user.id)
-    if (!dealer) {
-      return NextResponse.json({ error: "Dealer not found" }, { status: 404 })
-    }
-
-    const inventoryItem = await dealerService.getInventoryItemById(id, dealer.id)
-
-    if (!inventoryItem) {
-      return NextResponse.json({ error: "Inventory item not found" }, { status: 404 })
-    }
-
-    return NextResponse.json({ success: true, inventoryItem })
-  } catch (error: any) {
-    console.error("[v0] Get inventory item error:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-}
-
 // Update inventory item
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -38,7 +11,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const dealer = await dealerService.getDealerByUserId(user.userId)
+    const dealer = await dealerService.getDealerByUserId(user.id)
     if (!dealer) {
       return NextResponse.json({ error: "Dealer not found" }, { status: 404 })
     }
@@ -62,7 +35,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const dealer = await dealerService.getDealerByUserId(user.userId)
+    const dealer = await dealerService.getDealerByUserId(user.id)
     if (!dealer) {
       return NextResponse.json({ error: "Dealer not found" }, { status: 404 })
     }

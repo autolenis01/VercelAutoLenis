@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     const { data: affiliate, error: affiliateError } = await supabase
       .from("Affiliate")
       .select("id")
-      .eq("userId", user.userId)
+      .eq("userId", user.id)
       .maybeSingle()
 
     if (affiliateError) {

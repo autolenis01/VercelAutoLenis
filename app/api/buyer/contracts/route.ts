@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     const { data: deal, error: dealError } = await supabase
       .from("SelectedDeal")
       .select("*")
-      .eq("buyerId", user.userId)
+      .eq("buyerId", user.id)
       .order("createdAt", { ascending: false })
       .limit(1)
       .maybeSingle()

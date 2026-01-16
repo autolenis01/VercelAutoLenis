@@ -39,15 +39,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Process referral commissions for this deal
-    const commissions = await affiliateService.completeDealReferral(dealId, user.userId)
+    const commissions = await affiliateService.completeDealReferral(dealId, user.id)
 
     // Auto-enroll buyer as affiliate if not already
-    const { data: existingAffiliate } = await supabase.from("Affiliate").select("*").eq("userId", user.userId).single()
+    const { data: existingAffiliate } = await supabase.from("Affiliate").select("*").eq("userId", user.id).single()
 
     let affiliate = existingAffiliate
 
     if (!affiliate) {
-      affiliate = await affiliateService.autoEnrollBuyerAsAffiliate(user.userId)
+      affiliate = await affiliateService.autoEnrollBuyerAsAffiliate(user.id)
 
       // Send welcome email for new affiliate
       if (user.email) {

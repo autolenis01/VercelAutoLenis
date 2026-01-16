@@ -1,12 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { ContractShieldService } from "@/lib/services/contract-shield.service"
-import { getSessionUser } from "@/lib/auth-server"
+import { getServerSession } from "@/lib/auth-server"
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getSessionUser()
+    const session = await getServerSession(req)
 
-    if (!session || session.role !== "ADMIN") {
+    if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
