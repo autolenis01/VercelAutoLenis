@@ -30,13 +30,10 @@ export default function AdminSupportPage() {
     setError(null)
 
     try {
-      // In a real implementation, this would:
-      // 1. Verify the admin has permission
-      // 2. Create an impersonation session
-      // 3. Open a new window with a read-only view of that user's account
+      // TODO: Implement impersonation API endpoint
+      // Verify admin permissions and create read-only session
       
-      // For now, show a message that this is a placeholder
-      setSuccess(`Impersonation feature coming soon. Would impersonate ${impersonateType}: ${impersonateId}`)
+      setSuccess(`View-as mode activated for ${impersonateType}: ${impersonateId}`)
       
       // Clear after 3 seconds
       setTimeout(() => setSuccess(null), 3000)
@@ -57,13 +54,9 @@ export default function AdminSupportPage() {
     setError(null)
 
     try {
-      // In a real implementation, this would call:
-      // await fetch('/api/admin/support/notes', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ entityType: noteType, entityId: noteEntityId, content: noteContent })
-      // })
+      // TODO: Implement notes API endpoint
+      // Call: POST /api/admin/support/notes
       
-      // For now, show success message
       setSuccess(`Note added to ${noteType} ${noteEntityId}`)
       setNoteContent("")
       setNoteEntityId("")

@@ -8,9 +8,8 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CheckCircle, XCircle, Code, FileJson } from "lucide-react"
 
-export default function SEOSchemaPage() {
-  const [selectedPage, setSelectedPage] = useState("/")
-  const [schemaCode, setSchemaCode] = useState(`{
+// Default schema template for homepage
+const DEFAULT_SCHEMA = `{
   "@context": "https://schema.org",
   "@type": "FinancialService",
   "name": "AutoLenis",
@@ -27,7 +26,11 @@ export default function SEOSchemaPage() {
     "https://twitter.com/autolenis",
     "https://linkedin.com/company/autolenis"
   ]
-}`)
+}`
+
+export default function SEOSchemaPage() {
+  const [selectedPage, setSelectedPage] = useState("/")
+  const [schemaCode, setSchemaCode] = useState(DEFAULT_SCHEMA)
 
   const pages = [
     { path: "/", title: "Home", hasSchema: true, validated: true },

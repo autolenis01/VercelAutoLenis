@@ -579,10 +579,11 @@ model ContractDocument {
   
   // Relations
   scan              ContractShieldScan? @relation(fields: [scanId], references: [id])
-  scanId            String?         @unique
+  scanId            String?
   
   @@index([dealId])
   @@index([dealerId])
+  @@index([scanId])
 }
 
 model ContractShieldScan {
@@ -609,7 +610,7 @@ model ContractShieldScan {
   overrides         ContractShieldOverride[]
   notifications     ContractShieldNotification[]
   fixList           FixListItem[]
-  document          ContractDocument?
+  documents         ContractDocument[]
   
   @@index([dealId])
   @@index([dealerId])

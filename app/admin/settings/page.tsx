@@ -39,20 +39,10 @@ export default function AdminSettingsPage() {
         throw new Error("Auction duration must be at least 1 hour")
       }
 
-      // In a real implementation, this would call:
-      // const response = await fetch('/api/admin/settings', {
-      //   method: 'PATCH',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     depositAmount: depositAmountNum,
-      //     feeTierOne: feeTierOneNum,
-      //     feeTierTwo: feeTierTwoNum,
-      //     auctionDuration: auctionDurationNum
-      //   })
-      // })
-      // if (!response.ok) throw new Error('Failed to save settings')
+      // TODO: Implement settings API endpoint
+      // Call: PATCH /api/admin/settings with validated values
 
-      // For now, simulate save
+      // Simulate save
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
       setSuccess(true)
