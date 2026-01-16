@@ -156,13 +156,13 @@ This document details all security, performance, and quality improvements implem
 - Reduced data transfer and improved query speed
 
 **Example**:
-```typescript
+\`\`\`typescript
 // Before
 .select("*")
 
 // After
 .select("id, email, firstName, lastName, role, createdAt")
-```
+\`\`\`
 
 ### 4. Caching Strategy Implemented
 **Status**: ✅ Complete
@@ -436,7 +436,7 @@ This document details all security, performance, and quality improvements implem
 ## Deployment Instructions
 
 ### 1. Execute RLS Policies
-```bash
+\`\`\`bash
 # Option A: Via v0 script runner
 # Run scripts/02-add-rls-policies.sql
 
@@ -446,20 +446,20 @@ npm run db:migrate
 # Option C: Via Supabase Dashboard
 # Copy SQL from scripts/02-add-rls-policies.sql
 # Paste into SQL Editor and execute
-```
+\`\`\`
 
 ### 2. Run Tests
-```bash
+\`\`\`bash
 # Unit tests
 npm test
 
 # E2E tests (requires app running on localhost:3000)
 npm run dev
 npm run test:e2e
-```
+\`\`\`
 
 ### 3. Deploy
-```bash
+\`\`\`bash
 # Build locally to verify
 npm run build
 
@@ -468,7 +468,7 @@ git push origin main
 
 # Or manual deploy
 vercel --prod
-```
+\`\`\`
 
 ### 4. Post-Deployment
 - Run through deployment checklist

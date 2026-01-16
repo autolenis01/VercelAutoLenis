@@ -38,38 +38,38 @@ AutoLenis is a comprehensive automotive marketplace connecting buyers, dealers, 
 ### Installation
 
 1. **Clone the repository**
-   ```bash
+   \`\`\`bash
    git clone <repository-url>
    cd autolenis
-   ```
+   \`\`\`
 
 2. **Install dependencies**
-   ```bash
+   \`\`\`bash
    bun install
    # or
    npm install
-   ```
+   \`\`\`
 
 3. **Set up environment variables**
-   ```bash
+   \`\`\`bash
    cp .env.example .env
-   ```
+   \`\`\`
    
    Fill in all required environment variables (see `.env.example` for details)
 
 4. **Set up the database**
-   ```bash
+   \`\`\`bash
    # Generate Prisma client
    bun run postinstall
    
    # Run database migrations
    bun run db:migrate
-   ```
+   \`\`\`
 
 5. **Run the development server**
-   ```bash
+   \`\`\`bash
    bun run dev
-   ```
+   \`\`\`
 
    Open [http://localhost:3000](http://localhost:3000)
 
@@ -83,13 +83,13 @@ The project uses PostgreSQL with Supabase. Follow these steps:
    - Copy connection strings to `.env`
 
 2. **Run Migrations**
-   ```bash
+   \`\`\`bash
    # Initialize database schema
    bun run scripts/01-initialize-database.sql
    
    # Apply RLS policies (see docs/RLS_SETUP.md)
    bun run db:migrate
-   ```
+   \`\`\`
 
 3. **Verify Setup**
    - Check tables in Supabase Dashboard > Database
@@ -97,7 +97,7 @@ The project uses PostgreSQL with Supabase. Follow these steps:
 
 ## Project Structure
 
-```
+\`\`\`
 ├── app/                    # Next.js App Router pages
 │   ├── api/               # API routes
 │   ├── admin/             # Admin dashboard
@@ -116,7 +116,7 @@ The project uses PostgreSQL with Supabase. Follow these steps:
 │   └── migrations/       # Migration scripts
 ├── docs/                 # Documentation
 └── prisma/               # Prisma schema
-```
+\`\`\`
 
 ## Available Scripts
 
@@ -143,11 +143,11 @@ The platform supports multiple user roles:
 ### Creating Admin Account
 
 1. Set environment variables:
-   ```bash
+   \`\`\`bash
    SUPER_ADMIN_EMAIL=admin@autolenis.com
    SUPER_ADMIN_TEMP_PASSWORD=your-secure-password
    ADMIN_REGISTRATION_CODE=your-secret-code
-   ```
+   \`\`\`
 
 2. Use the admin signup endpoint with the registration code
 
@@ -205,7 +205,7 @@ Run `bun run analyze` to see bundle composition.
 
 ### Testing
 
-```bash
+\`\`\`bash
 # Run type checking
 bun run typecheck
 
@@ -214,7 +214,7 @@ bun run test:unit
 
 # Run E2E tests (coming soon)
 bun run test:e2e
-```
+\`\`\`
 
 ## Environment Variables
 

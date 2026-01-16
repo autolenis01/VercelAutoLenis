@@ -34,26 +34,26 @@ If you're working in v0, the platform can execute SQL scripts directly with prop
 
 For programmatic execution or CI/CD pipelines:
 
-```bash
+\`\`\`bash
 # Ensure environment variables are set
 export SUPABASE_URL="your-project-url"
 export SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 
 # Run the TypeScript migration
 bun run scripts/migrations/02-add-rls-policies.ts
-```
+\`\`\`
 
 ### Method 4: psql Command Line (Advanced)
 
 If you prefer command-line tools:
 
-```bash
+\`\`\`bash
 # Get your connection string from Supabase Dashboard > Settings > Database
 # It should look like: postgresql://postgres:[YOUR-PASSWORD]@[HOST]:5432/postgres
 
 psql "postgresql://postgres:[PASSWORD]@[HOST]:5432/postgres?sslmode=require" \
   -f scripts/02-add-rls-policies.sql
-```
+\`\`\`
 
 **Important:** Always include `?sslmode=require` in the connection string for Supabase.
 
@@ -121,7 +121,7 @@ If users can't access data after RLS is enabled:
 
 Test policies by trying to access data as different user types:
 
-```typescript
+\`\`\`typescript
 // Test as regular user
 const { data, error } = await supabase
   .from('User')
@@ -136,7 +136,7 @@ const { data, error } = await supabase
   .select('*')
 
 // Should return all users
-```
+\`\`\`
 
 ## Security Best Practices
 
@@ -155,6 +155,6 @@ After applying RLS policies:
 3. ✅ Test admin access to all data
 4. ✅ Monitor application logs for RLS errors
 5. ✅ Update application code if any queries fail due to RLS
-```
+\`\`\`
 
-```json file="" isHidden
+\`\`\`json file="" isHidden

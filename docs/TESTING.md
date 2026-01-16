@@ -6,7 +6,7 @@ AutoLenis uses Vitest for unit and integration testing. Tests ensure code qualit
 
 ## Running Tests
 
-```bash
+\`\`\`bash
 # Run all tests
 npm test
 
@@ -18,7 +18,7 @@ npm test auth.test.ts
 
 # Run with coverage
 npm test -- --coverage
-```
+\`\`\`
 
 ## Test Structure
 
@@ -27,7 +27,7 @@ npm test -- --coverage
 Located in `__tests__/` directory. Test individual functions and components in isolation.
 
 **Example:**
-```typescript
+\`\`\`typescript
 import { describe, it, expect } from "vitest"
 import { AuthService } from "@/lib/services/auth.service"
 
@@ -38,14 +38,14 @@ describe("AuthService", () => {
     expect(hash).toBeTruthy()
   })
 })
-```
+\`\`\`
 
 ### Integration Tests
 
 Test API routes and database operations together.
 
 **Example:**
-```typescript
+\`\`\`typescript
 describe("POST /api/auth/signin", () => {
   it("should return 401 for invalid credentials", async () => {
     const response = await fetch("/api/auth/signin", {
@@ -55,7 +55,7 @@ describe("POST /api/auth/signin", () => {
     expect(response.status).toBe(401)
   })
 })
-```
+\`\`\`
 
 ### E2E Tests
 
@@ -97,7 +97,7 @@ Manual testing checklist:
 ## Error Monitoring
 
 In production, errors are automatically captured by Sentry. In development:
-```typescript
+\`\`\`typescript
 import { errorMonitoring } from "@/lib/monitoring/sentry"
 
 try {

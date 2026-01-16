@@ -52,7 +52,7 @@ With RLS policies:
 
 ### Verification:
 
-```sql
+\`\`\`sql
 -- Check RLS is enabled on User table
 SELECT tablename, rowsecurity 
 FROM pg_tables 
@@ -67,7 +67,7 @@ FROM pg_policies
 WHERE schemaname = 'public';
 
 -- Should return 60+ policies
-```
+\`\`\`
 
 ---
 
@@ -81,16 +81,16 @@ WHERE schemaname = 'public';
 ### Steps:
 
 1. **Ensure Environment Variables**
-   ```bash
+   \`\`\`bash
    # Check these are set:
    echo $SUPABASE_URL
    echo $SUPABASE_SERVICE_ROLE_KEY
-   ```
+   \`\`\`
 
 2. **Run Migration**
-   ```bash
+   \`\`\`bash
    npm run db:migrate
-   ```
+   \`\`\`
 
 3. **Follow Console Output**
    - Script will log progress
@@ -120,19 +120,19 @@ WHERE schemaname = 'public';
    - Enable SSL
 
 2. **Connect to Database**
-   ```bash
+   \`\`\`bash
    psql "postgresql://postgres:[YOUR_PASSWORD]@[YOUR_HOST]:5432/postgres?sslmode=require"
-   ```
+   \`\`\`
 
 3. **Execute SQL File**
-   ```sql
+   \`\`\`sql
    \i scripts/02-add-rls-policies.sql
-   ```
+   \`\`\`
 
 4. **Exit**
-   ```sql
+   \`\`\`sql
    \q
-   ```
+   \`\`\`
 
 ---
 
@@ -143,9 +143,9 @@ WHERE schemaname = 'public';
 **Solution**: Ensure you're using SSL connection mode.
 
 For psql:
-```bash
+\`\`\`bash
 psql "postgresql://...?sslmode=require"
-```
+\`\`\`
 
 For Supabase client, SSL is automatic.
 
@@ -160,23 +160,23 @@ For Supabase client, SSL is automatic.
 
 **Solution**: Run database initialization first.
 
-```bash
+\`\`\`bash
 # Make sure tables exist
 npm run db:setup
 # Or
 prisma db push
-```
+\`\`\`
 
 ### Error: "Policy already exists"
 
 **Solution**: Policies were already created. This is safe to ignore.
 
 To drop existing policies first:
-```sql
+\`\`\`sql
 -- Drop all policies on a table
 DROP POLICY IF EXISTS "Users can read own data" ON "User";
 -- Repeat for each policy
-```
+\`\`\`
 
 Or use the script which has `CREATE POLICY IF NOT EXISTS`.
 
@@ -195,7 +195,7 @@ After running RLS policies, verify:
 
 ### Test Queries:
 
-```sql
+\`\`\`sql
 -- Test as authenticated user
 SET request.jwt.claim.sub TO 'user-id-here';
 SELECT * FROM "User" WHERE id = 'user-id-here'; -- Should work
@@ -204,7 +204,7 @@ SELECT * FROM "User" WHERE id != 'user-id-here'; -- Should return nothing
 -- Test as admin
 SET request.jwt.claim.role TO 'ADMIN';
 SELECT * FROM "User"; -- Should return all users
-```
+\`\`\`
 
 ---
 
@@ -233,13 +233,13 @@ After enabling RLS:
 
 If RLS causes issues:
 
-```sql
+\`\`\`sql
 -- EMERGENCY: Temporarily disable RLS on a table
 ALTER TABLE "User" DISABLE ROW LEVEL SECURITY;
 
 -- Re-enable when ready
 ALTER TABLE "User" ENABLE ROW LEVEL SECURITY;
-```
+\`\`\`
 
 **Warning**: Only disable RLS in emergency. Investigate and fix the policy instead.
 

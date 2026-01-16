@@ -61,7 +61,7 @@
    - Records IP and user agent
 
 3. New Database Tables:
-   ```prisma
+   \`\`\`prisma
    model ContractOverrideLog {
      id                    String   @id
      dealId                String
@@ -82,7 +82,7 @@
      ip              String?
      userAgent       String?
    }
-   ```
+   \`\`\`
 
 **Implementation Files:**
 - `app/admin/contracts/[scanId]/override/page.tsx` (new)
@@ -131,7 +131,7 @@
 3. JSON config file or database table for rules versioning
 
 **Example Config:**
-```json
+\`\`\`json
 {
   "version": "2.0.0",
   "thresholds": {
@@ -146,7 +146,7 @@
   "required_docs_any_of": ["BUYERS_ORDER", "FINANCE_CONTRACT"],
   "required_fields": ["vin", "otd_cents"]
 }
-```
+\`\`\`
 
 ---
 

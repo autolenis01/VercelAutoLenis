@@ -5,7 +5,7 @@
 ### Simple In-Memory Cache
 We've implemented a simple in-memory cache for frequently accessed data:
 
-```typescript
+\`\`\`typescript
 import { cache } from '@/lib/cache/simple-cache'
 
 // Set cache with 5 minute TTL
@@ -13,7 +13,7 @@ cache.set('user-123', userData, 5 * 60 * 1000)
 
 // Get from cache
 const data = cache.get('user-123')
-```
+\`\`\`
 
 **When to use:**
 - Frequently accessed static/semi-static data
@@ -36,19 +36,19 @@ All service methods have been optimized to:
 4. Order efficiently
 
 **Example:**
-```typescript
+\`\`\`typescript
 // ❌ Bad - fetches all columns
 await supabase.from("User").select("*").eq("id", userId)
 
 // ✅ Good - only needed columns
 await supabase.from("User").select("email, firstName, lastName").eq("id", userId)
-```
+\`\`\`
 
 ## Referral Code Standardization
 
 All referral code logic now uses the `refCode` field as primary with backwards compatibility:
 
-```typescript
+\`\`\`typescript
 import { getReferralCode, buildReferralLink } from '@/lib/utils/referral-code'
 
 // Get code from affiliate (handles all field variants)
@@ -56,7 +56,7 @@ const code = getReferralCode(affiliate)
 
 // Build referral link
 const link = buildReferralLink(code, '/get-started')
-```
+\`\`\`
 
 ## Production Recommendations
 

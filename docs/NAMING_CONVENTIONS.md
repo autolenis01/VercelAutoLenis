@@ -19,13 +19,13 @@ Consistent naming conventions improve code readability and maintainability.
 - **camelCase**: Maps to snake_case database columns
 - Use `@map()` directive to specify database column names
 - Example:
-  ```prisma
+  \`\`\`prisma
   model User {
     id              String   @id
     isEmailVerified Boolean  @map("is_email_verified")
     createdAt       DateTime @map("created_at")
   }
-  ```
+  \`\`\`
 
 ## TypeScript/JavaScript
 
@@ -46,33 +46,33 @@ Consistent naming conventions improve code readability and maintainability.
 - **SCREAMING_SNAKE_CASE**: `MAX_RETRY_ATTEMPTS`, `API_BASE_URL`, `DEFAULT_PAGE_SIZE`
 - Use for true constants that never change
 - Group related constants in objects:
-  ```typescript
+  \`\`\`typescript
   const AUTH_CONFIG = {
     SESSION_DURATION: 3600,
     MAX_LOGIN_ATTEMPTS: 5,
     TOKEN_REFRESH_INTERVAL: 300,
   } as const
-  ```
+  \`\`\`
 
 ### Types and Interfaces
 - **PascalCase**: `User`, `BuyerProfile`, `ApiResponse`
 - Interfaces: descriptive noun (e.g., `UserData`, `ApiConfig`)
 - Types: describe what they represent (e.g., `UserId`, `EmailAddress`)
 - Generic types: single uppercase letter or descriptive name
-  ```typescript
+  \`\`\`typescript
   // Good
   type Result<T> = { data: T; error?: Error }
   type ApiResponse<TData> = { success: boolean; data: TData }
   
   // Avoid
   type Result<data> = { data: data; error?: Error }
-  ```
+  \`\`\`
 
 ### Components
 - **PascalCase**: `UserProfile`, `NavMenu`, `LoadingSpinner`
 - File name matches component name: `UserProfile.tsx`
 - Props interface: `{ComponentName}Props`
-  ```typescript
+  \`\`\`typescript
   interface UserProfileProps {
     userId: string
     onUpdate?: () => void
@@ -81,12 +81,12 @@ Consistent naming conventions improve code readability and maintainability.
   export function UserProfile({ userId, onUpdate }: UserProfileProps) {
     // ...
   }
-  ```
+  \`\`\`
 
 ### Enums
 - **PascalCase** for enum name
 - **SCREAMING_SNAKE_CASE** for values (database compatibility)
-  ```typescript
+  \`\`\`typescript
   enum UserRole {
     BUYER = "BUYER",
     DEALER = "DEALER",
@@ -98,7 +98,7 @@ Consistent naming conventions improve code readability and maintainability.
     IN_PROGRESS = "IN_PROGRESS",
     COMPLETED = "COMPLETED",
   }
-  ```
+  \`\`\`
 
 ## API Routes & Endpoints
 
@@ -131,7 +131,7 @@ Consistent naming conventions improve code readability and maintainability.
 ### Event Handlers
 - Prefix with `handle`: `handleSubmit`, `handleClick`, `handleChange`
 - For props: prefix with `on`: `onSubmit`, `onClick`, `onChange`
-  ```typescript
+  \`\`\`typescript
   // Component
   function Form({ onSubmit }: { onSubmit: () => void }) {
     const handleFormSubmit = (e: FormEvent) => {
@@ -141,7 +141,7 @@ Consistent naming conventions improve code readability and maintainability.
     
     return <form onSubmit={handleFormSubmit}>...</form>
   }
-  ```
+  \`\`\`
 
 ### State Variables
 - Descriptive names: `user`, `isLoading`, `error`, `selectedItems`
@@ -153,13 +153,13 @@ Consistent naming conventions improve code readability and maintainability.
 ### Service Classes
 - **PascalCase** with `Service` suffix: `AuthService`, `PaymentService`
 - Singleton instance: **camelCase** without suffix: `authService`, `paymentService`
-  ```typescript
+  \`\`\`typescript
   class AuthService {
     async signIn(email: string, password: string) { }
   }
   
   export const authService = new AuthService()
-  ```
+  \`\`\`
 
 ### Service Methods
 - **camelCase**: `getUserById`, `createOrder`, `sendEmail`
@@ -171,14 +171,14 @@ Consistent naming conventions improve code readability and maintainability.
 ### Error Classes
 - **PascalCase** with `Error` suffix: `ValidationError`, `AuthenticationError`
 - Extend base Error class
-  ```typescript
+  \`\`\`typescript
   export class AuthenticationError extends Error {
     constructor(message: string) {
       super(message)
       this.name = "AuthenticationError"
     }
   }
-  ```
+  \`\`\`
 
 ### Error Messages
 - User-facing: descriptive, helpful
@@ -187,15 +187,15 @@ Consistent naming conventions improve code readability and maintainability.
 ## Comments
 
 ### File Headers
-```typescript
+\`\`\`typescript
 /**
  * User Authentication Service
  * Handles user sign in, sign up, and session management
  */
-```
+\`\`\`
 
 ### Function Documentation
-```typescript
+\`\`\`typescript
 /**
  * Retrieves user profile by ID
  * @param userId - The unique user identifier
@@ -205,7 +205,7 @@ Consistent naming conventions improve code readability and maintainability.
 async function getUserProfile(userId: string): Promise<User | null> {
   // ...
 }
-```
+\`\`\`
 
 ### Inline Comments
 - Explain **why**, not **what**
@@ -215,7 +215,7 @@ async function getUserProfile(userId: string): Promise<User | null> {
 ## Examples
 
 ### Good Naming
-```typescript
+\`\`\`typescript
 // ✅ Clear, consistent, descriptive
 const isUserAuthenticated = await authService.checkAuthentication(userId)
 const selectedDeal = await dealService.getById(dealId)
@@ -231,10 +231,10 @@ interface UserProfileData {
 function formatCurrency(amount: number, currency: string = "USD"): string {
   return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount)
 }
-```
+\`\`\`
 
 ### Bad Naming
-```typescript
+\`\`\`typescript
 // ❌ Unclear, inconsistent, abbreviated
 const auth = await svc.chk(uid)
 const d = await getD(id)
@@ -250,7 +250,7 @@ interface Data {
 function fmt(amt: number, cur: string = "USD"): string {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: cur }).format(amt)
 }
-```
+\`\`\`
 
 ## Migration Strategy
 

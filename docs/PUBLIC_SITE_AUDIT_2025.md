@@ -212,6 +212,6 @@
 - ✅ Mobile-first, fully responsive
 - ✅ Accessible and keyboard navigable
 - ✅ Premium enterprise SaaS aesthetic
-```
+\`\`\`
 
 Now I'll implement these improvements systematically, starting with the highest-impact changes:

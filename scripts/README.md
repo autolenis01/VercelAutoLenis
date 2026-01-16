@@ -13,7 +13,7 @@ Some tables need to be created manually in the **Supabase Dashboard → SQL Edit
 
 ### RefinanceLead Table
 
-```sql
+\`\`\`sql
 -- Create RefinanceLead table
 CREATE TABLE IF NOT EXISTS "RefinanceLead" (
   "id" TEXT PRIMARY KEY,
@@ -51,11 +51,11 @@ CREATE POLICY "Admins can view refinance leads"
       AND "User"."role" = 'ADMIN'
     )
   );
-```
+\`\`\`
 
 ### Admin MFA and Audit Tables
 
-```sql
+\`\`\`sql
 -- Add MFA fields to User table
 ALTER TABLE "User" 
 ADD COLUMN IF NOT EXISTS "mfaEnabled" BOOLEAN DEFAULT FALSE,

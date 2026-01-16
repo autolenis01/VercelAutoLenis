@@ -15,14 +15,14 @@ This guide will help you set up the AutoLenis platform for development or deploy
 
 The platform uses Supabase/Neon PostgreSQL. You need to set the following variables:
 
-```bash
+\`\`\`bash
 # Primary database URL for Prisma (uses connection pooling)
 POSTGRES_PRISMA_URL="postgresql://user:pass@host:5432/db?pgbouncer=true"
 
 # Other database URLs (automatically set by Supabase)
 POSTGRES_URL="postgresql://user:pass@host:5432/db"
 POSTGRES_URL_NON_POOLING="postgresql://user:pass@host:5432/db"
-```
+\`\`\`
 
 **How to get these:**
 1. Go to your Supabase project dashboard
@@ -31,14 +31,14 @@ POSTGRES_URL_NON_POOLING="postgresql://user:pass@host:5432/db"
 
 ### 2. Supabase Configuration
 
-```bash
+\`\`\`bash
 SUPABASE_URL="https://xxxxx.supabase.co"
 NEXT_PUBLIC_SUPABASE_URL="https://xxxxx.supabase.co"
 SUPABASE_ANON_KEY="your-anon-key"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
 SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 SUPABASE_JWT_SECRET="your-jwt-secret"
-```
+\`\`\`
 
 **How to get these:**
 1. Go to Supabase Project Settings → API
@@ -46,22 +46,22 @@ SUPABASE_JWT_SECRET="your-jwt-secret"
 
 ### 3. Authentication
 
-```bash
+\`\`\`bash
 JWT_SECRET="your-secure-random-string-min-32-chars"
-```
+\`\`\`
 
 Generate a secure secret:
-```bash
+\`\`\`bash
 openssl rand -base64 32
-```
+\`\`\`
 
 ### 4. Stripe Configuration
 
-```bash
+\`\`\`bash
 STRIPE_SECRET_KEY="sk_test_..."
 STRIPE_PUBLISHABLE_KEY="pk_test_..."
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
-```
+\`\`\`
 
 **How to get these:**
 1. Go to Stripe Dashboard → Developers → API Keys
@@ -69,10 +69,10 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
 
 ### 5. Application URLs
 
-```bash
+\`\`\`bash
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL="http://localhost:3000/auth/callback"
-```
+\`\`\`
 
 ## Database Setup
 
@@ -80,9 +80,9 @@ NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL="http://localhost:3000/auth/callback"
 
 Run the setup script:
 
-```bash
+\`\`\`bash
 bun run scripts/setup-database.ts
-```
+\`\`\`
 
 This will:
 - Generate Prisma Client
@@ -92,27 +92,27 @@ This will:
 ### Option 2: Manual Setup
 
 1. Generate Prisma Client:
-```bash
+\`\`\`bash
 npx prisma generate
-```
+\`\`\`
 
 2. Push schema to database:
-```bash
+\`\`\`bash
 npx prisma db push
-```
+\`\`\`
 
 3. Initialize database (optional):
-```bash
+\`\`\`bash
 psql $POSTGRES_URL < scripts/01-initialize-database.sql
-```
+\`\`\`
 
 ## Verify Setup
 
 ### Check Database Connection
 
-```bash
+\`\`\`bash
 npx prisma studio
-```
+\`\`\`
 
 This opens a GUI to view your database. If it works, your connection is configured correctly.
 
@@ -120,7 +120,7 @@ This opens a GUI to view your database. If it works, your connection is configur
 
 Create a test file:
 
-```typescript
+\`\`\`typescript
 // test-env.ts
 console.log({
   database: !!process.env.POSTGRES_PRISMA_URL,
@@ -128,7 +128,7 @@ console.log({
   stripe: !!process.env.STRIPE_SECRET_KEY,
   jwt: !!process.env.JWT_SECRET,
 })
-```
+\`\`\`
 
 Run: `bun run test-env.ts`
 
@@ -138,9 +138,9 @@ All values should be `true`.
 
 Start the development server:
 
-```bash
+\`\`\`bash
 bun run dev
-```
+\`\`\`
 
 Visit: http://localhost:3000
 
@@ -167,9 +167,9 @@ These automatically set up the required environment variables.
 
 ### 4. Deploy
 
-```bash
+\`\`\`bash
 git push origin main
-```
+\`\`\`
 
 Vercel will automatically deploy on push.
 
@@ -178,11 +178,11 @@ Vercel will automatically deploy on push.
 ### "Cannot find module .prisma/client"
 
 **Solution:** Run `npx prisma generate` or add to package.json:
-```json
+\`\`\`json
 "scripts": {
   "postinstall": "prisma generate"
 }
-```
+\`\`\`
 
 ### "Invalid DATABASE_URL"
 
@@ -191,9 +191,9 @@ Vercel will automatically deploy on push.
 ### "0 tables found" in database
 
 **Solution:** Run the database setup script:
-```bash
+\`\`\`bash
 bun run scripts/setup-database.ts
-```
+\`\`\`
 
 ### Build fails on Vercel
 

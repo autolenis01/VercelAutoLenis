@@ -34,11 +34,11 @@ The AutoLenis payments system is **robust, complete, and professionally implemen
 - ✅ `POST /api/admin/payments/refund` - Admin refund
 
 **Status Flow:**
-```
+\`\`\`
 PENDING → PROCESSING → SUCCEEDED → (optional) REFUNDED
          ↓
        FAILED
-```
+\`\`\`
 
 **Frontend Pages:**
 - ✅ `/buyer/billing` - View deposit payments
@@ -74,11 +74,11 @@ PENDING → PROCESSING → SUCCEEDED → (optional) REFUNDED
 - ✅ `/admin/payments` - Admin fee management
 
 **Fee Logic:**
-```
+\`\`\`
 Base Fee: $499 (vehicles < $35,000 OTD) or $750 (premium vehicles)
 Deposit Credit: -$99 (if deposit was paid)
 Final Amount: Base Fee - Deposit Credit
-```
+\`\`\`
 
 **Related Tables:**
 - ✅ `FeeFinancingDisclosure` - Loan inclusion consent tracking
@@ -139,9 +139,9 @@ Final Amount: Base Fee - Deposit Credit
 - ✅ `/admin/payments` - Refund UI with modal confirmation
 
 **Refund Logic:**
-```
+\`\`\`
 Stripe Refund → Update Database Status → Send Email Notification
-```
+\`\`\`
 
 **Missing/Enhancements:**
 - ⚠️ No partial refund capability

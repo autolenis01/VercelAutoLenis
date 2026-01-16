@@ -8,15 +8,15 @@ Sign in an existing user.
 **Rate Limit:** 5 requests per 15 minutes per IP
 
 **Request Body:**
-```json
+\`\`\`json
 {
   "email": "string",
   "password": "string"
 }
-```
+\`\`\`
 
 **Response:**
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -28,7 +28,7 @@ Sign in an existing user.
     "redirect": "string"
   }
 }
-```
+\`\`\`
 
 **Error Responses:**
 - 400: Validation error
@@ -44,17 +44,17 @@ Create a new user account.
 **Rate Limit:** 5 requests per 15 minutes per IP
 
 **Request Body:**
-```json
+\`\`\`json
 {
   "email": "string",
   "password": "string",
   "role": "BUYER | DEALER | AFFILIATE",
   "refCode": "string (optional)"
 }
-```
+\`\`\`
 
 **Response:**
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -66,7 +66,7 @@ Create a new user account.
     "redirect": "string"
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -76,19 +76,19 @@ Request a password reset email.
 **Rate Limit:** 5 requests per 15 minutes per IP
 
 **Request Body:**
-```json
+\`\`\`json
 {
   "email": "string"
 }
-```
+\`\`\`
 
 **Response:**
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Password reset email sent"
 }
-```
+\`\`\`
 
 ---
 
@@ -98,7 +98,7 @@ Request a password reset email.
 Check service health and database connectivity.
 
 **Response:**
-```json
+\`\`\`json
 {
   "status": "healthy",
   "database": "up",
@@ -106,7 +106,7 @@ Check service health and database connectivity.
   "timestamp": "2024-01-01T00:00:00.000Z",
   "version": "1.0.0"
 }
-```
+\`\`\`
 
 ---
 
@@ -114,7 +114,7 @@ Check service health and database connectivity.
 
 All API endpoints return errors in a consistent format:
 
-```json
+\`\`\`json
 {
   "success": false,
   "error": "Error message",
@@ -123,7 +123,7 @@ All API endpoints return errors in a consistent format:
     "fieldName": "Field-specific error"
   }
 }
-```
+\`\`\`
 
 ### Common Error Codes
 - `VALIDATION_ERROR`: Invalid input data

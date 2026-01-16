@@ -154,9 +154,9 @@ All 5 priority enhancements have been successfully implemented for Contract Shie
 
 Run the Prisma migration to add the new tables:
 
-```bash
+\`\`\`bash
 npx prisma migrate dev --name contract-shield-enhancements
-```
+\`\`\`
 
 Or manually execute the schema updates in your database.
 
@@ -165,13 +165,13 @@ Or manually execute the schema updates in your database.
 ## Initial Setup Steps
 
 1. **Initialize Default Rules**
-   ```typescript
+   \`\`\`typescript
    await ContractShieldService.initializeDefaultRules()
-   ```
+   \`\`\`
 
 2. **Configure Vercel Cron Job**
    Add to `vercel.json`:
-   ```json
+   \`\`\`json
    {
      "crons": [
        {
@@ -180,7 +180,7 @@ Or manually execute the schema updates in your database.
        }
      ]
    }
-   ```
+   \`\`\`
 
 3. **Update Admin Navigation**
    Add menu items:
