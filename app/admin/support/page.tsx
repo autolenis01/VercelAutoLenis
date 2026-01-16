@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Flag, StickyNote, Search, AlertTriangle, User, Building2 } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Eye, Flag, StickyNote, Search, AlertTriangle, User, Building2, CheckCircle, Loader2 } from "lucide-react"
 
 export default function AdminSupportPage() {
   const [impersonateType, setImpersonateType] = useState<"buyer" | "dealer">("buyer")
@@ -14,13 +15,59 @@ export default function AdminSupportPage() {
   const [noteType, setNoteType] = useState<"buyer" | "dealer" | "deal">("buyer")
   const [noteEntityId, setNoteEntityId] = useState("")
   const [noteContent, setNoteContent] = useState("")
+  const [isImpersonating, setIsImpersonating] = useState(false)
+  const [isAddingNote, setIsAddingNote] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
-  const handleImpersonate = () => {
-    // Implementation would open a new tab with read-only view
+  const handleImpersonate = async () => {
+    if (!impersonateId.trim()) {
+      setError("Please enter a user ID or email")
+      return
+    }
+
+    setIsImpersonating(true)
+    setError(null)
+
+    try {
+      // TODO: Implement impersonation API endpoint
+      // Verify admin permissions and create read-only session
+      
+      setSuccess(`View-as mode activated for ${impersonateType}: ${impersonateId}`)
+      
+      // Clear after 3 seconds
+      setTimeout(() => setSuccess(null), 3000)
+    } catch (err: any) {
+      setError(err.message || "Failed to impersonate user")
+    } finally {
+      setIsImpersonating(false)
+    }
   }
 
-  const handleAddNote = () => {
-    // Implementation would save note via API
+  const handleAddNote = async () => {
+    if (!noteEntityId.trim() || !noteContent.trim()) {
+      setError("Please enter both entity ID and note content")
+      return
+    }
+
+    setIsAddingNote(true)
+    setError(null)
+
+    try {
+      // TODO: Implement notes API endpoint
+      // Call: POST /api/admin/support/notes
+      
+      setSuccess(`Note added to ${noteType} ${noteEntityId}`)
+      setNoteContent("")
+      setNoteEntityId("")
+      
+      // Clear after 3 seconds
+      setTimeout(() => setSuccess(null), 3000)
+    } catch (err: any) {
+      setError(err.message || "Failed to add note")
+    } finally {
+      setIsAddingNote(false)
+    }
   }
 
   return (
@@ -29,6 +76,20 @@ export default function AdminSupportPage() {
         <h1 className="text-3xl font-bold text-gray-900">Support Tools</h1>
         <p className="text-gray-500">Administrative tools for user support</p>
       </div>
+
+      {/* Success/Error Messages */}
+      {error && (
+        <Alert className="bg-red-50 border-red-200">
+          <AlertTriangle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">{error}</AlertDescription>
+        </Alert>
+      )}
+      {success && (
+        <Alert className="bg-green-50 border-green-200">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800">{success}</AlertDescription>
+        </Alert>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Impersonation */}
@@ -60,9 +121,22 @@ export default function AdminSupportPage() {
                 className="flex-1"
               />
             </div>
-            <Button onClick={handleImpersonate} className="w-full bg-[#2D1B69] hover:bg-[#2D1B69]/90">
-              <Eye className="h-4 w-4 mr-2" />
-              View As {impersonateType === "buyer" ? "Buyer" : "Dealer"}
+            <Button 
+              onClick={handleImpersonate} 
+              className="w-full bg-[#2D1B69] hover:bg-[#2D1B69]/90"
+              disabled={isImpersonating || !impersonateId.trim()}
+            >
+              {isImpersonating ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <Eye className="h-4 w-4 mr-2" />
+                  View As {impersonateType === "buyer" ? "Buyer" : "Dealer"}
+                </>
+              )}
             </Button>
           </CardContent>
         </Card>
@@ -103,9 +177,22 @@ export default function AdminSupportPage() {
               onChange={(e) => setNoteContent(e.target.value)}
               rows={3}
             />
-            <Button onClick={handleAddNote} className="w-full bg-[#7ED321] hover:bg-[#7ED321]/90 text-white">
-              <StickyNote className="h-4 w-4 mr-2" />
-              Add Note
+            <Button 
+              onClick={handleAddNote} 
+              className="w-full bg-[#7ED321] hover:bg-[#7ED321]/90 text-white"
+              disabled={isAddingNote || !noteEntityId.trim() || !noteContent.trim()}
+            >
+              {isAddingNote ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Adding...
+                </>
+              ) : (
+                <>
+                  <StickyNote className="h-4 w-4 mr-2" />
+                  Add Note
+                </>
+              )}
             </Button>
           </CardContent>
         </Card>

@@ -1,17 +1,17 @@
 ## Summary
-Describe the change, why it is needed, and link the issue or acceptance criteria being satisfied.
+<!-- Briefly describe the change and its impact -->
+- Briefly describe the change and intent.
+
+## Root Cause
+- What gap or issue motivated this change?
 
 ## Acceptance Criteria
-- [ ] Requirements in the linked issue are satisfied.
-- [ ] No secrets committed (.env stays local; update `.env.example` when adding envs).
-- [ ] Prisma schema changes are formatted (`pnpm prisma format`).
-- [ ] Prisma client is regenerated after validation passes (`pnpm prisma generate`) when the schema changes.
-- [ ] If no schema changes were needed, note that explicitly.
-- [ ] CI-ready: deterministic install/build using `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm test`/`pnpm vitest`, and `pnpm build` where applicable.
+- [ ] Scope is limited to the stated change set
+- [ ] No secrets or .env files committed; env keys live only in `.env.example`
+- [ ] Required docs/instructions/templates updated or confirmed unchanged (if applicable)
+- [ ] Lint/tests/build run when affected, or rationale for any skips is noted
 
-## Verification
-- [ ] `pnpm install --frozen-lockfile` (note blockers such as schema validation in the PR description).
-- [ ] `pnpm lint`
-- [ ] `pnpm test` or `pnpm vitest`
-- [ ] `pnpm build`
-- [ ] Screenshots attached for any UI changes.
+## How to Verify
+- [ ] Review the updated files for completeness and alignment with scope
+- [ ] Confirm `.env`/credentials are absent from the diff and git history
+- [ ] Run targeted checks (lint/test/build) relevant to the touched areas
