@@ -3,7 +3,7 @@ import { requireAuth } from "@/lib/auth-server"
 import { affiliateService } from "@/lib/services/affiliate.service"
 
 // POST - Mark a payout as processed/paid
-export async function POST(request: NextRequest, { params }: { params: Promise<{ payoutId: string }> }) {
+export async function POST(_request: NextRequest, { params }: { params: Promise<{ payoutId: string }> }) {
   try {
     const session = await requireAuth()
     if (!session || session.role !== "ADMIN") {
