@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status") || undefined
 
     const skip = (page - 1) * limit
-    const supabase = createClient()
+    const supabase = await createClient()
 
     let query = supabase.from("Affiliate").select(
       `
