@@ -5,12 +5,12 @@
 - What gap or issue motivated this change?
 
 ## Acceptance Criteria
-- [ ] Scope is governance/docs only; no functional refactors
+- [ ] Scope is limited to the stated change set
 - [ ] No secrets or .env files committed; env keys live only in `.env.example`
-- [ ] Required instructions/templates updated or confirmed unchanged
+- [ ] Required docs/instructions/templates updated or confirmed unchanged (if applicable)
 - [ ] Lint/tests/build run when affected, or rationale for any skips is noted
 
 ## How to Verify
-- [ ] Review the updated instruction files for completeness
+- [ ] Review the updated files for completeness and alignment with scope
 - [ ] Confirm `.env`/credentials are absent from the diff and git history
 - [ ] Run targeted checks (lint/test/build) relevant to the touched areas
