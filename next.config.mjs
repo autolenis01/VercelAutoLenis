@@ -6,6 +6,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // TODO: Re-enable strict type-checking once existing TS errors are addressed.
   typescript: {
     ignoreBuildErrors: true,
   },
