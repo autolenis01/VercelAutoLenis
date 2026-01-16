@@ -4,7 +4,11 @@
 ## Do
 - Keep datasource URLs in env vars; document any new keys in `.env.example` and never commit real values.
 - Use `prisma format` and align schema changes with migrations under `migrations/`; prefer `prisma migrate dev` for iterative work.
-- Guard `prisma generate` so missing `POSTGRES_PRISMA_URL` does not hard-fail (e.g., set a placeholder URL or conditionally skip generate in scripts when the var is absent), including the `postinstall` hook that runs `prisma generate` (example: `POSTGRES_PRISMA_URL=${POSTGRES_PRISMA_URL:-postgresql://placeholder:placeholder@localhost:5432/db?schema=public} prisma generate || echo \"skipping prisma generate\"`).
+- Guard `prisma generate` so missing `POSTGRES_PRISMA_URL` does not hard-fail (e.g., set a placeholder URL or conditionally skip generate in scripts when the var is absent), including the `postinstall` hook that runs `prisma generate`. Example guard:
+
+```sh
+POSTGRES_PRISMA_URL=${POSTGRES_PRISMA_URL:-postgresql://placeholder:placeholder@localhost:5432/db?schema=public} prisma generate || echo "skipping prisma generate"
+```
 - Run `pnpm build`/`prisma validate` with the expected env loaded before shipping schema changes.
 
 ## Don't
