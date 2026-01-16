@@ -11,7 +11,7 @@
     "db:setup": "bun run scripts/setup-database.mjs",
     "db:studio": "prisma studio",
     "dev": "next dev",
-    "postinstall": "prisma generate",
+    "postinstall": "node scripts/postinstall.js",
     "lint": "eslint .",
     "start": "next start",
     "test": "vitest",
