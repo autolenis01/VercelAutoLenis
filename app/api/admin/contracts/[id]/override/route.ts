@@ -1,13 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { ContractShieldService } from "@/lib/services/contract-shield.service"
-import { getServerSession } from "@/lib/auth-server"
+import { getSession } from "@/lib/auth-server"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const session = await getServerSession(req)
+    const session = await getSession()
 
-    if (!session?.user || session.user.role !== "ADMIN") {
+    if (!session || session.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
