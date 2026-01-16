@@ -40,7 +40,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: user.id,
+          id: user.userId,
           email: user.email,
           role: user.role,
           name: `${user.first_name || ""} ${user.last_name || ""}`.trim() || user.email,
@@ -59,7 +59,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id
+        token.id = user.userId
         token.role = user.role
       }
       return token
