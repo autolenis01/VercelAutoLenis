@@ -4,7 +4,7 @@ import { ContractShieldService } from "@/lib/services/contract-shield.service"
 
 export async function POST(request: Request) {
   try {
-    const session = await requireAuth(["DEALER"])
+    await requireAuth(["DEALER"])
     const body = await request.json()
 
     const contract = await ContractShieldService.uploadContract(

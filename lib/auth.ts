@@ -3,7 +3,7 @@ import type { UserRole } from "./types"
 import { logger } from "./logger"
 
 const jwtSecretString = process.env.JWT_SECRET
-if (!jwtSecretString && process.env.NODE_ENV === "production") {
+if (!jwtSecretString && process.env["NODE_ENV"] === "production") {
   logger.error("JWT_SECRET is not configured in production!")
 }
 

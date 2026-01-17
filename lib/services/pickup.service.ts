@@ -481,7 +481,7 @@ export class PickupService {
       },
     })
 
-    return appointments.map((apt) => {
+    return appointments.map((apt: any) => {
       const user = apt.deal?.user
       const profile = apt.deal?.buyerProfile
       const dealer = apt.deal?.auctionOffer?.dealer

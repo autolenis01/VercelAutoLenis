@@ -198,9 +198,9 @@ export class ContractShieldService {
     }
 
     // Determine status
-    const criticalCount = items.filter((i) => i.severity === "CRITICAL").length
-    const importantCount = items.filter((i) => i.severity === "IMPORTANT").length
-    const reviewCount = items.filter((i) => i.severity === "REVIEW").length
+    const criticalCount = items.filter((i: any) => i.severity === "CRITICAL").length
+    const importantCount = items.filter((i: any) => i.severity === "IMPORTANT").length
+    const reviewCount = items.filter((i: any) => i.severity === "REVIEW").length
 
     let status: ScanStatus
     let overallScore: number
@@ -216,10 +216,10 @@ export class ContractShieldService {
       overallScore = 100
     }
 
-    const aprMatch = !items.some((i) => i.category === "APR_DIFFERENCE")
-    const paymentMatch = !items.some((i) => i.category === "PAYMENT_DIFFERENCE")
-    const otdMatch = !items.some((i) => i.category === "OTD_DIFFERENCE")
-    const feesReviewed = items.some((i) => i.category === "FEE_REVIEW" || i.category === "ADD_ON_REVIEW")
+    const aprMatch = !items.some((i: any) => i.category === "APR_DIFFERENCE")
+    const paymentMatch = !items.some((i: any) => i.category === "PAYMENT_DIFFERENCE")
+    const otdMatch = !items.some((i: any) => i.category === "OTD_DIFFERENCE")
+    const feesReviewed = items.some((i: any) => i.category === "FEE_REVIEW" || i.category === "ADD_ON_REVIEW")
 
     const summary = this.generateSummary(items, status)
 
@@ -292,7 +292,7 @@ export class ContractShieldService {
     // Check fees breakdown
     const feesBreakdown = deal.feesBreakdown as Record<string, number> | null
     if (feesBreakdown) {
-      const totalFees = Object.values(feesBreakdown).reduce((sum, val) => sum + (val || 0), 0)
+      const totalFees = Object.values(feesBreakdown).reduce((sum: any, val) => sum + (val || 0), 0)
       const taxAmount = deal.taxAmount || 0
       const calculatedOtd = (deal.offer?.cashOtd || 0) + totalFees + taxAmount
 
@@ -415,7 +415,7 @@ export class ContractShieldService {
       suggestedFix: string
     }> = []
 
-    const uploadedTypes = documents.map((d) => d.documentType)
+    const uploadedTypes = documents.map((d: any) => d.documentType)
 
     if (!uploadedTypes.includes("BUYERS_ORDER")) {
       items.push({
@@ -453,7 +453,7 @@ export class ContractShieldService {
     })
 
     if (scan) {
-      const unresolvedCount = scan.fixList.filter((f) => !f.resolved).length
+      const unresolvedCount = scan.fixList.filter((f: any) => !f.resolved).length
       if (unresolvedCount === 0 && scan.selectedDealId) {
         return this.scanContract(scan.selectedDealId)
       }
@@ -683,7 +683,7 @@ export class ContractShieldService {
             overrideId,
             action,
             reason,
-            reviewUrl: `${process.env.NEXT_PUBLIC_APP_URL}/buyer/contracts`,
+            reviewUrl: `${process.env["NEXT_PUBLIC_APP_URL"]}/buyer/contracts`,
           },
         })
 
@@ -756,7 +756,7 @@ export class ContractShieldService {
               scanId,
               oldStatus,
               newStatus,
-              reviewUrl: `${process.env.NEXT_PUBLIC_APP_URL}/buyer/contracts`,
+              reviewUrl: `${process.env["NEXT_PUBLIC_APP_URL"]}/buyer/contracts`,
             },
           })
 
@@ -798,7 +798,7 @@ export class ContractShieldService {
               scanId,
               oldStatus,
               newStatus,
-              reviewUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dealer/contracts`,
+              reviewUrl: `${process.env["NEXT_PUBLIC_APP_URL"]}/dealer/contracts`,
             },
           })
 
@@ -1126,9 +1126,9 @@ export class ContractShieldService {
       return "Our review didn't find any items that need attention. You should still review the contract carefully before signing."
     }
 
-    const criticalCount = items.filter((i) => i.severity === "CRITICAL").length
-    const importantCount = items.filter((i) => i.severity === "IMPORTANT").length
-    const reviewCount = items.filter((i) => i.severity === "REVIEW").length
+    const criticalCount = items.filter((i: any) => i.severity === "CRITICAL").length
+    const importantCount = items.filter((i: any) => i.severity === "IMPORTANT").length
+    const reviewCount = items.filter((i: any) => i.severity === "REVIEW").length
 
     let summary = `We found ${items.length} item(s) you may want to review: `
 

@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Missing paymentId and reason" }, { status: 400 })
       }
 
-      const result = await PaymentService.processRefund(id, paymentType, reason, user.id)
+      const result = await PaymentService.processRefund(id, paymentType, reason, user.userId)
       return NextResponse.json({ success: true, data: result })
     }
 

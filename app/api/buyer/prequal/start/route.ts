@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { requireAuth } from "@/lib/auth-server"
-import { PreQualService } from "@/lib/services/prequal.service"
+import { prequalService } from "@/lib/services/prequal.service"
 import { preQualStartSchema } from "@/lib/validators/prequal"
 import { headers } from "next/headers"
 
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     }
 
     // Start pre-qualification
-    const result = await PreQualService.startPreQual(session.userId, validated, requestContext)
+    const result = await prequalService.startPreQual(session.userId, validated, requestContext)
 
     if (!result.success) {
       return NextResponse.json({ success: false, error: result.error }, { status: 400 })

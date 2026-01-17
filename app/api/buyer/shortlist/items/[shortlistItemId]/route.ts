@@ -4,11 +4,11 @@ import { createClient } from "@/lib/supabase/server"
 import { ShortlistService } from "@/lib/services/shortlist.service"
 
 // DELETE - Remove specific shortlist item by ID
-export async function DELETE(request: Request, { params }: { params: Promise<{ shortlistItemId: string }> }) {
+export async function DELETE(_request: Request, { params }: { params: Promise<{ shortlistItemId: string }> }) {
   try {
     const session = await requireAuth(["BUYER"])
     const { shortlistItemId } = await params
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data: buyer, error: buyerError } = await supabase
       .from("BuyerProfile")
@@ -63,12 +63,12 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ s
 }
 
 // PATCH - Update notes for a shortlist item
-export async function PATCH(request: Request, { params }: { params: Promise<{ shortlistItemId: string }> }) {
+export async function PATCH(_request: Request, { params }: { params: Promise<{ shortlistItemId: string }> }) {
   try {
     const session = await requireAuth(["BUYER"])
     const { shortlistItemId } = await params
     const body = await request.json()
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data: buyer, error: buyerError } = await supabase
       .from("BuyerProfile")

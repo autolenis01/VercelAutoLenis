@@ -198,7 +198,7 @@ export class BestPriceService {
     )
 
     // Filter out offers without valid inventory/vehicle
-    const validOffers = enhancedOffers.filter((o) => o.inventoryItem && o.vehicle)
+    const validOffers = enhancedOffers.filter((o: any) => o.inventoryItem && o.vehicle)
 
     if (validOffers.length === 0) {
       await this.logRun(auctionId, runType, offers.length, 0, "No offers with valid inventory")
@@ -357,7 +357,7 @@ export class BestPriceService {
   ): { junkFeeCents: number; junkFeeRatio: number } {
     const docFee = breakdown.doc_fee_cents || 0
     const dealerFees = breakdown.dealer_fees_cents || 0
-    const addOns = (breakdown.add_ons || []).reduce((sum, a) => sum + (a.amount_cents || 0), 0)
+    const addOns = (breakdown.add_ons || []).reduce((sum: any, a) => sum + (a.amount_cents || 0), 0)
 
     const junkFeeCents = docFee + dealerFees + addOns
     const junkFeeRatio = totalOtdCents > 0 ? junkFeeCents / totalOtdCents : 0
@@ -373,8 +373,8 @@ export class BestPriceService {
       return { primaryUniverse: offers, fallbackUniverse: offers }
     }
 
-    const normalizedPreferred = preferredMakes.map((m) => m.toLowerCase().trim())
-    const primaryUniverse = offers.filter((o) => {
+    const normalizedPreferred = preferredMakes.map((m: any) => m.toLowerCase().trim())
+    const primaryUniverse = offers.filter((o: any) => {
       const make = o.vehicle?.make?.toLowerCase().trim()
       return make && normalizedPreferred.includes(make)
     })
@@ -397,7 +397,7 @@ export class BestPriceService {
   }
 
   private static rankBestCash(offers: EnhancedOffer[], maxOtdCents: number | null, limit: number): ScoredOffer[] {
-    const scored = offers.map((offer) => {
+    const scored = offers.map((offer: any) => {
       const otdCents = this.getOfferOtdCents(offer)
       let score = 1_000_000_000 / (otdCents || 1) // Inverse of OTD
 
@@ -421,7 +421,7 @@ export class BestPriceService {
       // Get best financing option for display
       const bestFinancing =
         offer.financingOptions.length > 0
-          ? offer.financingOptions.reduce((best, curr) =>
+          ? offer.financingOptions.reduce((best: any, curr) =>
               this.getMonthlyPaymentCents(curr) < this.getMonthlyPaymentCents(best) ? curr : best,
             )
           : null
@@ -488,7 +488,7 @@ export class BestPriceService {
     return Array.from(bestByOffer.values())
       .sort((a, b) => b.score - a.score)
       .slice(0, limit)
-      .map((p) => ({
+      .map((p: any) => ({
         offer: p.offer,
         score: p.score,
         monthlyPayment: this.getMonthlyPaymentCents(p.option),
@@ -505,26 +505,26 @@ export class BestPriceService {
     limit: number,
   ): ScoredOffer[] {
     // Calculate min/max for normalization
-    const otds = offers.map((o) => this.getOfferOtdCents(o))
+    const otds = offers.map((o: any) => this.getOfferOtdCents(o))
     const minOtd = Math.min(...otds)
     const maxOtd = Math.max(...otds)
 
     const monthlies = offers
-      .flatMap((o) => o.financingOptions.map((f) => this.getMonthlyPaymentCents(f)))
-      .filter((m) => m > 0)
+      .flatMap((o) => o.financingOptions.map((f: any) => this.getMonthlyPaymentCents(f)))
+      .filter((m: any) => m > 0)
     const minMonthly = monthlies.length > 0 ? Math.min(...monthlies) : 0
     const maxMonthly = monthlies.length > 0 ? Math.max(...monthlies) : 1
 
-    const scored = offers.map((offer) => {
+    const scored = offers.map((offer: any) => {
       const otdCents = this.getOfferOtdCents(offer)
 
       // OTD score (normalized, lower = higher score)
       const otdScore = maxOtd !== minOtd ? (maxOtd - otdCents) / (maxOtd - minOtd) : 1
 
       // Pick representative financing option (promoted or closest to 60-72 months)
-      const promoted = offer.financingOptions.find((f) => f.is_promoted_option)
+      const promoted = offer.financingOptions.find((f: any) => f.is_promoted_option)
       const standardTerm = offer.financingOptions
-        .filter((f) => {
+        .filter((f: any) => {
           const term = this.getTermMonths(f)
           return term >= 60 && term <= 72
         })
@@ -844,7 +844,7 @@ export class BestPriceService {
 
     // If financing option selected, create financing offer
     if (financingOptionId) {
-      const financingOption = offer.financingOptions.find((f) => f.id === financingOptionId)
+      const financingOption = offer.financingOptions.find((f: any) => f.id === financingOptionId)
 
       if (financingOption) {
         const downPaymentCents =

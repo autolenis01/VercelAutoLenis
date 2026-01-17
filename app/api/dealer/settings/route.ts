@@ -5,14 +5,14 @@ import { dealerService } from "@/lib/services/dealer.service"
 export const dynamic = "force-dynamic"
 
 // Get settings
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || !["DEALER", "DEALER_USER"].includes(user.role)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const dealer = await dealerService.getDealerByUserId(user.id)
+    const dealer = await dealerService.getDealerByUserId(user.userId)
     if (!dealer) {
       return NextResponse.json({ error: "Dealer not found" }, { status: 404 })
     }
@@ -27,14 +27,14 @@ export async function GET(req: NextRequest) {
 }
 
 // Update settings
-export async function PATCH(req: NextRequest) {
+export async function PATCH(_req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || !["DEALER", "DEALER_USER"].includes(user.role)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const dealer = await dealerService.getDealerByUserId(user.id)
+    const dealer = await dealerService.getDealerByUserId(user.userId)
     if (!dealer) {
       return NextResponse.json({ error: "Dealer not found" }, { status: 404 })
     }

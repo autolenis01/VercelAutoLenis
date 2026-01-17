@@ -5,7 +5,7 @@ import { supabase, isDatabaseConfigured } from "@/lib/db"
 export const dynamic = "force-dynamic"
 
 // Get contracts
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || !["DEALER", "DEALER_USER"].includes(user.role)) {
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
 }
 
 // Upload contract
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || !["DEALER", "DEALER_USER"].includes(user.role)) {

@@ -397,12 +397,12 @@ export class AffiliateService {
     }
 
     // Send notification to Level 1 affiliate
-    const level1Referral = referrals.find((r) => r.level === 1)
+    const level1Referral = referrals.find((r: any) => r.level === 1)
     if (level1Referral?.affiliate?.user) {
       await this.sendCommissionNotification(
         level1Referral.affiliate,
         level1Referral.affiliate.user,
-        commissions.find((c) => c.level === 1)!,
+        commissions.find((c: any) => c.level === 1)!,
         serviceFeePaymentId,
       )
     }
@@ -511,7 +511,7 @@ export class AffiliateService {
     return {
       primary: buildReferralLink(refCode, "/"),
       getStarted: buildReferralLink(refCode, "/get-started"),
-      landingPage: slug ? `${process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"}/a/${slug}` : null,
+      landingPage: slug ? `${process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"}/a/${slug}` : null,
       refCode,
       landingSlug: slug,
     }
@@ -597,13 +597,13 @@ export class AffiliateService {
         lifetimePaidCents: affiliate.lifetime_paid_cents || 0,
       },
       referralsByLevel: {
-        level1: referralsByLevel.find((r) => r.level === 1)?._count || 0,
-        level2: referralsByLevel.find((r) => r.level === 2)?._count || 0,
-        level3: referralsByLevel.find((r) => r.level === 3)?._count || 0,
-        level4: referralsByLevel.find((r) => r.level === 4)?._count || 0,
-        level5: referralsByLevel.find((r) => r.level === 5)?._count || 0,
+        level1: referralsByLevel.find((r: any) => r.level === 1)?._count || 0,
+        level2: referralsByLevel.find((r: any) => r.level === 2)?._count || 0,
+        level3: referralsByLevel.find((r: any) => r.level === 3)?._count || 0,
+        level4: referralsByLevel.find((r: any) => r.level === 4)?._count || 0,
+        level5: referralsByLevel.find((r: any) => r.level === 5)?._count || 0,
       },
-      recentCommissions: recentCommissions.map((c) => ({
+      recentCommissions: recentCommissions.map((c: any) => ({
         id: c.id,
         amountCents: c.amount_cents || c.amountCents,
         level: c.level,
@@ -731,29 +731,29 @@ export class AffiliateService {
         status: affiliate.status,
       },
       tree: {
-        level1: levelCounts.find((l) => l.level === 1)?._count || 0,
-        level2: levelCounts.find((l) => l.level === 2)?._count || 0,
-        level3: levelCounts.find((l) => l.level === 3)?._count || 0,
-        level4: levelCounts.find((l) => l.level === 4)?._count || 0,
-        level5: levelCounts.find((l) => l.level === 5)?._count || 0,
-        total: levelCounts.reduce((sum, l) => sum + l._count, 0),
+        level1: levelCounts.find((l: any) => l.level === 1)?._count || 0,
+        level2: levelCounts.find((l: any) => l.level === 2)?._count || 0,
+        level3: levelCounts.find((l: any) => l.level === 3)?._count || 0,
+        level4: levelCounts.find((l: any) => l.level === 4)?._count || 0,
+        level5: levelCounts.find((l: any) => l.level === 5)?._count || 0,
+        total: levelCounts.reduce((sum: any, l) => sum + l._count, 0),
       },
       commissions: {
         pending: {
-          count: commissionStats.find((s) => s.status === "PENDING")?._count || 0,
-          amountCents: commissionStats.find((s) => s.status === "PENDING")?._sum.amount_cents || 0,
+          count: commissionStats.find((s: any) => s.status === "PENDING")?._count || 0,
+          amountCents: commissionStats.find((s: any) => s.status === "PENDING")?._sum.amount_cents || 0,
         },
         earned: {
-          count: commissionStats.find((s) => s.status === "EARNED")?._count || 0,
-          amountCents: commissionStats.find((s) => s.status === "EARNED")?._sum.amount_cents || 0,
+          count: commissionStats.find((s: any) => s.status === "EARNED")?._count || 0,
+          amountCents: commissionStats.find((s: any) => s.status === "EARNED")?._sum.amount_cents || 0,
         },
         paid: {
-          count: commissionStats.find((s) => s.status === "PAID")?._count || 0,
-          amountCents: commissionStats.find((s) => s.status === "PAID")?._sum.amount_cents || 0,
+          count: commissionStats.find((s: any) => s.status === "PAID")?._count || 0,
+          amountCents: commissionStats.find((s: any) => s.status === "PAID")?._sum.amount_cents || 0,
         },
         cancelled: {
-          count: commissionStats.find((s) => s.status === "CANCELLED")?._count || 0,
-          amountCents: commissionStats.find((s) => s.status === "CANCELLED")?._sum.amount_cents || 0,
+          count: commissionStats.find((s: any) => s.status === "CANCELLED")?._count || 0,
+          amountCents: commissionStats.find((s: any) => s.status === "CANCELLED")?._sum.amount_cents || 0,
         },
       },
       directReferrals: directReferrals.length,
@@ -774,7 +774,7 @@ export class AffiliateService {
 
     return {
       userId,
-      levels: referrals.map((r) => ({
+      levels: referrals.map((r: any) => ({
         level: r.level,
         affiliateId: r.affiliateId,
         affiliateName: `${r.affiliate?.firstName} ${r.affiliate?.lastName}`.trim(),
@@ -810,7 +810,7 @@ export class AffiliateService {
       throw new Error("No earned commissions available for payout")
     }
 
-    const totalCents = earnedCommissions.reduce((sum, c) => sum + (c.amount_cents || 0), 0)
+    const totalCents = earnedCommissions.reduce((sum: any, c) => sum + (c.amount_cents || 0), 0)
 
     const payout = await prisma.$transaction(async (tx) => {
       const newPayout = await tx.payout.create({

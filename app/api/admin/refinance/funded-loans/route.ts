@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get("startDate")
     const endDate = searchParams.get("endDate")
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     let query = supabase.from("FundedLoan").select(
       `

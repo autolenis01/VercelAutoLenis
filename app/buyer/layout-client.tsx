@@ -59,7 +59,7 @@ export function BuyerLayoutClient({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [expandedItems, setExpandedItems] = useState<string[]>([])
-  const router = useRouter()
+  // const router = useRouter()
   const pathname = usePathname()
 
   useEffect(() => {

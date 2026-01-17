@@ -128,7 +128,7 @@ export class ESignService {
 
     // Call provider to create envelope
     const providerName = options?.provider || "mock"
-    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"}/buyer/deal/esign/complete`
+    const redirectUrl = `${process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"}/buyer/deal/esign/complete`
 
     const providerResult = await this.provider.createEnvelope({
       documents,

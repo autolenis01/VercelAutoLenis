@@ -133,7 +133,7 @@ export class DealService {
 
     // Create financing offer from selected option
     const selectedFinancingOption = financingOptionId
-      ? offer.financingOptions.find((f) => f.id === financingOptionId)
+      ? offer.financingOptions.find((f: any) => f.id === financingOptionId)
       : offer.financingOptions[0]
 
     if (selectedFinancingOption) {
@@ -369,7 +369,7 @@ export class DealService {
         if (!primaryFinancingOfferId) {
           throw new Error("Primary financing offer ID required for financed payment type")
         }
-        const financingOffer = deal.financingOffers.find((f) => f.id === primaryFinancingOfferId)
+        const financingOffer = deal.financingOffers.find((f: any) => f.id === primaryFinancingOfferId)
         if (!financingOffer) {
           throw new Error("Financing offer not found")
         }
