@@ -9,7 +9,7 @@ import { CheckCircle, ExternalLink, FileText } from "lucide-react"
 export default function ESignPage() {
   const params = useParams()
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const [_loading, _setLoading] = useState(false)
   const [envelope, setEnvelope] = useState<any>(null)
   const [error, setError] = useState("")
 

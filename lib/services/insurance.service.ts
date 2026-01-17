@@ -206,7 +206,7 @@ export class InsuranceService {
         id: deal.id,
         insurance_status: deal.insurance_status || "NOT_SELECTED",
       },
-      quotes: quotes.map((q) => ({
+      quotes: quotes.map((q: any) => ({
         id: q.id,
         carrier_name: q.carrier_name || q.carrier,
         product_name: q.product_name || q.productName,
@@ -219,7 +219,7 @@ export class InsuranceService {
         valid_until: q.valid_until || q.expiresAt,
         created_at: q.createdAt,
       })),
-      policies: policies.map((p) => ({
+      policies: policies.map((p: any) => ({
         id: p.id,
         type: p.type || "AUTOLENIS",
         carrier_name: p.carrier,
@@ -361,10 +361,10 @@ export class InsuranceService {
       // Log success
       await this.logEvent("QUOTE_RECEIVED", dealId, userId, getProvider().name, {
         quoteCount: savedQuotes.length,
-        carriers: savedQuotes.map((q) => q.carrier_name),
+        carriers: savedQuotes.map((q: any) => q.carrier_name),
       })
 
-      return savedQuotes.map((q) => ({
+      return savedQuotes.map((q: any) => ({
         id: q.id,
         carrier_name: q.carrier_name,
         product_name: q.product_name,
@@ -750,7 +750,7 @@ export class InsuranceService {
         insurance_status: deal.insurance_status,
         user_id: deal.user_id || deal.buyerId,
       },
-      quotes: quotes.map((q) => ({
+      quotes: quotes.map((q: any) => ({
         id: q.id,
         carrier_name: q.carrier_name || q.carrier,
         product_name: q.product_name || q.productName,
@@ -765,7 +765,7 @@ export class InsuranceService {
         provider_name: q.provider_name,
         created_at: q.createdAt,
       })),
-      policies: policies.map((p) => ({
+      policies: policies.map((p: any) => ({
         id: p.id,
         type: p.type,
         carrier: p.carrier,

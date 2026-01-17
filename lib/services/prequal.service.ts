@@ -455,7 +455,7 @@ export class PreQualService {
       >`SELECT * FROM prequal_provider_events WHERE user_id = ${userId} ORDER BY created_at DESC`,
     ])
 
-    const activePreQual = preQuals.find((p) => p.prequal_status === "ACTIVE" && p.expiresAt && p.expiresAt > new Date())
+    const activePreQual = preQuals.find((p: any) => p.prequal_status === "ACTIVE" && p.expiresAt && p.expiresAt > new Date())
 
     return {
       activePreQualification: activePreQual || null,

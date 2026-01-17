@@ -110,7 +110,7 @@ export class AdminService {
       take: limit,
     })
 
-    return dealers.map((dealer) => ({
+    return dealers.map((dealer: any) => ({
       id: dealer.id,
       name: dealer.name || dealer.businessName || "Unknown",
       integrityScore: dealer.integrityScore || 0,
@@ -137,7 +137,7 @@ export class AdminService {
       take: limit,
     })
 
-    return affiliates.map((a) => ({
+    return affiliates.map((a: any) => ({
       id: a.id,
       name: `${a.firstName || ""} ${a.lastName || ""}`.trim() || a.user?.email || "Unknown",
       email: a.user?.email || "",
@@ -194,7 +194,7 @@ export class AdminService {
     ])
 
     return {
-      buyers: buyers.map((u) => ({
+      buyers: buyers.map((u: any) => ({
         id: u.id,
         email: u.email,
         firstName: u.first_name || u.buyer?.profile?.firstName || "",
@@ -306,7 +306,7 @@ export class AdminService {
     ])
 
     return {
-      dealers: dealers.map((d) => ({
+      dealers: dealers.map((d: any) => ({
         id: d.id,
         name: d.name || d.businessName || "Unknown",
         email: d.email || "",
@@ -372,7 +372,7 @@ export class AdminService {
     ])
 
     return {
-      auctions: auctions.map((a) => ({
+      auctions: auctions.map((a: any) => ({
         id: a.id,
         buyerName:
           `${a.buyer?.profile?.firstName || ""} ${a.buyer?.profile?.lastName || ""}`.trim() ||
@@ -444,7 +444,7 @@ export class AdminService {
     ])
 
     return {
-      deals: deals.map((d) => ({
+      deals: deals.map((d: any) => ({
         id: d.id,
         buyerName:
           `${d.buyer?.profile?.firstName || ""} ${d.buyer?.profile?.lastName || ""}`.trim() ||
@@ -545,7 +545,7 @@ export class AdminService {
     }
 
     return {
-      deposits: deposits.map((d) => ({
+      deposits: deposits.map((d: any) => ({
         id: d.id,
         type: "DEPOSIT",
         buyerName:
@@ -559,7 +559,7 @@ export class AdminService {
         createdAt: d.createdAt,
         refundedAt: d.refundedAt,
       })),
-      fees: fees.map((f) => ({
+      fees: fees.map((f: any) => ({
         id: f.id,
         type: "SERVICE_FEE",
         dealId: f.dealId,
@@ -623,20 +623,20 @@ export class AdminService {
     ])
 
     return {
-      affiliates: affiliates.map((a) => ({
+      affiliates: affiliates.map((a: any) => ({
         id: a.id,
         name: `${a.firstName || ""} ${a.lastName || ""}`.trim() || a.user?.email || "Unknown",
         email: a.user?.email || "",
         refCode: a.referralCode || a.refCode || a.ref_code || "",
         totalClicks: a.clicks?.length || 0,
-        level1Referrals: a.referrals?.filter((r) => r.level === 1).length || 0,
-        level2Referrals: a.referrals?.filter((r) => r.level === 2).length || 0,
-        level3Referrals: a.referrals?.filter((r) => r.level === 3).length || 0,
-        level4Referrals: a.referrals?.filter((r) => r.level === 4).length || 0,
-        level5Referrals: a.referrals?.filter((r) => r.level === 5).length || 0,
+        level1Referrals: a.referrals?.filter((r: any) => r.level === 1).length || 0,
+        level2Referrals: a.referrals?.filter((r: any) => r.level === 2).length || 0,
+        level3Referrals: a.referrals?.filter((r: any) => r.level === 3).length || 0,
+        level4Referrals: a.referrals?.filter((r: any) => r.level === 4).length || 0,
+        level5Referrals: a.referrals?.filter((r: any) => r.level === 5).length || 0,
         totalEarnings: a.totalEarnings || 0,
         pendingEarnings: a.pendingEarnings || 0,
-        totalPayouts: a.payouts?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0,
+        totalPayouts: a.payouts?.reduce((sum: any, p) => sum + (p.amount || 0), 0) || 0,
         createdAt: a.createdAt,
       })),
       total,
@@ -685,7 +685,7 @@ export class AdminService {
     ])
 
     return {
-      events: events.map((e) => ({
+      events: events.map((e: any) => ({
         id: e.id,
         type: e.type || e.eventType || "UNKNOWN",
         severity: e.severity || "INFO",
@@ -743,7 +743,7 @@ export class AdminService {
     ])
 
     return {
-      scans: scans.map((s) => ({
+      scans: scans.map((s: any) => ({
         id: s.id,
         dealId: s.selectedDealId,
         buyerName:
@@ -759,7 +759,7 @@ export class AdminService {
         paymentMatch: s.paymentMatch,
         junkFeesDetected: s.junkFeesDetected,
         issues:
-          s.fixListItems?.map((i) => ({
+          s.fixListItems?.map((i: any) => ({
             id: i.id,
             category: i.category,
             description: i.description,
@@ -821,7 +821,7 @@ export class AdminService {
     ])
 
     return {
-      quotes: quotes.map((q) => ({
+      quotes: quotes.map((q: any) => ({
         id: q.id,
         buyerName:
           `${q.buyer?.profile?.firstName || ""} ${q.buyer?.profile?.lastName || ""}`.trim() ||
@@ -834,7 +834,7 @@ export class AdminService {
         expiresAt: q.expiresAt,
         createdAt: q.createdAt,
       })),
-      policies: policies.map((p) => ({
+      policies: policies.map((p: any) => ({
         id: p.id,
         buyerName:
           `${p.deal?.buyer?.profile?.firstName || ""} ${p.deal?.buyer?.profile?.lastName || ""}`.trim() ||
@@ -861,7 +861,7 @@ export class AdminService {
     const settings = await prisma.adminSettings.findMany()
 
     const settingsMap: Record<string, any> = {}
-    settings.forEach((s) => {
+    settings.forEach((s: any) => {
       settingsMap[s.key] = s.valueJson || s.value || null
     })
 
@@ -1004,7 +1004,7 @@ export class AdminService {
       },
     })
 
-    return dealers.map((dealer) => ({
+    return dealers.map((dealer: any) => ({
       id: dealer.id,
       name: dealer.name || dealer.businessName || "Unknown",
       integrityScore: dealer.integrityScore || 0,

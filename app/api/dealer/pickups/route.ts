@@ -5,7 +5,7 @@ import { dealerService } from "@/lib/services/dealer.service"
 export const dynamic = "force-dynamic"
 
 // Get pickups
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || !["DEALER", "DEALER_USER"].includes(user.role)) {
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 }
 
 // Validate QR code
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || !["DEALER", "DEALER_USER"].includes(user.role)) {

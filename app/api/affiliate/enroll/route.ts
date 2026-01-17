@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getCurrentUser } from "@/lib/auth-server"
 import { affiliateService } from "@/lib/services/affiliate.service"
 
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
     const user = await getCurrentUser()
     if (!user) {

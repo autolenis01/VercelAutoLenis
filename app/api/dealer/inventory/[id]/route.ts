@@ -3,7 +3,7 @@ import { getSessionUser } from "@/lib/auth-server"
 import { dealerService } from "@/lib/services/dealer.service"
 
 // Update inventory item
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const user = await getSessionUser()
@@ -27,7 +27,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 // Delete inventory item
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const user = await getSessionUser()

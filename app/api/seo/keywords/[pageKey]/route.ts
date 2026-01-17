@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { requireAuth } from "@/lib/auth-server"
 import { seoService } from "@/lib/services/seo.service"
 
-export async function GET(request: Request, { params }: { params: Promise<{ pageKey: string }> }) {
+export async function GET(_request: Request, { params }: { params: Promise<{ pageKey: string }> }) {
   try {
     const user = await requireAuth(["ADMIN"])
     if (!user) {
@@ -19,7 +19,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ page
   }
 }
 
-export async function PUT(request: Request, { params }: { params: Promise<{ pageKey: string }> }) {
+export async function PUT(_request: Request, { params }: { params: Promise<{ pageKey: string }> }) {
   try {
     const user = await requireAuth(["ADMIN"])
     if (!user) {

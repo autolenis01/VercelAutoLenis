@@ -20,7 +20,7 @@ export default function BuyerSearchPage() {
   const [vehicles, setVehicles] = useState<any[]>([])
   const [shortlist, setShortlist] = useState<any>(null)
   const [preQual, setPreQual] = useState<any>(null)
-  const [filters, setFilters] = useState({
+  const [_filters, _setFilters] = useState({
     makes: [] as string[],
     bodyStyles: [] as string[],
     maxPrice: "",

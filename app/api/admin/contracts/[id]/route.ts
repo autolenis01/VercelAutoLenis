@@ -5,7 +5,7 @@ import { ContractShieldService } from "@/lib/services/contract-shield.service"
 export const dynamic = "force-dynamic"
 
 // Get contract scan details for admin
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await getSessionUser()
     if (!user || user.role !== "ADMIN") {

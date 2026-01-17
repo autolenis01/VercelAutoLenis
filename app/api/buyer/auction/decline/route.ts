@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   try {
     const session = await requireAuth(["BUYER"])
     const body = await request.json()
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data: buyer, error: buyerError } = await supabase
       .from("BuyerProfile")
