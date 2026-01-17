@@ -5,7 +5,7 @@ export function getReferralCode(affiliate: any): string {
 }
 
 export function buildReferralLink(code: string, path = "/"): string {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"
+  const baseUrl = process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"
   return `${baseUrl}${path}?ref=${code}`
 }
 

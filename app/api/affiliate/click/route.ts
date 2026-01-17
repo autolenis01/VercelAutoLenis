@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     // Set attribution cookie (30 days)
     response.cookies.set("autolenis_ref", result.cookieId!, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env["NODE_ENV"] === "production",
       sameSite: "lax",
       maxAge: 30 * 24 * 60 * 60,
       path: "/",
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     // Also set ref code cookie for easier access
     response.cookies.set("autolenis_ref_code", code, {
       httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env["NODE_ENV"] === "production",
       sameSite: "lax",
       maxAge: 30 * 24 * 60 * 60,
       path: "/",

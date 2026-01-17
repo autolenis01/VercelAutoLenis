@@ -32,7 +32,7 @@ function ipToNumber(ip: string): number {
 export async function validateCronRequest(request: NextRequest): Promise<NextResponse | null> {
   // Check cron secret
   const authHeader = request.headers.get("authorization")
-  const cronSecret = process.env.CRON_SECRET
+  const cronSecret = process.env["CRON_SECRET"]
 
   if (!cronSecret) {
     console.error("[CronSecurity] CRON_SECRET not configured")
@@ -45,7 +45,7 @@ export async function validateCronRequest(request: NextRequest): Promise<NextRes
   }
 
   // In production, also verify IP address
-  if (process.env.NODE_ENV === "production") {
+  if (process.env["NODE_ENV"] === "production") {
     const ip = request.ip || request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip")
 
     if (!ip) {

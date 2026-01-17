@@ -511,7 +511,7 @@ export class AffiliateService {
     return {
       primary: buildReferralLink(refCode, "/"),
       getStarted: buildReferralLink(refCode, "/get-started"),
-      landingPage: slug ? `${process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"}/a/${slug}` : null,
+      landingPage: slug ? `${process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"}/a/${slug}` : null,
       refCode,
       landingSlug: slug,
     }

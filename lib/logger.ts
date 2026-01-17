@@ -16,7 +16,7 @@ class Logger {
 
   constructor(prefix = "") {
     this.prefix = prefix
-    this.isDevelopment = process.env.NODE_ENV === "development"
+    this.isDevelopment = process.env["NODE_ENV"] === "development"
   }
 
   private log(level: LogLevel, message: string, context?: LogContext) {

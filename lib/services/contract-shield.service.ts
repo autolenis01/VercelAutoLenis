@@ -683,7 +683,7 @@ export class ContractShieldService {
             overrideId,
             action,
             reason,
-            reviewUrl: `${process.env.NEXT_PUBLIC_APP_URL}/buyer/contracts`,
+            reviewUrl: `${process.env["NEXT_PUBLIC_APP_URL"]}/buyer/contracts`,
           },
         })
 
@@ -756,7 +756,7 @@ export class ContractShieldService {
               scanId,
               oldStatus,
               newStatus,
-              reviewUrl: `${process.env.NEXT_PUBLIC_APP_URL}/buyer/contracts`,
+              reviewUrl: `${process.env["NEXT_PUBLIC_APP_URL"]}/buyer/contracts`,
             },
           })
 
@@ -798,7 +798,7 @@ export class ContractShieldService {
               scanId,
               oldStatus,
               newStatus,
-              reviewUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dealer/contracts`,
+              reviewUrl: `${process.env["NEXT_PUBLIC_APP_URL"]}/dealer/contracts`,
             },
           })
 

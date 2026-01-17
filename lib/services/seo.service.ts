@@ -422,7 +422,7 @@ export class SEOService {
     if (error) {
       console.error("[SEO] Error generating sitemap:", error)
       // Return default pages if database query fails
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"
+      const baseUrl = process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"
       return [
         { loc: baseUrl, lastmod: new Date().toISOString().split("T")[0], changefreq: "weekly", priority: "1.0" },
         {
@@ -440,7 +440,7 @@ export class SEOService {
       ]
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"
+    const baseUrl = process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"
 
     if (!pages || pages.length === 0) {
       // Return default sitemap entries if no SEO pages configured
@@ -473,7 +473,7 @@ export class SEOService {
 
   // Generate robots.txt rules
   async generateRobotsTxt() {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"
+    const baseUrl = process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"
 
     const rules = [
       "User-agent: *",

@@ -161,7 +161,7 @@ export async function setAdminSession(
   const cookieStore = await cookies()
   cookieStore.set("admin_session", sessionId, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env["NODE_ENV"] === "production",
     sameSite: "strict",
     maxAge: 60 * 60 * 24, // 24 hours
     path: "/",

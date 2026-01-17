@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
         ? {
             id: affiliate.id,
             referralCode: affiliate.refCode || affiliate.referralCode,
-            referralLink: `${process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"}/ref/${affiliate.refCode || affiliate.referralCode}`,
+            referralLink: `${process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"}/ref/${affiliate.refCode || affiliate.referralCode}`,
           }
         : null,
       commissionsProcessed: commissions.length,

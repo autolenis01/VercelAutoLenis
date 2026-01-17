@@ -13,7 +13,7 @@ export class MonitoringService {
 
     // Log startup
     logger.info("Application monitoring initialized", {
-      environment: process.env.NODE_ENV,
+      environment: process.env["NODE_ENV"],
       version: process.env.NEXT_PUBLIC_APP_VERSION || "unknown",
     })
 
@@ -66,7 +66,7 @@ export class MonitoringService {
           })
 
           // Track in production monitoring
-          if (process.env.NODE_ENV === "production") {
+          if (process.env["NODE_ENV"] === "production") {
             errorMonitoring.addBreadcrumb("performance", "info", {
               metric: "LCP",
               value: lcpValue,
@@ -91,7 +91,7 @@ export class MonitoringService {
               threshold: "good < 100ms, needs improvement < 300ms",
             })
 
-            if (process.env.NODE_ENV === "production") {
+            if (process.env["NODE_ENV"] === "production") {
               errorMonitoring.addBreadcrumb("performance", "info", {
                 metric: "FID",
                 value: fid,
@@ -118,7 +118,7 @@ export class MonitoringService {
                 threshold: "good < 0.1, needs improvement < 0.25",
               })
 
-              if (process.env.NODE_ENV === "production" && clsValue > 0.1) {
+              if (process.env["NODE_ENV"] === "production" && clsValue > 0.1) {
                 errorMonitoring.addBreadcrumb("performance", "warning", {
                   metric: "CLS",
                   value: clsValue,
