@@ -10,7 +10,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ dea
     }
 
     const { dealId } = await params
-    const result = await esignService.getEnvelopeForBuyer(dealId, user.id)
+    const result = await esignService.getEnvelopeForBuyer(dealId, user.userId)
 
     return NextResponse.json({ success: true, ...result })
   } catch (error: any) {

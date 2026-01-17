@@ -30,14 +30,14 @@ export async function GET(_req: NextRequest) {
     let currentAffiliate = affiliate
     if (!currentAffiliate) {
       const refCode = generateReferralCode()
-      const landingSlug = generateLandingSlug(user.firstName || "user", user.lastName || user.userId.substring(0, 4))
+      const landingSlug = generateLandingSlug("user", user.userId.substring(0, 4))
 
       const { data: newAffiliate, error: createError } = await supabase
         .from("Affiliate")
         .insert({
           userId: user.userId,
-          firstName: user.firstName || "",
-          lastName: user.lastName || "",
+          firstName: "",
+          lastName: "",
           refCode,
           referralCode: refCode,
           ref_code: refCode,
@@ -133,7 +133,7 @@ export async function GET(_req: NextRequest) {
       level5: referralsByLevelData?.filter((r) => r.level === 5).length || 0,
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"
+    const baseUrl = process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"
     const links = {
       referralLink: `${baseUrl}/?ref=${currentAffiliate.refCode || currentAffiliate.referralCode}`,
       landingPage: `${baseUrl}/r/${currentAffiliate.landingSlug || currentAffiliate.landing_slug}`,

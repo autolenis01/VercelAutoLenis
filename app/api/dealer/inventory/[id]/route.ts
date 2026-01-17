@@ -11,7 +11,7 @@ export async function PATCH(_req: NextRequest, { params }: { params: Promise<{ i
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const dealer = await dealerService.getDealerByUserId(user.id)
+    const dealer = await dealerService.getDealerByUserId(user.userId)
     if (!dealer) {
       return NextResponse.json({ error: "Dealer not found" }, { status: 404 })
     }
@@ -35,7 +35,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const dealer = await dealerService.getDealerByUserId(user.id)
+    const dealer = await dealerService.getDealerByUserId(user.userId)
     if (!dealer) {
       return NextResponse.json({ error: "Dealer not found" }, { status: 404 })
     }
