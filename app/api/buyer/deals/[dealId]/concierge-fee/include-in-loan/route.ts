@@ -8,7 +8,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
     const { dealId } = await params
     const body = await request.json()
 
-    const { confirm, confirmation_text } = body
+    const { confirm } = body
 
     if (!confirm) {
       return NextResponse.json({ success: false, error: "Confirmation required" }, { status: 400 })

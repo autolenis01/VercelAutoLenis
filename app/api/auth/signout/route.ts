@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server"
 import { getSessionUser, clearSession } from "@/lib/auth-server"
 
-export async function POST(request: Request) {
+export async function POST(_request: Request) {
   try {
-    const _user = await getSessionUser()
+    const user = await getSessionUser()
     const userRole = user?.role || "BUYER"
 
     // Clear the session
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
-    const _user = await getSessionUser()
+    const user = await getSessionUser()
     const userRole = user?.role || "BUYER"
 
     await clearSession()

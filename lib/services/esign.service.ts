@@ -253,6 +253,10 @@ export class ESignService {
     }
   }
 
+  async getEnvelopeStatus(envelopeId: string) {
+    return this.provider.getEnvelopeStatus(envelopeId)
+  }
+
   // Handle webhook from e-sign provider
   async handleWebhook(payload: {
     provider: string

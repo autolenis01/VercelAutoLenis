@@ -27,7 +27,7 @@ export async function GET(_req: NextRequest) {
 }
 
 // Validate QR code
-export async function POST(_req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || !["DEALER", "DEALER_USER"].includes(user.role)) {

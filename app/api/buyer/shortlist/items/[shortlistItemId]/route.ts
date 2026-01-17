@@ -63,7 +63,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
 }
 
 // PATCH - Update notes for a shortlist item
-export async function PATCH(_request: Request, { params }: { params: Promise<{ shortlistItemId: string }> }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ shortlistItemId: string }> }) {
   try {
     const session = await requireAuth(["BUYER"])
     const { shortlistItemId } = await params

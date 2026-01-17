@@ -508,6 +508,24 @@ export class PickupService {
     })
   }
 
+  async checkIn(qrCodeValue: string, dealerUserId: string) {
+    return this.checkInByQR(qrCodeValue, dealerUserId)
+  }
+
+  async generateQRCode(appointmentId: string) {
+    const codeValue = `PICKUP:${appointmentId}:${crypto.randomUUID()}`
+    return { qrCode: codeValue, qrCodeValue: codeValue }
+  }
+
+  async validatePickupCode(code: string) {
+    const parts = code.split(":")
+    const isValid = parts[0] === "PICKUP" && parts.length >= 3
+    return {
+      valid: isValid,
+      appointmentId: isValid ? parts[1] : null,
+    }
+  }
+
   // Helper: Log pickup event
   private async logPickupEvent(
     appointmentId: string,

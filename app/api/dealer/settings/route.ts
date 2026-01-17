@@ -27,7 +27,7 @@ export async function GET(_req: NextRequest) {
 }
 
 // Update settings
-export async function PATCH(_req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || !["DEALER", "DEALER_USER"].includes(user.role)) {

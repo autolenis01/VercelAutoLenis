@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const referral = await affiliateService.trackReferral(affiliate.id, buyer.id)
+    const referral = await affiliateService.trackReferral(affiliate.id, buyer.id, user.userId)
 
     return NextResponse.json(referral)
   } catch (error: any) {

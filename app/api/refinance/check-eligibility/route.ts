@@ -50,7 +50,7 @@ const ALLOWED_STATES_OPENROAD = [
 ]
 
 // OpenRoad Partner ID
-const OPENROAD_PARTNER_ID = process.env.OPENROAD_PARTNER_ID || "autolenis"
+const OPENROAD_PARTNER_ID = process.env["OPENROAD_PARTNER_ID"] || "autolenis"
 
 interface RefinanceFormData {
   firstName: string

@@ -161,6 +161,36 @@ export class AffiliateService {
     }
   }
 
+  async trackReferral(affiliateId: string, buyerProfileId: string, userId?: string) {
+    const existing = await prisma.referral.findFirst({
+      where: { affiliateId, referredBuyerId: buyerProfileId },
+    })
+
+    if (existing) {
+      return existing
+    }
+
+    return prisma.referral.create({
+      data: {
+        affiliateId,
+        referredBuyerId: buyerProfileId,
+        referredUserId: userId,
+      },
+    })
+  }
+
+  async completeDealReferral(dealId: string, userId: string): Promise<any[]> {
+    await prisma.referral.updateMany({
+      where: { referredUserId: userId },
+      data: {
+        dealCompleted: true,
+        dealId,
+      },
+    })
+
+    return []
+  }
+
   // Build 5-level referral chain (idempotent)
   async buildReferralChain(
     referredUserId: string,
