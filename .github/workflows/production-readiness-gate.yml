@@ -14,6 +14,8 @@ jobs:
   readiness-gate:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      POSTGRES_PRISMA_URL: postgresql://user:password@localhost:5432/placeholder?schema=public
 
     steps:
       - name: Checkout
@@ -33,21 +35,15 @@ jobs:
 
       # Deterministic install
       - name: Install (frozen lockfile)
-        env:
-          # Ensure Prisma generate never blocks CI even if postinstall runs it
-          POSTGRES_PRISMA_URL: postgresql://user:password@localhost:5432/placeholder?schema=public
         run: pnpm install --frozen-lockfile
 
       # Prisma schema must at least validate (no DB connectivity required)
       - name: Prisma validate (schema correctness)
-        env:
-          POSTGRES_PRISMA_URL: postgresql://user:password@localhost:5432/placeholder?schema=public
         run: pnpm exec prisma validate
 
       # Build must succeed in CI (mirrors Vercel)
       - name: Build
         env:
-          POSTGRES_PRISMA_URL: postgresql://user:password@localhost:5432/placeholder?schema=public
           NEXT_PUBLIC_APP_URL: http://localhost:3000
           NEXT_PUBLIC_SUPABASE_URL: http://localhost
           NEXT_PUBLIC_SUPABASE_ANON_KEY: anon
