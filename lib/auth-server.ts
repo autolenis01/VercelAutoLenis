@@ -45,10 +45,10 @@ export async function setSessionCookie(token: string) {
   // In preview, we use host-only cookies (no domain attribute)
   const isProduction = process.env.VERCEL_ENV === "production"
   
-  const cookieOptions: any = {
+  const cookieOptions = {
     httpOnly: true,
     secure: isSecure,
-    sameSite: "lax",
+    sameSite: "lax" as const,
     maxAge: 60 * 60 * 24 * 7, // 7 days
     path: "/",
   }

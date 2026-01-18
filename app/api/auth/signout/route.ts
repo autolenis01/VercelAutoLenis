@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server"
 import { getSessionUser, clearSession } from "@/lib/auth-server"
 
+function buildClearCookieHeader(): string {
+  const isSecure = process.env.NODE_ENV === "production"
+  return `session=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax${isSecure ? "; Secure" : ""}`
+}
+
 export async function POST() {
   try {
     const user = await getSessionUser()
@@ -8,10 +13,6 @@ export async function POST() {
 
     // Clear the session
     await clearSession()
-
-    // Match the cookie attributes used in setSessionCookie
-    const isSecure = process.env.NODE_ENV === "production"
-    const cookieHeader = `session=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax${isSecure ? "; Secure" : ""}`
 
     return NextResponse.json(
       {
@@ -22,16 +23,13 @@ export async function POST() {
       {
         // Clear the session cookie in the response
         headers: {
-          "Set-Cookie": cookieHeader,
+          "Set-Cookie": buildClearCookieHeader(),
         },
       },
     )
   } catch (error) {
     console.error("[SignOut API] Error:", error)
     // Even on error, return success so user can be redirected
-    const isSecure = process.env.NODE_ENV === "production"
-    const cookieHeader = `session=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax${isSecure ? "; Secure" : ""}`
-    
     return NextResponse.json(
       {
         success: true,
@@ -40,7 +38,7 @@ export async function POST() {
       },
       {
         headers: {
-          "Set-Cookie": cookieHeader,
+          "Set-Cookie": buildClearCookieHeader(),
         },
       },
     )

@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { useToast } from "@/hooks/use-toast"
 
 interface AuthDebugDrawerProps {
   portalType?: "buyer" | "dealer" | "affiliate" | "admin"
@@ -16,6 +17,7 @@ export function AuthDebugDrawer({ portalType = "buyer" }: AuthDebugDrawerProps) 
   const [mounted, setMounted] = useState(false)
   const [debugInfo, setDebugInfo] = useState<any>(null)
   const [isOpen, setIsOpen] = useState(false)
+  const { toast } = useToast()
 
   useEffect(() => {
     setMounted(true)
@@ -36,6 +38,14 @@ export function AuthDebugDrawer({ portalType = "buyer" }: AuthDebugDrawerProps) 
       })
     }
   }, [mounted, portalType])
+
+  const handleCopyDebugInfo = () => {
+    navigator.clipboard.writeText(JSON.stringify(debugInfo, null, 2))
+    toast({
+      title: "Debug info copied",
+      description: "Debug information has been copied to your clipboard.",
+    })
+  }
 
   if (!mounted || !showDebug) {
     return null
@@ -149,14 +159,7 @@ export function AuthDebugDrawer({ portalType = "buyer" }: AuthDebugDrawerProps) 
               View Server Diagnostics
               <ChevronRight className="h-4 w-4" />
             </Button>
-            <Button
-              variant="outline"
-              className="w-full justify-between"
-              onClick={() => {
-                navigator.clipboard.writeText(JSON.stringify(debugInfo, null, 2))
-                alert("Debug info copied to clipboard")
-              }}
-            >
+            <Button variant="outline" className="w-full justify-between" onClick={handleCopyDebugInfo}>
               Copy Debug Info
               <ChevronRight className="h-4 w-4" />
             </Button>
