@@ -11,7 +11,7 @@ export async function GET() {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
     }
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data: deal, error } = await supabase
       .from("SelectedDeal")

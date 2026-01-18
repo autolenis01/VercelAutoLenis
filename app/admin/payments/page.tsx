@@ -25,7 +25,7 @@ export const dynamic = "force-dynamic"
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function AdminPaymentsPage() {
-  const { data, error, isLoading, mutate } = useSWR("/api/admin/payments", fetcher, {
+  const { data, error: _error, isLoading, mutate } = useSWR("/api/admin/payments", fetcher, {
     refreshInterval: 30000,
   })
   const [searchTerm, setSearchTerm] = useState("")
