@@ -13,7 +13,9 @@ jobs:
     env:
       PRISMA_CHECKPOINT_DISABLE: "1"
       PRISMA_DISABLE_TELEMETRY: "1"
-    
+      # Deterministic Prisma placeholder URL for CI (quoted to avoid YAML parsing edge cases)
+      POSTGRES_PRISMA_URL: "postgresql://user:password@localhost:5432/placeholder?schema=public"
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,36 +23,32 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Enable Corepack
         run: corepack enable
 
+      - name: Debug Prisma URL protocol (safe)
+        run: |
+          node -e "const v=process.env.POSTGRES_PRISMA_URL||''; console.log('POSTGRES_PRISMA_URL protocol ok:', /^postgres(ql)?:\\/\\//.test(v));"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        env:
-          # Prisma generate runs in postinstall with placeholder URL fallback
-          POSTGRES_PRISMA_URL: postgresql://user:password@localhost:5432/placeholder?schema=public
 
       - name: Verify Prisma schema is valid
         run: |
           echo "Validating Prisma schema..."
           pnpm prisma validate
-        env:
-          POSTGRES_PRISMA_URL: postgresql://user:password@localhost:5432/placeholder?schema=public
 
       - name: Build application
         run: pnpm build
-        env:
-          # Prisma generate already ran in postinstall
-          POSTGRES_PRISMA_URL: postgresql://user:password@localhost:5432/placeholder?schema=public
 
       - name: Verify security patches
         run: |
           echo "Verifying happy-dom version..."
           HAPPY_DOM_VERSION=$(pnpm list happy-dom --json | jq -r '.[0].devDependencies["happy-dom"].version')
           echo "happy-dom version: $HAPPY_DOM_VERSION"
-          
+
           # Check if version is >= 20.0.0
           if [ "$(printf '%s\n' "20.0.0" "$HAPPY_DOM_VERSION" | sort -V | head -n1)" = "20.0.0" ]; then
             echo "✓ happy-dom is patched (>= 20.0.0)"
