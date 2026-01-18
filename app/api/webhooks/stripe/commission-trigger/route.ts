@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   try {
     // Verify internal API key or Stripe signature
     const authHeader = request.headers.get("x-api-key")
-    const expectedKey = process.env["CRON_SECRET"] || process.env.INTERNAL_API_KEY
+    const expectedKey = process.env["CRON_SECRET"] || process.env["INTERNAL_API_KEY"]
 
     if (authHeader !== expectedKey) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

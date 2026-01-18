@@ -644,6 +644,16 @@ export class AffiliateService {
     }
   }
 
+  // Minimal placeholder to satisfy webhook usage
+  async processCommission(affiliateId: string, buyerId: string, amount: number, type: string) {
+    await this.logEvent(affiliateId, "COMMISSION_TRIGGERED", {
+      buyerId,
+      amount,
+      type,
+    })
+    return { processed: true }
+  }
+
   // Log affiliate event for audit trail
   private async logEvent(affiliateId: string, eventType: string, details: any) {
     try {

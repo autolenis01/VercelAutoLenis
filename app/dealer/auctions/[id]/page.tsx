@@ -27,7 +27,7 @@ const RESERVED_SEGMENTS = ["offers", "invited", "loading", "settings", "undefine
 
 export default function DealerAuctionDetailPage() {
   const params = useParams()
-  const auctionId = params.id as string
+  const auctionId = (params as any)?.id as string
   const router = useRouter()
   const { toast } = useToast()
 

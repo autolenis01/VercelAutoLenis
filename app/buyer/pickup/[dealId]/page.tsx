@@ -14,6 +14,7 @@ import Image from "next/image"
 
 export default function PickupSchedulePage() {
   const params = useParams()
+  const dealId = (params as any)?.dealId as string
   const [pickup, setPickup] = useState<any>(null)
   const [qrCode, setQrCode] = useState("")
   const [scheduledAt, setScheduledAt] = useState("")
@@ -29,7 +30,7 @@ export default function PickupSchedulePage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          dealId: params.dealId,
+          dealId,
           scheduledAt,
           notes,
         }),

@@ -63,8 +63,11 @@ export async function POST(request: Request) {
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const supabase = await createClient()
-  const metadata = session.metadata || {}
-  const type = metadata.type
+  const metadata = (session.metadata || {}) as Record<string, any>
+  const type = metadata["type"]
+  const buyerId = metadata["buyerId"]
+  const auctionId = metadata["auctionId"]
+  const dealId = metadata["dealId"]
 
   if (type === "deposit") {
     await supabase
@@ -73,19 +76,19 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         status: "SUCCEEDED",
         stripePaymentIntentId: session.payment_intent as string,
       })
-      .eq("buyerId", metadata.buyerId)
-      .eq("auctionId", metadata.auctionId)
+      .eq("buyerId", buyerId)
+      .eq("auctionId", auctionId)
       .eq("status", "PENDING")
 
     // Log compliance event
-    await supabase.from("ComplianceEvent").insert({
-      eventType: "DEPOSIT_PAYMENT",
-      buyerId: metadata.buyerId,
-      action: "DEPOSIT_PAID",
-      details: {
-        amount: session.amount_total ? session.amount_total / 100 : 0,
-        sessionId: session.id,
-        paymentIntentId: session.payment_intent,
+      await supabase.from("ComplianceEvent").insert({
+        eventType: "DEPOSIT_PAYMENT",
+        buyerId,
+        action: "DEPOSIT_PAID",
+        details: {
+          amount: session.amount_total ? session.amount_total / 100 : 0,
+          sessionId: session.id,
+          paymentIntentId: session.payment_intent,
       },
     })
   } else if (type === "service_fee") {
@@ -93,7 +96,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     const { data: payment } = await supabase
       .from("ServiceFeePayment")
       .select("id, finalAmount, deal:SelectedDeal(id, buyerId)")
-      .eq("dealId", metadata.dealId)
+      .eq("dealId", dealId)
       .eq("status", "PENDING")
       .single()
 
@@ -107,27 +110,37 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         .eq("id", payment.id)
 
       // Update deal status
-      await supabase.from("SelectedDeal").update({ status: "FEE_PAID" }).eq("id", metadata.dealId)
+      await supabase.from("SelectedDeal").update({ status: "FEE_PAID" }).eq("id", dealId)
 
       // Process affiliate commission if applicable
-      if (payment.deal?.buyerId) {
+      const dealBuyerId =
+        (payment as any)?.deal?.buyerId ||
+        (Array.isArray((payment as any)?.deal) ? (payment as any).deal[0]?.buyerId : undefined)
+
+      if (dealBuyerId) {
         const { data: buyer } = await supabase
           .from("BuyerProfile")
           .select("userId, user:User(referredBy)")
-          .eq("id", payment.deal.buyerId)
+          .eq("id", dealBuyerId)
           .single()
 
-        if (buyer?.user?.referredBy) {
+        const referrer =
+          (buyer as any)?.user?.referredBy ||
+          (Array.isArray((buyer as any)?.user) ? (buyer as any).user[0]?.referredBy : undefined)
+
+        const buyerUserId = buyer?.userId
+
+        if (referrer && buyerUserId) {
           // Award commission to referrer
-          await affiliateService.processCommission(buyer.user.referredBy, buyer.userId, payment.finalAmount, "PURCHASE")
+          await affiliateService.processCommission(referrer, buyerUserId, payment.finalAmount, "PURCHASE")
         }
       }
 
       // Log compliance event
       await supabase.from("ComplianceEvent").insert({
         eventType: "SERVICE_FEE_PAYMENT",
-        buyerId: payment.deal?.buyerId,
-        dealId: metadata.dealId,
+        buyerId: dealBuyerId,
+        dealId,
         action: "FEE_PAID_CARD",
         details: {
           amount: payment.finalAmount,
@@ -141,13 +154,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
 async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   const supabase = await createClient()
-  const metadata = paymentIntent.metadata || {}
+  const metadata = (paymentIntent.metadata || {}) as Record<string, any>
+  const type = metadata["type"]
 
-  if (metadata.type === "deposit") {
+  if (type === "deposit") {
     await supabase.from("DepositPayment").update({ status: "SUCCEEDED" }).eq("stripePaymentIntentId", paymentIntent.id)
   }
 
-  if (metadata.type === "service_fee") {
+  if (type === "service_fee") {
     await supabase
       .from("ServiceFeePayment")
       .update({ status: "SUCCEEDED" })
@@ -157,13 +171,14 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
 
 async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
   const supabase = await createClient()
-  const metadata = paymentIntent.metadata || {}
+  const metadata = (paymentIntent.metadata || {}) as Record<string, any>
+  const type = metadata["type"]
 
-  if (metadata.type === "deposit") {
+  if (type === "deposit") {
     await supabase.from("DepositPayment").update({ status: "FAILED" }).eq("stripePaymentIntentId", paymentIntent.id)
   }
 
-  if (metadata.type === "service_fee") {
+  if (type === "service_fee") {
     await supabase.from("ServiceFeePayment").update({ status: "FAILED" }).eq("stripePaymentIntentId", paymentIntent.id)
   }
 }
