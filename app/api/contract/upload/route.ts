@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
 import { requireAuth } from "@/lib/auth-server"
-import { contractShieldService } from "@/lib/services/contract-shield.service"
+import { ContractShieldService } from "@/lib/services/contract-shield.service"
 
 export async function POST(request: Request) {
   try {
     await requireAuth(["DEALER"])  // Auth check only
     const body = await request.json()
 
-    const contract = await contractShieldService.uploadContract(
+    const contract = await ContractShieldService.uploadDocument(
       body.dealId,
       body.dealerId,
       body.documentUrl,
