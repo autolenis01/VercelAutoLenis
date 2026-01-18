@@ -5,10 +5,10 @@
   "scripts": {
     "analyze": "ANALYZE=true next build",
     "build": "prisma generate && next build",
-    "check:unused": "bun run scripts/check-unused-imports.ts",
-    "db:migrate": "bun run scripts/migrations/run-migrations.ts",
+    "check:unused": "pnpm exec tsx scripts/check-unused-imports.ts",
+    "db:migrate": "pnpm exec tsx scripts/migrations/run-migrations.ts",
     "db:push": "prisma db push",
-    "db:setup": "bun run scripts/setup-database.mjs",
+    "db:setup": "node scripts/setup-database.mjs",
     "db:studio": "prisma studio",
     "dev": "next dev",
     "postinstall": "node scripts/postinstall.js",
@@ -31,6 +31,8 @@
   "dependencies": {
     "@auth/core": "0.34.3",
     "@edge-runtime/vm": "latest",
+    "@fontsource/geist": "^5.2.8",
+    "@fontsource/geist-mono": "^5.2.7",
     "@hookform/resolvers": "^3.10.0",
     "@opentelemetry/api": "latest",
     "@prisma/client": "6.10.0",

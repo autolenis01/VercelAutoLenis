@@ -20,11 +20,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Slider } from "@/components/ui/slider"
 import { Input } from "@/components/ui/input"
 
-const COMMISSION_RATES = [0.15, 0.03, 0.02]
-const LEVEL_NAMES = ["Direct Referral", "2nd Origin", "3rd Origin"]
-const LEVEL_COLORS = ["#7ED321", "#00D9FF", "#0066FF"]
+const COMMISSION_RATES: [number, number, number] = [0.15, 0.03, 0.02]
+const LEVEL_NAMES: [string, string, string] = ["Direct Referral", "2nd Origin", "3rd Origin"]
+const LEVEL_COLORS: [string, string, string] = ["#7ED321", "#00D9FF", "#0066FF"]
 
-const INCOME_DISTRIBUTION = [0.75, 0.15, 0.1]
+const INCOME_DISTRIBUTION: [number, number, number] = [0.75, 0.15, 0.1]
 
 export default function AffiliateIncomePage() {
   const [selectedPackage, setSelectedPackage] = useState(750)
@@ -232,12 +232,12 @@ export default function AffiliateIncomePage() {
               <div
                 key={index}
                 className="bg-white rounded-xl p-6 text-center border-2 transition-all hover:shadow-lg"
-                style={{ borderColor: `${LEVEL_COLORS[index]}40` }}
+                style={{ borderColor: `${LEVEL_COLORS[index]!}40` }}
               >
-                <div className="text-3xl md:text-4xl font-bold mb-2" style={{ color: LEVEL_COLORS[index] }}>
+                <div className="text-3xl md:text-4xl font-bold mb-2" style={{ color: LEVEL_COLORS[index]! }}>
                   {(rate * 100).toFixed(0)}%
                 </div>
-                <div className="text-sm text-[#666] mb-2">{LEVEL_NAMES[index]}</div>
+                <div className="text-sm text-[#666] mb-2">{LEVEL_NAMES[index]!}</div>
                 <div className="text-lg font-semibold text-[#3d2066]">${(selectedPackage * rate).toFixed(2)}</div>
                 <div className="text-xs text-[#999]">per car sold</div>
               </div>
