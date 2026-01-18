@@ -38,6 +38,16 @@ const formatDate = (date: string) => {
   })
 }
 
+const formatDateTime = (date: string) => {
+  return new Date(date).toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}
+
 // Reason code to human-readable labels
 const reasonLabels: Record<string, string> = {
   lender_vehicle_too_old: "Vehicle too old",

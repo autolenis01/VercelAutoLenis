@@ -1,15 +1,5 @@
 import Link from "next/link"
 import { Shield, Lock, Eye } from "lucide-react"
-import type { Metadata } from "next"
-import { resolveMetadata } from "@/lib/seo/resolve-metadata"
-
-export async function generateMetadata(): Promise<Metadata> {
-  return resolveMetadata({
-    pageKey: "privacy",
-    fallbackTitle: "Privacy Policy",
-    fallbackDescription: "Your data privacy and security are our top priorities. Learn how AutoLenis protects your information.",
-  })
-}
 
 export default function PrivacyPage() {
   return (

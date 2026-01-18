@@ -1,8 +1,9 @@
 // Server-side auth utilities - Only use in Server Components, Route Handlers, and Server Actions
-import { cookies } from "next/headers"
+import { cookies, headers } from "next/headers"
 import { verifySession, type SessionUser } from "./auth"
 import bcrypt from "bcryptjs"
 import { logger } from "./logger"
+import { getSessionCookieOptions, getClearCookieOptions } from "./utils/cookies"
 
 export async function getSession(): Promise<SessionUser | null> {
   const cookieStore = await cookies()
@@ -32,38 +33,40 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   }
 }
 
-export async function setSessionCookie(token: string) {
+export async function setSessionCookie(token: string, hostname?: string) {
   const cookieStore = await cookies()
-
-  logger.debug("Setting session cookie")
-
-  // Determine if we're in a secure context (https)
-  // In Vercel, both preview and production use https
-  const isSecure = process.env.NODE_ENV === "production"
   
-  // In production (not preview), we can set domain for autolenis.com
-  // In preview, we use host-only cookies (no domain attribute)
-  const isProduction = process.env.VERCEL_ENV === "production"
-  
-  const cookieOptions = {
-    httpOnly: true,
-    secure: isSecure,
-    sameSite: "lax" as const,
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-    path: "/",
+  // Get hostname from headers if not provided
+  let host = hostname
+  if (!host) {
+    const headerStore = await headers()
+    host = headerStore.get("host") || undefined
   }
-  
-  // Only set domain in true production if needed for subdomain sharing
-  // For now, we'll use host-only cookies for better cross-domain compatibility
-  // If domain is needed in future: cookieOptions.domain = ".autolenis.com"
-  
-  cookieStore.set("session", token, cookieOptions)
 
-  logger.debug("Session cookie set successfully", { isSecure, isProduction })
+  logger.debug("Setting session cookie", { host })
+
+  const options = getSessionCookieOptions(host)
+  cookieStore.set("session", token, options)
+
+  logger.debug("Session cookie set successfully", { domain: options.domain })
 }
 
-export async function clearSession() {
+export async function clearSession(hostname?: string) {
   const cookieStore = await cookies()
+  
+  // Get hostname from headers if not provided
+  let host = hostname
+  if (!host) {
+    const headerStore = await headers()
+    host = headerStore.get("host") || undefined
+  }
+
+  const options = getClearCookieOptions(host)
+  
+  // Delete session cookie with proper domain
+  cookieStore.set("session", "", options)
+  
+  // Also try deleting without domain for backwards compatibility
   cookieStore.delete("session")
 }
 

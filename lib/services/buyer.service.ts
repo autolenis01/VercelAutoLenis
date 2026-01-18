@@ -50,7 +50,7 @@ export const buyerService = {
         await Promise.all([
           supabase
             .from("PreQualification")
-            .select("id, buyerId, maxMonthlyPayment, approvedAmount, expiresAt, status, createdAt, updatedAt")
+            .select("id, buyerId, max_monthly_payment_cents, max_otd_amount_cents, expiresAt, prequal_status, createdAt, updatedAt")
             .eq("buyerId", buyerId)
             .order("createdAt", { ascending: false })
             .limit(1)
@@ -94,7 +94,7 @@ export const buyerService = {
 
           supabase
             .from("SelectedDeal")
-            .select("id, buyerId, status, totalPrice, createdAt, updatedAt")
+            .select("id, buyerId, status, total_otd_amount_cents, createdAt, updatedAt")
             .eq("buyerId", buyerId)
             .order("createdAt", { ascending: false }),
 
@@ -188,7 +188,7 @@ export const buyerService = {
 
     const { data } = await supabase
       .from("PreQualification")
-      .select("id, buyerId, maxMonthlyPayment, approvedAmount, expiresAt, status, createdAt")
+      .select("id, buyerId, max_monthly_payment_cents, max_otd_amount_cents, expiresAt, prequal_status, createdAt")
       .eq("buyerId", profile.id)
       .order("createdAt", { ascending: false })
       .limit(1)
@@ -243,7 +243,7 @@ export const buyerService = {
 
     const { data } = await supabase
       .from("SelectedDeal")
-      .select("id, buyerId, status, totalPrice, depositAmount, depositPaid, createdAt, updatedAt")
+      .select("id, buyerId, status, total_otd_amount_cents, createdAt, updatedAt")
       .eq("buyerId", profile.id)
       .neq("status", "CANCELLED")
       .order("createdAt", { ascending: false })

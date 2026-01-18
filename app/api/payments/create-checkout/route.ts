@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Buyer profile not found" }, { status: 400 })
     }
 
-    const baseUrl = process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"
 
     if (type === "deposit") {
       if (!auctionId) {

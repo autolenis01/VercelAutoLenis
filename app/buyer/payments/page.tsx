@@ -1,118 +1,240 @@
 "use client"
 
-import { useState } from "react"
+import { ProtectedRoute } from "@/components/layout/protected-route"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { EmptyState } from "@/components/dashboard/empty-state"
 import { LoadingSkeleton } from "@/components/dashboard/loading-skeleton"
 import { ErrorState } from "@/components/dashboard/error-state"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { StatusPill } from "@/components/dashboard/status-pill"
-import { DollarSign, Search, Eye } from "lucide-react"
-import useSWR from "swr"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { DollarSign, CreditCard, ArrowRight, Receipt, RefreshCw } from "lucide-react"
 import Link from "next/link"
-import { format } from "date-fns"
+import useSWR from "swr"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
-// Mock data for demonstration
-const mockPayments = []
-
 export default function BuyerPaymentsPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  
-  // In a real app, this would fetch from /api/buyer/payments
-  const { data, error, isLoading } = useSWR("/api/buyer/payments", fetcher, {
-    fallbackData: { payments: mockPayments }
-  })
+  const { data, error, isLoading, mutate } = useSWR("/api/buyer/payments", fetcher)
 
-  const payments = data?.payments || []
-  const filteredPayments = payments.filter((payment: any) =>
-    payment.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  const deposits = data?.deposits || []
+  const serviceFees = data?.serviceFees || []
+  const allPayments = [...deposits, ...serviceFees].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
+
+  const totalPaid = allPayments
+    .filter((p) => p.status === "COMPLETED" || p.status === "PENDING")
+    .reduce((sum, p) => sum + (p.amount || 0), 0)
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <PageHeader title="Payments" subtitle="View your payment history" />
-        <LoadingSkeleton variant="table" />
-      </div>
+      <ProtectedRoute allowedRoles={["BUYER"]}>
+        <div className="space-y-6">
+          <PageHeader title="Payments" subtitle="Manage your payments and transactions" />
+          <LoadingSkeleton variant="cards" count={4} />
+        </div>
+      </ProtectedRoute>
     )
   }
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <PageHeader title="Payments" subtitle="View your payment history" />
-        <ErrorState message="Failed to load payments" onRetry={() => window.location.reload()} />
-      </div>
+      <ProtectedRoute allowedRoles={["BUYER"]}>
+        <div className="space-y-6">
+          <PageHeader title="Payments" subtitle="Manage your payments and transactions" />
+          <ErrorState message="Failed to load payments" onRetry={() => mutate()} />
+        </div>
+      </ProtectedRoute>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Payment History"
-        subtitle="Track all your payments and transactions"
-        breadcrumb={[
-          { label: "Dashboard", href: "/buyer/dashboard" },
-          { label: "Payments" },
-        ]}
-      />
-
-      {payments.length === 0 ? (
-        <EmptyState
-          icon={DollarSign}
-          title="No payments yet"
-          description="Your payment history will appear here once you start making payments"
+    <ProtectedRoute allowedRoles={["BUYER"]}>
+      <div className="space-y-6">
+        <PageHeader
+          title="Payments"
+          subtitle="Manage your payments and transactions"
         />
-      ) : (
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search payments..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-            </div>
 
-            <div className="space-y-3">
-              {filteredPayments.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">No payments found</p>
-              ) : (
-                filteredPayments.map((payment: any) => (
-                  <div
-                    key={payment.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-medium truncate">{payment.description}</h3>
-                        <StatusPill status={payment.status} />
+        {/* Summary Cards */}
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#7ED321]/10 flex items-center justify-center">
+                  <DollarSign className="h-5 w-5 text-[#7ED321]" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">${(totalPaid / 100).toLocaleString()}</p>
+                  <p className="text-sm text-muted-foreground">Total Paid</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#0066FF]/10 flex items-center justify-center">
+                  <CreditCard className="h-5 w-5 text-[#0066FF]" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{deposits.length}</p>
+                  <p className="text-sm text-muted-foreground">Deposits</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#2D1B69]/10 flex items-center justify-center">
+                  <Receipt className="h-5 w-5 text-[#2D1B69]" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{serviceFees.length}</p>
+                  <p className="text-sm text-muted-foreground">Service Fees</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Payment List */}
+        <Tabs defaultValue="all">
+          <TabsList>
+            <TabsTrigger value="all">All Transactions</TabsTrigger>
+            <TabsTrigger value="deposits">Deposits</TabsTrigger>
+            <TabsTrigger value="fees">Service Fees</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="all" className="mt-6">
+            {allPayments.length === 0 ? (
+              <EmptyState
+                icon={<DollarSign className="h-8 w-8 text-muted-foreground" />}
+                title="No payments yet"
+                description="Your payment history will appear here once you make your first deposit."
+                primaryCta={{ label: "Pay Deposit", href: "/buyer/billing" }}
+              />
+            ) : (
+              <div className="space-y-4">
+                {allPayments.map((payment: any) => (
+                  <Card key={payment.id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                            {payment.type === "DEPOSIT" ? (
+                              <CreditCard className="h-5 w-5" />
+                            ) : (
+                              <Receipt className="h-5 w-5" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {payment.type === "DEPOSIT" ? "Refundable Deposit" : "Concierge Fee"}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {new Date(payment.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <StatusPill status={payment.status?.toLowerCase() || "pending"} />
+                          <p className="font-semibold">
+                            ${((payment.amount || 0) / 100).toLocaleString()}
+                          </p>
+                          <Button variant="ghost" size="sm" asChild>
+                            <Link href={`/buyer/payments/${payment.id}`}>
+                              <ArrowRight className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </div>
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        {format(new Date(payment.date), "MMM d, yyyy")} • ${payment.amount.toLocaleString()}
-                      </p>
-                    </div>
-                    <Link href={`/buyer/payments/${payment.id}`}>
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4 mr-2" />
-                        View
-                      </Button>
-                    </Link>
-                  </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="deposits" className="mt-6">
+            {deposits.length === 0 ? (
+              <EmptyState
+                icon={<CreditCard className="h-8 w-8 text-muted-foreground" />}
+                title="No deposits"
+                description="Pay a refundable deposit to start your car buying journey."
+                primaryCta={{ label: "Pay Deposit", href: "/buyer/billing" }}
+              />
+            ) : (
+              <div className="space-y-4">
+                {deposits.map((payment: any) => (
+                  <Card key={payment.id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-[#7ED321]/10 flex items-center justify-center">
+                            <CreditCard className="h-5 w-5 text-[#7ED321]" />
+                          </div>
+                          <div>
+                            <p className="font-medium">Refundable Deposit</p>
+                            <p className="text-sm text-muted-foreground">
+                              {new Date(payment.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <StatusPill status={payment.status?.toLowerCase() || "pending"} />
+                          <p className="font-semibold">${((payment.amount || 0) / 100).toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="fees" className="mt-6">
+            {serviceFees.length === 0 ? (
+              <EmptyState
+                icon={<Receipt className="h-8 w-8 text-muted-foreground" />}
+                title="No service fees"
+                description="Concierge fee payments will appear here."
+              />
+            ) : (
+              <div className="space-y-4">
+                {serviceFees.map((payment: any) => (
+                  <Card key={payment.id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-[#2D1B69]/10 flex items-center justify-center">
+                            <Receipt className="h-5 w-5 text-[#2D1B69]" />
+                          </div>
+                          <div>
+                            <p className="font-medium">Concierge Fee</p>
+                            <p className="text-sm text-muted-foreground">
+                              {new Date(payment.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <StatusPill status={payment.status?.toLowerCase() || "pending"} />
+                          <p className="font-semibold">${((payment.amount || 0) / 100).toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
+    </ProtectedRoute>
   )
 }

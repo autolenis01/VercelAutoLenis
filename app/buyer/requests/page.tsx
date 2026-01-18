@@ -1,130 +1,111 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { ProtectedRoute } from "@/components/layout/protected-route"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { EmptyState } from "@/components/dashboard/empty-state"
 import { LoadingSkeleton } from "@/components/dashboard/loading-skeleton"
 import { ErrorState } from "@/components/dashboard/error-state"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { StatusPill } from "@/components/dashboard/status-pill"
-import { FileText, Search, Plus, Eye } from "lucide-react"
-import useSWR from "swr"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { FileText, Plus, Search, Car, Calendar, ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { formatDistanceToNow } from "date-fns"
+import useSWR from "swr"
+import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
-// Mock data for demonstration
-const mockRequests = []
+const Loading = () => null
 
 export default function BuyerRequestsPage() {
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState("")
-  
-  // In a real app, this would fetch from /api/buyer/requests
-  const { data, error, isLoading } = useSWR("/api/buyer/requests", fetcher, {
-    fallbackData: { requests: mockRequests }
-  })
+  const searchParams = useSearchParams()
+  const { data, error, isLoading, mutate } = useSWR("/api/buyer/auctions", fetcher)
 
-  const requests = data?.requests || []
-  const filteredRequests = requests.filter((req: any) =>
-    req.title?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Financing Requests" subtitle="Manage your financing requests" />
-        <LoadingSkeleton variant="table" />
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Financing Requests" subtitle="Manage your financing requests" />
-        <ErrorState message="Failed to load financing requests" onRetry={() => window.location.reload()} />
-      </div>
-    )
-  }
+  const requests = data?.auctions || []
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Financing Requests"
-        subtitle="Track and manage your financing requests"
-        primaryAction={
-          <Button onClick={() => router.push("/buyer/prequal")}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Request
-          </Button>
-        }
-        breadcrumb={[
-          { label: "Dashboard", href: "/buyer/dashboard" },
-          { label: "Requests" },
-        ]}
-      />
+    <ProtectedRoute allowedRoles={["BUYER"]}>
+      <Suspense fallback={<Loading />}>
+        <div className="space-y-6">
+          <PageHeader
+            title="My Requests"
+            subtitle="Track your vehicle requests and auction status"
+            primaryAction={{
+              label: "New Request",
+              href: "/buyer/search",
+              icon: <Plus className="h-4 w-4 mr-2" />,
+            }}
+          />
 
-      {requests.length === 0 ? (
-        <EmptyState
-          icon={FileText}
-          title="No financing requests yet"
-          description="Start a request to get matched with dealers and receive competitive offers"
-          primaryCta={{
-            label: "Start a Request",
-            onClick: () => router.push("/buyer/prequal"),
-          }}
-        />
-      ) : (
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search requests..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
+          {/* Search */}
+          <div className="flex gap-4">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search requests..." className="pl-9" />
             </div>
+          </div>
 
-            <div className="space-y-3">
-              {filteredRequests.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">No requests found</p>
-              ) : (
-                filteredRequests.map((request: any) => (
-                  <div
-                    key={request.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-medium truncate">{request.title}</h3>
-                        <StatusPill status={request.status} />
+          {/* Content */}
+          {isLoading ? (
+            <LoadingSkeleton variant="cards" count={3} />
+          ) : error ? (
+            <ErrorState message="Failed to load requests" onRetry={() => mutate()} />
+          ) : requests.length === 0 ? (
+            <EmptyState
+              icon={<FileText className="h-8 w-8 text-muted-foreground" />}
+              title="No requests yet"
+              description="Start your car buying journey by searching for vehicles and creating a request for dealers to bid on."
+              primaryCta={{ label: "Search Vehicles", href: "/buyer/search" }}
+              secondaryCta={{ label: "Get Pre-Qualified", href: "/buyer/prequal" }}
+            />
+          ) : (
+            <div className="grid gap-4">
+              {requests.map((request: any) => (
+                <Card key={request.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-lg bg-[#2D1B69]/10 flex items-center justify-center flex-shrink-0">
+                          <Car className="h-6 w-6 text-[#2D1B69]" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold">
+                            {request.inventoryItem?.vehicle?.year} {request.inventoryItem?.vehicle?.make}{" "}
+                            {request.inventoryItem?.vehicle?.model}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            Request ID: {request.id.slice(0, 8)}
+                          </p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <StatusPill status={request.status?.toLowerCase() || "pending"} />
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {new Date(request.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        {request.vehicleType} • Created {formatDistanceToNow(new Date(request.createdAt), { addSuffix: true })}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">
+                          {request.offerCount || 0} offers
+                        </span>
+                        <Button variant="outline" size="sm" asChild className="bg-transparent">
+                          <Link href={`/buyer/requests/${request.id}`}>
+                            View Details
+                            <ArrowRight className="h-4 w-4 ml-2" />
+                          </Link>
+                        </Button>
+                      </div>
                     </div>
-                    <Link href={`/buyer/requests/${request.id}`}>
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4 mr-2" />
-                        View
-                      </Button>
-                    </Link>
-                  </div>
-                ))
-              )}
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+          )}
+        </div>
+      </Suspense>
+    </ProtectedRoute>
   )
 }

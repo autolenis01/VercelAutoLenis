@@ -1,189 +1,220 @@
 "use client"
 
 import { use } from "react"
+import { ProtectedRoute } from "@/components/layout/protected-route"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { DetailShell } from "@/components/dashboard/detail-shell"
 import { KeyValueGrid } from "@/components/dashboard/key-value-grid"
-import { ActivityTimeline, type TimelineItem } from "@/components/dashboard/activity-timeline"
+import { ActivityTimeline } from "@/components/dashboard/activity-timeline"
 import { StatusPill } from "@/components/dashboard/status-pill"
 import { LoadingSkeleton } from "@/components/dashboard/loading-skeleton"
 import { ErrorState } from "@/components/dashboard/error-state"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/dashboard/empty-state"
-import { FileText, HandCoins, MessageSquare, DollarSign, Activity } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Car, MessageSquare, FileText, DollarSign, Gavel } from "lucide-react"
+import Link from "next/link"
 import useSWR from "swr"
-import { format } from "date-fns"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
-export default function BuyerRequestDetailPage({ params }: { params: Promise<{ requestId: string }> }) {
+export default function BuyerRequestDetailPage({
+  params,
+}: {
+  params: Promise<{ requestId: string }>
+}) {
   const { requestId } = use(params)
-  
-  // In a real app, this would fetch from /api/buyer/requests/${requestId}
-  const { data, error, isLoading } = useSWR(`/api/buyer/requests/${requestId}`, fetcher, {
-    fallbackData: null
-  })
+  const { data, error, isLoading, mutate } = useSWR(`/api/buyer/auctions/${requestId}`, fetcher)
+
+  const request = data?.auction
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <PageHeader title="Loading..." subtitle="Loading request details" />
-        <LoadingSkeleton variant="detail" />
-      </div>
+      <ProtectedRoute allowedRoles={["BUYER"]}>
+        <div className="space-y-6">
+          <PageHeader title="Loading..." backHref="/buyer/requests" backLabel="Back to Requests" />
+          <LoadingSkeleton variant="detail" />
+        </div>
+      </ProtectedRoute>
     )
   }
 
-  if (error || !data) {
+  if (error || !request) {
     return (
-      <div className="space-y-6">
-        <PageHeader title="Request Not Found" subtitle="Unable to load request" />
-        <ErrorState message="Failed to load request details" onRetry={() => window.location.reload()} />
-      </div>
+      <ProtectedRoute allowedRoles={["BUYER"]}>
+        <div className="space-y-6">
+          <PageHeader title="Request Not Found" backHref="/buyer/requests" backLabel="Back to Requests" />
+          <ErrorState message="Failed to load request details" onRetry={() => mutate()} />
+        </div>
+      </ProtectedRoute>
     )
   }
 
-  // Mock data structure
-  const request = {
-    id: requestId,
-    title: "2024 Toyota Camry Financing",
-    status: "pending" as const,
-    vehicleType: "Sedan",
-    maxBudget: "$35,000",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  }
-
-  const activityItems: TimelineItem[] = [
-    {
-      id: "1",
-      title: "Request created",
-      description: "Your financing request was submitted",
-      timestamp: new Date(),
-      type: "success",
-    },
-  ]
+  const vehicle = request.inventoryItem?.vehicle
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title={request.title}
-        subtitle="Financing Request Details"
-        breadcrumb={[
-          { label: "Dashboard", href: "/buyer/dashboard" },
-          { label: "Requests", href: "/buyer/requests" },
-          { label: request.title },
-        ]}
-      />
+    <ProtectedRoute allowedRoles={["BUYER"]}>
+      <div className="space-y-6">
+        <PageHeader
+          title={`${vehicle?.year || ""} ${vehicle?.make || ""} ${vehicle?.model || ""}`}
+          subtitle={`Request ID: ${requestId.slice(0, 8)}`}
+          backHref="/buyer/requests"
+          backLabel="Back to Requests"
+          breadcrumbs={[
+            { label: "Requests", href: "/buyer/requests" },
+            { label: `${vehicle?.make || "Request"} ${vehicle?.model || ""}` },
+          ]}
+        />
 
-      <DetailShell
-        summaryTitle="Request Summary"
-        summary={
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Status</span>
-              <StatusPill status={request.status} />
-            </div>
-            <KeyValueGrid
-              items={[
-                { label: "Request ID", value: `#${request.id.slice(0, 8).toUpperCase()}` },
-                { label: "Vehicle Type", value: request.vehicleType },
-                { label: "Max Budget", value: request.maxBudget },
-                { label: "Created", value: format(request.createdAt, "MMM d, yyyy") },
-                { label: "Last Updated", value: format(request.updatedAt, "MMM d, yyyy") },
-              ]}
-              columns={1}
-            />
-            <div className="pt-4 space-y-2">
-              <Button className="w-full">Edit Request</Button>
-              <Button variant="outline" className="w-full">Cancel Request</Button>
-            </div>
-          </div>
-        }
-        tabs={[
-          {
-            value: "overview",
-            label: "Overview",
+        <DetailShell
+          summary={{
+            title: "Request Summary",
             content: (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Request Details</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Complete request information and requirements will be displayed here.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-lg bg-[#2D1B69]/10 flex items-center justify-center">
+                    <Car className="h-6 w-6 text-[#2D1B69]" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">
+                      {vehicle?.year} {vehicle?.make} {vehicle?.model}
+                    </p>
+                    <StatusPill status={request.status?.toLowerCase() || "pending"} />
+                  </div>
+                </div>
+                <KeyValueGrid
+                  columns={1}
+                  items={[
+                    { label: "Created", value: new Date(request.createdAt).toLocaleDateString() },
+                    { label: "Offers Received", value: request.offers?.length || 0 },
+                    { label: "Status", value: <StatusPill status={request.status?.toLowerCase() || "pending"} /> },
+                  ]}
+                />
+              </div>
             ),
-          },
-          {
-            value: "offers",
-            label: "Offers",
-            content: (
-              <EmptyState
-                icon={HandCoins}
-                title="No offers yet"
-                description="Dealers will submit offers for this request soon"
-              />
+            actions: (
+              <div className="space-y-2">
+                <Button className="w-full bg-[#2D1B69] hover:bg-[#2D1B69]/90" asChild>
+                  <Link href={`/buyer/auction/${requestId}/offers`}>View Offers</Link>
+                </Button>
+                <Button variant="outline" className="w-full bg-transparent">
+                  Cancel Request
+                </Button>
+              </div>
             ),
-          },
-          {
-            value: "documents",
-            label: "Documents",
-            content: (
-              <EmptyState
-                icon={FileText}
-                title="No documents"
-                description="Upload required documents to support this request"
-                primaryCta={{
-                  label: "Upload Documents",
-                  onClick: () => {},
-                }}
-              />
-            ),
-          },
-          {
-            value: "payments",
-            label: "Payments",
-            content: (
-              <EmptyState
-                icon={DollarSign}
-                title="No payments"
-                description="Payment history for this request will appear here"
-              />
-            ),
-          },
-          {
-            value: "messages",
-            label: "Messages",
-            content: (
-              <EmptyState
-                icon={MessageSquare}
-                title="No messages"
-                description="Messages related to this request will appear here"
-              />
-            ),
-          },
-          {
-            value: "activity",
-            label: "Activity",
-            content: (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Activity className="h-5 w-5" />
-                    Activity Timeline
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ActivityTimeline items={activityItems} />
-                </CardContent>
-              </Card>
-            ),
-          },
-        ]}
-      />
-    </div>
+          }}
+          tabs={[
+            {
+              id: "overview",
+              label: "Overview",
+              content: (
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Vehicle Details</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <KeyValueGrid
+                        items={[
+                          { label: "Year", value: vehicle?.year },
+                          { label: "Make", value: vehicle?.make },
+                          { label: "Model", value: vehicle?.model },
+                          { label: "Trim", value: vehicle?.trim || "—" },
+                          { label: "Mileage", value: vehicle?.mileage?.toLocaleString() || "—" },
+                          { label: "VIN", value: vehicle?.vin || "—" },
+                        ]}
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+              ),
+            },
+            {
+              id: "offers",
+              label: "Offers",
+              badge: request.offers?.length || 0,
+              content:
+                request.offers?.length > 0 ? (
+                  <div className="space-y-4">
+                    {request.offers.map((offer: any) => (
+                      <Card key={offer.id}>
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p className="font-medium">{offer.dealer?.name || "Dealer"}</p>
+                              <p className="text-2xl font-bold text-[#7ED321]">
+                                ${(offer.cashOtd || 0).toLocaleString()}
+                              </p>
+                            </div>
+                            <Button size="sm" asChild>
+                              <Link href={`/buyer/offers/${offer.id}`}>View Offer</Link>
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState
+                    icon={<Gavel className="h-8 w-8 text-muted-foreground" />}
+                    title="No offers yet"
+                    description="Dealers are reviewing your request. You'll be notified when offers come in."
+                  />
+                ),
+            },
+            {
+              id: "documents",
+              label: "Documents",
+              content: (
+                <EmptyState
+                  icon={<FileText className="h-8 w-8 text-muted-foreground" />}
+                  title="No documents"
+                  description="Documents related to this request will appear here."
+                />
+              ),
+            },
+            {
+              id: "payments",
+              label: "Payments",
+              content: (
+                <EmptyState
+                  icon={<DollarSign className="h-8 w-8 text-muted-foreground" />}
+                  title="No payments"
+                  description="Payment information will appear here once you select a deal."
+                />
+              ),
+            },
+            {
+              id: "messages",
+              label: "Messages",
+              content: (
+                <EmptyState
+                  icon={<MessageSquare className="h-8 w-8 text-muted-foreground" />}
+                  title="No messages"
+                  description="Messages from dealers will appear here."
+                />
+              ),
+            },
+            {
+              id: "activity",
+              label: "Activity",
+              content: (
+                <ActivityTimeline
+                  items={[
+                    {
+                      id: "1",
+                      title: "Request created",
+                      description: "You submitted a request for this vehicle",
+                      timestamp: new Date(request.createdAt).toLocaleDateString(),
+                      type: "success",
+                    },
+                  ]}
+                />
+              ),
+            },
+          ]}
+        />
+      </div>
+    </ProtectedRoute>
   )
 }

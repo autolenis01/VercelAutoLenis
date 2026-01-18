@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server"
 import { seoService } from "@/lib/services/seo.service"
 
-export const dynamic = "force-dynamic" // CRITICAL: prevent static generation
-
 export async function GET() {
   try {
     const urls = await seoService.generateSitemap()
@@ -28,25 +26,7 @@ ${urls
       },
     })
   } catch (error) {
-    console.error("[Sitemap] Error generating sitemap:", error)
-
-    // Safe fallback: return minimal sitemap
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"
-    const minimalSitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>${baseUrl}</loc>
-    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-</urlset>`
-
-    return new NextResponse(minimalSitemap, {
-      headers: {
-        "Content-Type": "application/xml",
-        "Cache-Control": "public, max-age=300, s-maxage=300", // Shorter cache for fallback
-      },
-    })
+    console.error("[v0] Error generating sitemap:", error)
+    return new NextResponse("Error generating sitemap", { status: 500 })
   }
 }

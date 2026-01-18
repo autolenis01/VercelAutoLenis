@@ -17,8 +17,6 @@ export default async function BuyerLayout({ children }: { children: React.ReactN
     { href: "/buyer/shortlist", label: "Shortlist", icon: "Heart" },
     { href: "/buyer/trade-in", label: "Trade-In", icon: "Car" },
     { href: "/buyer/auction", label: "Auctions & Offers", icon: "Gavel" },
-    { href: "/buyer/requests", label: "Requests", icon: "FileText" },
-    { href: "/buyer/offers", label: "Offers", icon: "HandCoins" },
     {
       href: "/buyer/deal",
       label: "My Deal",
@@ -34,9 +32,6 @@ export default async function BuyerLayout({ children }: { children: React.ReactN
       ],
     },
     { href: "/buyer/contracts", label: "Contracts", icon: "Shield" },
-    { href: "/buyer/documents", label: "Documents", icon: "FileText" },
-    { href: "/buyer/payments", label: "Payments", icon: "DollarSign" },
-    { href: "/buyer/messages", label: "Messages", icon: "MessageSquare" },
     { href: "/affiliate/portal/dashboard", label: "Referrals & Earnings", icon: "Users2" },
     { href: "/buyer/settings", label: "Settings", icon: "Settings" },
   ]

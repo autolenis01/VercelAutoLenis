@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getSessionUser } from "@/lib/auth-server"
 import { esignService } from "@/lib/services/esign.service"
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ dealId: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ dealId: string }> }) {
   try {
     const user = await getSessionUser()
     if (!user || user.role !== "ADMIN") {

@@ -3,7 +3,7 @@ import { requireAuth } from "@/lib/auth-server"
 import { PaymentService } from "@/lib/services/payment.service"
 import { DealService } from "@/lib/services/deal.service"
 
-export async function GET(_request: Request, { params }: { params: Promise<{ dealId: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ dealId: string }> }) {
   try {
     const session = await requireAuth(["BUYER"])
     const { dealId } = await params

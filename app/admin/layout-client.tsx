@@ -145,15 +145,20 @@ export function AdminLayoutClient({
                   <p className="text-sm font-medium truncate max-w-[120px]">{userEmail}</p>
                   <p className="text-xs text-white/60">Super Admin</p>
                 </div>
-                <form action="/api/auth/signout" method="POST">
-                  <button
-                    className="flex items-center gap-2 px-2 sm:px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg touch-target focus-ring"
-                    aria-label="Log out of admin account"
-                  >
-                    <LogOut className="h-4 w-4" aria-hidden="true" />
-                    <span className="hidden sm:inline">Log Out</span>
-                  </button>
-                </form>
+                <button
+                onClick={async () => {
+                  try {
+                    await fetch("/api/admin/auth/signout", { method: "POST", credentials: "include" })
+                  } finally {
+                    window.location.href = "/admin/sign-in"
+                  }
+                }}
+                className="flex items-center gap-2 px-2 sm:px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg touch-target focus-ring"
+                aria-label="Log out of admin account"
+              >
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Log Out</span>
+              </button>
               </div>
             </div>
           </div>

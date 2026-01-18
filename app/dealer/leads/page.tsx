@@ -1,186 +1,113 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { EmptyState } from "@/components/dashboard/empty-state"
 import { LoadingSkeleton } from "@/components/dashboard/loading-skeleton"
 import { ErrorState } from "@/components/dashboard/error-state"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { StatusPill } from "@/components/dashboard/status-pill"
-import { Users, Search, Eye, LayoutGrid, List } from "lucide-react"
-import useSWR from "swr"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Users, Search, Car, MapPin, Calendar, ArrowRight, DollarSign } from "lucide-react"
 import Link from "next/link"
-import { formatDistanceToNow } from "date-fns"
+import useSWR from "swr"
+import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
-const mockLeads = []
+const Loading = () => null;
 
 export default function DealerLeadsPage() {
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [viewMode, setViewMode] = useState<"list" | "card">("card")
-  
-  const { data, error, isLoading } = useSWR("/api/dealer/leads", fetcher, {
-    fallbackData: { leads: mockLeads }
-  })
+  const searchParams = useSearchParams();
+  const { data, error, isLoading, mutate } = useSWR("/api/dealer/auctions", fetcher)
 
-  const leads = data?.leads || []
-  const filteredLeads = leads.filter((lead: any) =>
-    lead.buyerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    lead.vehicleType?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Leads" subtitle="Buyer financing requests" />
-        <LoadingSkeleton variant="cards" />
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Leads" subtitle="Buyer financing requests" />
-        <ErrorState message="Failed to load leads" onRetry={() => window.location.reload()} />
-      </div>
-    )
-  }
+  const leads = data?.auctions || []
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Buyer Leads"
-        subtitle="New financing requests matching your criteria"
-        breadcrumb={[
-          { label: "Dashboard", href: "/dealer/dashboard" },
-          { label: "Leads" },
-        ]}
-      />
-
-      {leads.length === 0 ? (
-        <EmptyState
-          icon={Users}
-          title="No active leads yet"
-          description="New financing requests matching your criteria will appear here"
-          primaryCta={{
-            label: "Update Lead Preferences",
-            onClick: () => router.push("/dealer/settings"),
-          }}
+    <Suspense fallback={<Loading />}>
+      <div className="space-y-6">
+        <PageHeader
+          title="Leads"
+          subtitle="View and respond to buyer requests"
         />
-      ) : (
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by buyer name or vehicle type..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant={viewMode === "card" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setViewMode("card")}
-                >
-                  <LayoutGrid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
 
-            {viewMode === "card" ? (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {filteredLeads.length === 0 ? (
-                  <div className="col-span-full">
-                    <p className="text-sm text-muted-foreground text-center py-8">No leads found</p>
-                  </div>
-                ) : (
-                  filteredLeads.map((lead: any) => (
-                    <Card key={lead.id} className="hover:shadow-md transition-shadow">
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <h3 className="font-semibold">{lead.buyerName}</h3>
-                            <p className="text-sm text-muted-foreground">{lead.vehicleType}</p>
-                          </div>
-                          <StatusPill status={lead.status} />
+        {/* Search & Filters */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Search leads..." className="pl-9" />
+          </div>
+        </div>
+
+        {/* Content */}
+        {isLoading ? (
+          <LoadingSkeleton variant="cards" count={3} />
+        ) : error ? (
+          <ErrorState message="Failed to load leads" onRetry={() => mutate()} />
+        ) : leads.length === 0 ? (
+          <EmptyState
+            icon={<Users className="h-8 w-8 text-muted-foreground" />}
+            title="No active leads"
+            description="When buyers request vehicles matching your inventory, their requests will appear here as leads for you to submit offers."
+            secondaryCta={{ label: "Manage Inventory", href: "/dealer/inventory" }}
+          />
+        ) : (
+          <div className="grid gap-4">
+            {leads.map((lead: any) => {
+              const vehicle = lead.inventoryItem?.vehicle
+              return (
+                <Card key={lead.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-lg bg-[#7ED321]/10 flex items-center justify-center flex-shrink-0">
+                          <Car className="h-6 w-6 text-[#7ED321]" />
                         </div>
-                        <div className="space-y-2 mb-4">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Budget:</span>
-                            <span className="font-semibold">${lead.maxBudget.toLocaleString()}</span>
+                        <div>
+                          <h3 className="font-semibold">
+                            {vehicle?.year} {vehicle?.make} {vehicle?.model}
+                          </h3>
+                          <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {lead.buyer?.zipCode || "N/A"}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {new Date(lead.createdAt).toLocaleDateString()}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <DollarSign className="h-3 w-3" />
+                              Budget: ${(lead.buyer?.maxBudget || 0).toLocaleString()}
+                            </span>
                           </div>
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Credit Score:</span>
-                            <span className="font-semibold">{lead.creditScore}</span>
+                          <div className="mt-2">
+                            <StatusPill status={lead.status?.toLowerCase() || "active"} />
                           </div>
-                          <p className="text-xs text-muted-foreground">
-                            Received {formatDistanceToNow(new Date(lead.createdAt), { addSuffix: true })}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <p className="text-sm text-muted-foreground">
+                            {lead.offers?.length || 0} offers submitted
                           </p>
                         </div>
-                        <Link href={`/dealer/leads/${lead.id}`}>
-                          <Button variant="outline" className="w-full" size="sm">
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Details
-                          </Button>
-                        </Link>
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {filteredLeads.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">No leads found</p>
-                ) : (
-                  filteredLeads.map((lead: any) => (
-                    <div
-                      key={lead.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium truncate">{lead.buyerName}</h3>
-                          <StatusPill status={lead.status} />
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {lead.vehicleType} • Budget: ${lead.maxBudget.toLocaleString()} • Credit: {lead.creditScore}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Received {formatDistanceToNow(new Date(lead.createdAt), { addSuffix: true })}
-                        </p>
-                      </div>
-                      <Link href={`/dealer/leads/${lead.id}`}>
-                        <Button variant="ghost" size="sm">
-                          <Eye className="h-4 w-4 mr-2" />
-                          View
+                        <Button asChild>
+                          <Link href={`/dealer/leads/${lead.id}`}>
+                            View Lead
+                            <ArrowRight className="h-4 w-4 ml-2" />
+                          </Link>
                         </Button>
-                      </Link>
+                      </div>
                     </div>
-                  ))
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-    </div>
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    </Suspense>
   )
 }

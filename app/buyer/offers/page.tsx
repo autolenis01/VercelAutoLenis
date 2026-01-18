@@ -1,136 +1,115 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { ProtectedRoute } from "@/components/layout/protected-route"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { EmptyState } from "@/components/dashboard/empty-state"
 import { LoadingSkeleton } from "@/components/dashboard/loading-skeleton"
 import { ErrorState } from "@/components/dashboard/error-state"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { StatusPill } from "@/components/dashboard/status-pill"
-import { HandCoins, Search, Eye } from "lucide-react"
-import useSWR from "swr"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Gavel, Search, Building2, DollarSign, ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { formatDistanceToNow } from "date-fns"
+import useSWR from "swr"
+import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
-// Mock data for demonstration
-const mockOffers = []
+function Loading() {
+  return null
+}
 
 export default function BuyerOffersPage() {
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState("")
-  
-  // In a real app, this would fetch from /api/buyer/offers
-  const { data, error, isLoading } = useSWR("/api/buyer/offers", fetcher, {
-    fallbackData: { offers: mockOffers }
-  })
+  const searchParams = useSearchParams()
 
-  const offers = data?.offers || []
-  const filteredOffers = offers.filter((offer: any) =>
-    offer.dealerName?.toLowerCase().includes(searchQuery.toLowerCase())
+  const { data, error, isLoading, mutate } = useSWR("/api/buyer/auctions", fetcher)
+
+  // Flatten offers from all auctions
+  const allOffers = (data?.auctions || []).flatMap((auction: any) =>
+    (auction.offers || []).map((offer: any) => ({
+      ...offer,
+      auction,
+      vehicle: auction.inventoryItem?.vehicle,
+    }))
   )
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Offers" subtitle="Review offers from dealers" />
-        <LoadingSkeleton variant="cards" />
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Offers" subtitle="Review offers from dealers" />
-        <ErrorState message="Failed to load offers" onRetry={() => window.location.reload()} />
-      </div>
-    )
-  }
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Offers"
-        subtitle="Review and compare offers from dealers"
-        breadcrumb={[
-          { label: "Dashboard", href: "/buyer/dashboard" },
-          { label: "Offers" },
-        ]}
-      />
-
-      {offers.length === 0 ? (
-        <EmptyState
-          icon={HandCoins}
-          title="No offers yet"
-          description="Complete your financing request to receive competitive offers from dealers"
-          primaryCta={{
-            label: "View My Requests",
-            onClick: () => router.push("/buyer/requests"),
-          }}
+    <ProtectedRoute allowedRoles={["BUYER"]}>
+      <div className="space-y-6">
+        <PageHeader
+          title="My Offers"
+          subtitle="Review and compare offers from dealers"
         />
-      ) : (
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by dealer name..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-            </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredOffers.length === 0 ? (
-                <div className="col-span-full">
-                  <p className="text-sm text-muted-foreground text-center py-8">No offers found</p>
-                </div>
-              ) : (
-                filteredOffers.map((offer: any) => (
-                  <Card key={offer.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h3 className="font-semibold">{offer.dealerName}</h3>
-                          <p className="text-sm text-muted-foreground">{offer.vehicleName}</p>
-                        </div>
-                        <StatusPill status={offer.status} />
-                      </div>
-                      <div className="space-y-2 mb-4">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Monthly Payment:</span>
-                          <span className="font-semibold">${offer.monthlyPayment}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Total Price:</span>
-                          <span className="font-semibold">${offer.totalPrice.toLocaleString()}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          Received {formatDistanceToNow(new Date(offer.createdAt), { addSuffix: true })}
+        {/* Search */}
+        <div className="flex gap-4">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Search offers..." className="pl-9" />
+          </div>
+        </div>
+
+        {/* Content */}
+        {isLoading ? (
+          <LoadingSkeleton variant="cards" count={3} />
+        ) : error ? (
+          <ErrorState message="Failed to load offers" onRetry={() => mutate()} />
+        ) : allOffers.length === 0 ? (
+          <EmptyState
+            icon={<Gavel className="h-8 w-8 text-muted-foreground" />}
+            title="No offers yet"
+            description="Complete your vehicle request to start receiving competitive offers from dealers."
+            primaryCta={{ label: "Start a Request", href: "/buyer/search" }}
+          />
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {allOffers.map((offer: any) => (
+              <Card key={offer.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-semibold">
+                          {offer.vehicle?.year} {offer.vehicle?.make} {offer.vehicle?.model}
+                        </h3>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                          <Building2 className="h-3 w-3" />
+                          {offer.dealer?.name || "Dealer"}
                         </p>
                       </div>
+                      <StatusPill status={offer.status?.toLowerCase() || "pending"} />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-5 w-5 text-[#7ED321]" />
+                      <span className="text-2xl font-bold text-[#7ED321]">
+                        {(offer.cashOtd || 0).toLocaleString()}
+                      </span>
+                    </div>
+
+                    <Button variant="outline" size="sm" className="w-full bg-transparent" asChild>
                       <Link href={`/buyer/offers/${offer.id}`}>
-                        <Button variant="outline" className="w-full" size="sm">
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
-                        </Button>
+                        View Details
+                        <ArrowRight className="h-4 w-4 ml-2" />
                       </Link>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </ProtectedRoute>
   )
+}
+
+export const dynamic = "force-dynamic"
+export const dynamicParams = true
+export const revalidate = 0
+
+export function generateStaticParams() {
+  return []
 }

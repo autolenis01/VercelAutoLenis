@@ -1,7 +1,11 @@
-import { ReactNode } from "react"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
+"use client"
 
-interface BreadcrumbItemType {
+import { ChevronRight, ChevronLeft } from "lucide-react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import type { ReactNode } from "react"
+
+interface BreadcrumbItem {
   label: string
   href?: string
 }
@@ -9,54 +13,122 @@ interface BreadcrumbItemType {
 interface PageHeaderProps {
   title: string
   subtitle?: string
-  primaryAction?: ReactNode
-  secondaryActions?: ReactNode[]
-  breadcrumb?: BreadcrumbItemType[]
+  breadcrumbs?: BreadcrumbItem[]
+  backHref?: string
+  backLabel?: string
+  primaryAction?: {
+    label: string
+    href?: string
+    onClick?: () => void
+    icon?: ReactNode
+    variant?: "default" | "outline" | "secondary"
+  }
+  secondaryActions?: {
+    label: string
+    href?: string
+    onClick?: () => void
+    icon?: ReactNode
+    variant?: "default" | "outline" | "secondary" | "ghost"
+  }[]
+  children?: ReactNode
 }
 
 export function PageHeader({
   title,
   subtitle,
+  breadcrumbs,
+  backHref,
+  backLabel = "Back",
   primaryAction,
   secondaryActions,
-  breadcrumb,
+  children,
 }: PageHeaderProps) {
   return (
-    <div className="space-y-4 mb-6">
-      {breadcrumb && breadcrumb.length > 0 && (
-        <Breadcrumb>
-          <BreadcrumbList>
-            {breadcrumb.map((item, index) => (
-              <React.Fragment key={index}>
-                {index > 0 && <BreadcrumbSeparator />}
-                <BreadcrumbItem>
-                  {item.href && index < breadcrumb.length - 1 ? (
-                    <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
-                  ) : (
-                    <BreadcrumbPage>{item.label}</BreadcrumbPage>
-                  )}
-                </BreadcrumbItem>
-              </React.Fragment>
-            ))}
-          </BreadcrumbList>
-        </Breadcrumb>
+    <div className="space-y-4">
+      {/* Breadcrumbs */}
+      {breadcrumbs && breadcrumbs.length > 0 && (
+        <nav className="flex items-center text-sm text-muted-foreground" aria-label="Breadcrumb">
+          {breadcrumbs.map((item, index) => (
+            <div key={index} className="flex items-center">
+              {index > 0 && <ChevronRight className="h-4 w-4 mx-2" />}
+              {item.href ? (
+                <Link href={item.href} className="hover:text-foreground transition-colors">
+                  {item.label}
+                </Link>
+              ) : (
+                <span className="text-foreground font-medium">{item.label}</span>
+              )}
+            </div>
+          ))}
+        </nav>
       )}
-      
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{title}</h1>
-          {subtitle && <p className="text-sm sm:text-base text-muted-foreground">{subtitle}</p>}
+
+      {/* Back Button */}
+      {backHref && (
+        <Link
+          href={backHref}
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ChevronLeft className="h-4 w-4 mr-1" />
+          {backLabel}
+        </Link>
+      )}
+
+      {/* Header Row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{title}</h1>
+          {subtitle && <p className="text-muted-foreground text-sm sm:text-base mt-1">{subtitle}</p>}
         </div>
-        
-        {(primaryAction || (secondaryActions && secondaryActions.length > 0)) && (
+
+        {/* Actions */}
+        {(primaryAction || secondaryActions) && (
           <div className="flex items-center gap-2 flex-wrap">
             {secondaryActions?.map((action, index) => (
-              <div key={index}>{action}</div>
+              <Button
+                key={index}
+                variant={action.variant || "outline"}
+                onClick={action.onClick}
+                asChild={!!action.href}
+              >
+                {action.href ? (
+                  <Link href={action.href}>
+                    {action.icon}
+                    {action.label}
+                  </Link>
+                ) : (
+                  <>
+                    {action.icon}
+                    {action.label}
+                  </>
+                )}
+              </Button>
             ))}
-            {primaryAction && <div>{primaryAction}</div>}
+            {primaryAction && (
+              <Button
+                variant={primaryAction.variant || "default"}
+                onClick={primaryAction.onClick}
+                asChild={!!primaryAction.href}
+                className="bg-[#2D1B69] hover:bg-[#2D1B69]/90"
+              >
+                {primaryAction.href ? (
+                  <Link href={primaryAction.href}>
+                    {primaryAction.icon}
+                    {primaryAction.label}
+                  </Link>
+                ) : (
+                  <>
+                    {primaryAction.icon}
+                    {primaryAction.label}
+                  </>
+                )}
+              </Button>
+            )}
           </div>
         )}
       </div>
+
+      {children}
     </div>
   )
 }

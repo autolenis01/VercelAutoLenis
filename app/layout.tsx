@@ -1,21 +1,12 @@
 import type React from "react"
 import type { Metadata } from "next"
-import localFont from "next/font/local"
+import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { SkipLink } from "@/components/skip-link"
 import "@/lib/monitoring"
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-})
-
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-})
+const _geist = Geist({ subsets: ["latin"] })
+const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://autolenis.com"),
@@ -103,7 +94,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en">
       <body className={`font-sans antialiased`}>
         <SkipLink />
         {children}

@@ -4,7 +4,7 @@ import { InventoryService } from "@/lib/services/inventory.service"
 import { createClient } from "@/lib/supabase/server"
 
 // GET /api/buyer/inventory/:inventoryItemId - Get vehicle detail for buyer
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ inventoryItemId: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ inventoryItemId: string }> }) {
   try {
     const { inventoryItemId } = await params
     const user = await getSessionUser()

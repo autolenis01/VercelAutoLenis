@@ -1,151 +1,248 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { PageHeader } from "@/components/dashboard/page-header"
-import { EmptyState } from "@/components/dashboard/empty-state"
-import { LoadingSkeleton } from "@/components/dashboard/loading-skeleton"
-import { ErrorState } from "@/components/dashboard/error-state"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { StatusPill } from "@/components/dashboard/status-pill"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { HandCoins, Search, Eye } from "lucide-react"
-import useSWR from "swr"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { formatDistanceToNow } from "date-fns"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Search, DollarSign, Clock, CheckCircle, XCircle, Eye, RefreshCw, TrendingUp } from "lucide-react"
+import { formatCurrency, formatDate } from "@/lib/utils/format"
+import { PageHeader } from "@/components/dashboard/page-header"
+import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+interface Offer {
+  id: string
+  auctionId: string
+  dealerId: string
+  status: string
+  otdPriceCents: number
+  createdAt: string
+  dealer?: {
+    dealershipName: string
+  }
+  auction?: {
+    make: string
+    model: string
+    year: number
+  }
+}
 
-// Mock data for demonstration
-const mockOffers = []
+const Loading = () => null
 
 export default function AdminOffersPage() {
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
-  
-  // In a real app, this would fetch from /api/admin/offers
-  const { data, error, isLoading } = useSWR("/api/admin/offers", fetcher, {
-    fallbackData: { offers: mockOffers }
-  })
+  const [offers, setOffers] = useState<Offer[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState("")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const searchParams = useSearchParams()
 
-  const offers = data?.offers || []
-  const filteredOffers = offers.filter((offer: any) => {
-    const matchesSearch = offer.dealerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         offer.vehicleName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         offer.buyerName?.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = statusFilter === "all" || offer.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
+  useEffect(() => {
+    fetchOffers()
+  }, [statusFilter, searchParams])
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Offers" subtitle="All dealer offers" />
-        <LoadingSkeleton variant="cards" />
-      </div>
-    )
+  async function fetchOffers() {
+    try {
+      setLoading(true)
+      const params = new URLSearchParams()
+      if (statusFilter !== "all") params.set("status", statusFilter)
+      if (search) params.set("search", search)
+      
+      const res = await fetch(`/api/admin/offers?${params}`)
+      if (!res.ok) throw new Error("Failed to fetch offers")
+      const data = await res.json()
+      setOffers(data.offers || [])
+    } catch (err) {
+      console.error("Error fetching offers:", err)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Offers" subtitle="All dealer offers" />
-        <ErrorState message="Failed to load offers" onRetry={() => window.location.reload()} />
-      </div>
-    )
+  const statusColors: Record<string, string> = {
+    PENDING: "bg-yellow-100 text-yellow-800",
+    ACTIVE: "bg-blue-100 text-blue-800",
+    ACCEPTED: "bg-green-100 text-green-800",
+    REJECTED: "bg-red-100 text-red-800",
+    EXPIRED: "bg-gray-100 text-gray-800",
+    COUNTERED: "bg-purple-100 text-purple-800",
+  }
+
+  const stats = {
+    total: offers.length,
+    pending: offers.filter((o) => o.status === "PENDING").length,
+    accepted: offers.filter((o) => o.status === "ACCEPTED").length,
+    avgPrice: offers.length > 0 
+      ? offers.reduce((sum, o) => sum + (o.otdPriceCents || 0), 0) / offers.length / 100 
+      : 0,
   }
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       <PageHeader
-        title="Offers"
-        subtitle="Manage all dealer offers across the platform"
-        breadcrumb={[
-          { label: "Admin", href: "/admin/dashboard" },
-          { label: "Offers" },
-        ]}
+        title="Dealer Offers"
+        description="Review and manage all dealer offers on auctions"
       />
 
-      {offers.length === 0 ? (
-        <EmptyState
-          icon={HandCoins}
-          title="No offers yet"
-          description="Dealer offers will appear here"
-        />
-      ) : (
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardContent className="p-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
-              <div className="relative flex-1 w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by dealer, vehicle, or buyer..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <DollarSign className="h-5 w-5 text-blue-600" />
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="accepted">Accepted</SelectItem>
-                  <SelectItem value="declined">Declined</SelectItem>
-                  <SelectItem value="expired">Expired</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredOffers.length === 0 ? (
-                <div className="col-span-full">
-                  <p className="text-sm text-muted-foreground text-center py-8">No offers found</p>
-                </div>
-              ) : (
-                filteredOffers.map((offer: any) => (
-                  <Card key={offer.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="min-w-0 flex-1">
-                          <h3 className="font-semibold truncate">{offer.dealerName}</h3>
-                          <p className="text-sm text-muted-foreground truncate">{offer.vehicleName}</p>
-                          <p className="text-xs text-muted-foreground">Buyer: {offer.buyerName}</p>
-                        </div>
-                        <StatusPill status={offer.status} />
-                      </div>
-                      <div className="space-y-2 mb-4">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Monthly Payment:</span>
-                          <span className="font-semibold">${offer.monthlyPayment}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Total Price:</span>
-                          <span className="font-semibold">${offer.totalPrice.toLocaleString()}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          Received {formatDistanceToNow(new Date(offer.createdAt), { addSuffix: true })}
-                        </p>
-                      </div>
-                      <Link href={`/admin/offers/${offer.id}`}>
-                        <Button variant="outline" className="w-full" size="sm">
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
+              <div>
+                <p className="text-sm text-muted-foreground">Total Offers</p>
+                <p className="text-2xl font-bold">{stats.total}</p>
+              </div>
             </div>
           </CardContent>
         </Card>
-      )}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-yellow-100 rounded-lg">
+                <Clock className="h-5 w-5 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Pending Review</p>
+                <p className="text-2xl font-bold">{stats.pending}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Accepted</p>
+                <p className="text-2xl font-bold">{stats.accepted}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <TrendingUp className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Avg. Price</p>
+                <p className="text-2xl font-bold">{formatCurrency(stats.avgPrice * 100)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by dealer or vehicle..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && fetchOffers()}
+                className="pl-10"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="ACTIVE">Active</SelectItem>
+                <SelectItem value="ACCEPTED">Accepted</SelectItem>
+                <SelectItem value="REJECTED">Rejected</SelectItem>
+                <SelectItem value="EXPIRED">Expired</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button onClick={fetchOffers} variant="outline">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Table */}
+      <Card>
+        <CardContent className="p-0">
+          <Suspense fallback={<Loading />}>
+            {loading ? (
+              <div className="p-8 text-center">
+                <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2" />
+                <p className="text-muted-foreground">Loading offers...</p>
+              </div>
+            ) : offers.length === 0 ? (
+              <div className="p-8 text-center text-muted-foreground">
+                No offers found
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Vehicle</TableHead>
+                    <TableHead>Dealer</TableHead>
+                    <TableHead>OTD Price</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Submitted</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {offers.map((offer) => (
+                    <TableRow key={offer.id}>
+                      <TableCell>
+                        {offer.auction ? (
+                          <p className="font-medium">
+                            {offer.auction.year} {offer.auction.make} {offer.auction.model}
+                          </p>
+                        ) : (
+                          <span className="text-muted-foreground">Unknown Vehicle</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {offer.dealer?.dealershipName || "Unknown Dealer"}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {formatCurrency(offer.otdPriceCents)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={statusColors[offer.status] || "bg-gray-100"}>
+                          {offer.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{formatDate(offer.createdAt)}</TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={`/admin/offers/${offer.id}`}>
+                            <Eye className="h-4 w-4 mr-1" />
+                            View
+                          </Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </Suspense>
+        </CardContent>
+      </Card>
     </div>
   )
 }

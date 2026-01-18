@@ -1,46 +1,76 @@
-import { ReactNode } from "react"
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import type { ReactNode } from "react"
 
-interface DetailShellProps {
-  summaryTitle: string
-  summary: ReactNode
-  tabs: Array<{
-    value: string
-    label: string
-    content: ReactNode
-  }>
-  defaultTab?: string
+interface SummarySection {
+  title?: string
+  content: ReactNode
+  actions?: ReactNode
 }
 
-export function DetailShell({ summaryTitle, summary, tabs, defaultTab }: DetailShellProps) {
+interface TabConfig {
+  id: string
+  label: string
+  content: ReactNode
+  badge?: string | number
+}
+
+interface DetailShellProps {
+  summary: SummarySection
+  tabs: TabConfig[]
+  defaultTab?: string
+  className?: string
+}
+
+export function DetailShell({
+  summary,
+  tabs,
+  defaultTab,
+  className = "",
+}: DetailShellProps) {
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
+    <div className={`grid lg:grid-cols-3 gap-6 ${className}`}>
       {/* Summary Card */}
-      <Card className="lg:col-span-1">
-        <CardHeader>
-          <CardTitle>{summaryTitle}</CardTitle>
-        </CardHeader>
-        <CardContent>{summary}</CardContent>
+      <Card className="h-fit">
+        {summary.title && (
+          <CardHeader>
+            <CardTitle className="text-lg">{summary.title}</CardTitle>
+          </CardHeader>
+        )}
+        <CardContent className={summary.title ? "" : "pt-6"}>
+          {summary.content}
+          {summary.actions && <div className="mt-6">{summary.actions}</div>}
+        </CardContent>
       </Card>
 
       {/* Tabs Panel */}
-      <div className="lg:col-span-2">
-        <Tabs defaultValue={defaultTab || tabs[0]?.value} className="w-full">
-          <TabsList className="w-full justify-start overflow-x-auto flex-wrap h-auto">
+      <Card className="lg:col-span-2">
+        <Tabs defaultValue={defaultTab || tabs[0]?.id}>
+          <CardHeader className="pb-0">
+            <TabsList className="flex-wrap h-auto gap-1">
+              {tabs.map((tab) => (
+                <TabsTrigger key={tab.id} value={tab.id} className="relative">
+                  {tab.label}
+                  {tab.badge !== undefined && (
+                    <span className="ml-1.5 px-1.5 py-0.5 text-xs rounded-full bg-muted">
+                      {tab.badge}
+                    </span>
+                  )}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </CardHeader>
+          <CardContent className="pt-6">
             {tabs.map((tab) => (
-              <TabsTrigger key={tab.value} value={tab.value} className="flex-shrink-0">
-                {tab.label}
-              </TabsTrigger>
+              <TabsContent key={tab.id} value={tab.id} className="mt-0">
+                {tab.content}
+              </TabsContent>
             ))}
-          </TabsList>
-          {tabs.map((tab) => (
-            <TabsContent key={tab.value} value={tab.value} className="mt-6">
-              {tab.content}
-            </TabsContent>
-          ))}
+          </CardContent>
         </Tabs>
-      </div>
+      </Card>
     </div>
   )
 }

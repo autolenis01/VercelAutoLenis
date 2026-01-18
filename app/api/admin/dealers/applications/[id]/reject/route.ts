@@ -12,7 +12,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Rejection reason is required" }, { status: 400 })
     }
 
-    await dealerApprovalService.rejectApplication(id, user.userId, body.reason)
+    await dealerApprovalService.rejectApplication(id, user.id, body.reason)
 
     return NextResponse.json({ success: true, message: "Application rejected" })
   } catch (error: any) {

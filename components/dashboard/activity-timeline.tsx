@@ -1,74 +1,75 @@
-import { formatDistanceToNow } from "date-fns"
-import { cn } from "@/lib/utils"
+"use client"
 
-import { ReactNode } from "react"
+import type { ReactNode } from "react"
 
-export interface TimelineItem {
+interface TimelineItem {
   id: string
   title: string
   description?: string
-  timestamp: Date
-  type?: "default" | "success" | "warning" | "error"
+  timestamp: string
   icon?: ReactNode
+  type?: "default" | "success" | "warning" | "error" | "info"
 }
 
 interface ActivityTimelineProps {
   items: TimelineItem[]
+  emptyMessage?: string
+  className?: string
 }
 
-const typeStyles = {
-  default: "bg-gray-500",
+const typeColors = {
+  default: "bg-gray-400",
   success: "bg-green-500",
   warning: "bg-yellow-500",
   error: "bg-red-500",
+  info: "bg-blue-500",
 }
 
-export function ActivityTimeline({ items }: ActivityTimelineProps) {
+export function ActivityTimeline({
+  items,
+  emptyMessage = "No activity yet",
+  className = "",
+}: ActivityTimelineProps) {
   if (items.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground text-center py-8">No activity to display</p>
+      <div className="text-center py-8 text-muted-foreground text-sm">
+        {emptyMessage}
+      </div>
     )
   }
 
   return (
-    <div className="space-y-4">
-      {items.map((item, index) => {
-        const isLast = index === items.length - 1
-        const typeClass = typeStyles[item.type || "default"]
-
-        return (
-          <div key={item.id} className="relative flex gap-3 sm:gap-4">
-            {/* Timeline line */}
-            {!isLast && (
-              <div className="absolute left-2 top-6 bottom-0 w-px bg-border" aria-hidden="true" />
+    <div className={`space-y-4 ${className}`}>
+      {items.map((item, index) => (
+        <div key={item.id} className="flex gap-4">
+          {/* Timeline Indicator */}
+          <div className="flex flex-col items-center">
+            <div
+              className={`w-3 h-3 rounded-full ${typeColors[item.type || "default"]}`}
+            />
+            {index < items.length - 1 && (
+              <div className="w-px flex-1 bg-border mt-2" />
             )}
+          </div>
 
-            {/* Icon/Dot */}
-            <div className="relative flex-shrink-0">
-              {item.icon ? (
-                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white", typeClass)}>
-                  {item.icon}
-                </div>
-              ) : (
-                <div className={cn("w-4 h-4 rounded-full mt-1", typeClass)} />
-              )}
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 min-w-0 pb-4">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                <h4 className="text-sm font-medium">{item.title}</h4>
-                <time className="text-xs text-muted-foreground flex-shrink-0">
-                  {formatDistanceToNow(item.timestamp, { addSuffix: true })}
-                </time>
+          {/* Content */}
+          <div className="flex-1 pb-4">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-sm font-medium">{item.title}</p>
+                {item.description && (
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    {item.description}
+                  </p>
+                )}
               </div>
-              {item.description && (
-                <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
-              )}
+              <time className="text-xs text-muted-foreground whitespace-nowrap">
+                {item.timestamp}
+              </time>
             </div>
           </div>
-        )
-      })}
+        </div>
+      ))}
     </div>
   )
 }

@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   try {
     const session = await requireAuth(["BUYER"])
     const body = await request.json()
-    const supabase = await createClient()
+    const supabase = createClient()
 
     const { data: buyer, error: buyerError } = await supabase
       .from("BuyerProfile")
@@ -28,16 +28,14 @@ export async function POST(request: Request) {
     // Decline the offer and get updated options
     const updatedOptions = await BestPriceService.declineOffer(body.auctionId, body.offerId, buyer.id)
 
-    // Check if updatedOptions is an array
-    const hasMoreOptions = Array.isArray(updatedOptions) && updatedOptions.length > 0
-
     return NextResponse.json({
       success: true,
       data: {
         options: updatedOptions,
-        message: hasMoreOptions
-          ? "Offer declined. Here are your updated options."
-          : "You've reviewed all available offers.",
+        message:
+          updatedOptions.length > 0
+            ? "Offer declined. Here are your updated options."
+            : "You've reviewed all available offers.",
       },
     })
   } catch (error: any) {

@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server"
 import { seoService } from "@/lib/services/seo.service"
 
-export const dynamic = "force-dynamic" // CRITICAL: prevent static generation
-
 export async function GET() {
   try {
     const robotsTxt = await seoService.generateRobotsTxt()

@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { ContractShieldService } from "@/lib/services/contract-shield.service"
 import { getSession } from "@/lib/auth-server"
 
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const session = await getSession()
 

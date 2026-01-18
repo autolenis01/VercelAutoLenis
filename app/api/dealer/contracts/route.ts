@@ -5,7 +5,7 @@ import { supabase, isDatabaseConfigured } from "@/lib/db"
 export const dynamic = "force-dynamic"
 
 // Get contracts
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || !["DEALER", "DEALER_USER"].includes(user.role)) {
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Dealer not found" }, { status: 404 })
     }
 
-    const { dealId, documentType, fileUrl } = await req.json()
+    const { dealId, documentType, fileUrl, metaJson } = await req.json()
 
     const { data: contract, error: contractError } = await supabase
       .from("ContractDocument")

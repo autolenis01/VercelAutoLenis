@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { qr_code_value } = schema.parse(body)
 
-    const result = await pickupService.checkInByQR(qr_code_value, user.userId)
+    const result = await pickupService.checkInByQR(qr_code_value, user.id)
 
     return NextResponse.json({ success: true, ...result })
   } catch (error: any) {

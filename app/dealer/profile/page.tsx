@@ -1,84 +1,43 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { PageHeader } from "@/components/dashboard/page-header"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { KeyValueGrid } from "@/components/dashboard/key-value-grid"
+import { StatusPill } from "@/components/dashboard/status-pill"
+import { LoadingSkeleton } from "@/components/dashboard/loading-skeleton"
+import { ErrorState } from "@/components/dashboard/error-state"
+import { NotImplementedModal } from "@/components/dashboard/not-implemented-modal"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/hooks/use-toast"
-import { Building2, Mail, Phone, MapPin, FileText, Globe } from "lucide-react"
-import { LoadingSkeleton } from "@/components/dashboard/loading-skeleton"
+import { Separator } from "@/components/ui/separator"
+import { Building2, MapPin, Phone, Mail, Globe, Edit, Save } from "lucide-react"
+import useSWR from "swr"
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function DealerProfilePage() {
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [profile, setProfile] = useState<any>(null)
-  const { toast } = useToast()
+  const [showModal, setShowModal] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const { data, error, isLoading, mutate } = useSWR("/api/dealer/profile", fetcher)
 
-  useEffect(() => {
-    loadProfile()
-  }, [])
+  const profile = data?.dealer
 
-  const loadProfile = async () => {
-    try {
-      const response = await fetch("/api/dealer/profile")
-      const data = await response.json()
-
-      if (data.success) {
-        setProfile(data.data.profile)
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to load profile",
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSaving(true)
-
-    try {
-      const response = await fetch("/api/dealer/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profile),
-      })
-
-      const data = await response.json()
-
-      if (!data.success) {
-        throw new Error(data.error)
-      }
-
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been saved successfully",
-      })
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      })
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
-        <PageHeader title="Dealer Profile" subtitle="Manage your business information" />
+        <PageHeader title="Dealership Profile" subtitle="Manage your dealership information" />
         <LoadingSkeleton variant="detail" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title="Dealership Profile" subtitle="Manage your dealership information" />
+        <ErrorState message="Failed to load profile" onRetry={() => mutate()} />
       </div>
     )
   }
@@ -86,168 +45,137 @@ export default function DealerProfilePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Dealer Profile"
-        subtitle="Manage your business information and preferences"
-        breadcrumb={[
-          { label: "Dashboard", href: "/dealer/dashboard" },
-          { label: "Profile" },
-        ]}
+        title="Dealership Profile"
+        subtitle="Manage your dealership information"
+        primaryAction={{
+          label: isEditing ? "Save Changes" : "Edit Profile",
+          onClick: () => {
+            if (isEditing) {
+              setShowModal(true)
+            } else {
+              setIsEditing(true)
+            }
+          },
+          icon: isEditing ? <Save className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />,
+        }}
       />
 
-      <form onSubmit={handleSave}>
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Profile Card */}
         <Card>
-          <CardHeader>
-            <CardTitle>Business Information</CardTitle>
-            <CardDescription>Update your dealership details and contact information</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="businessName">
-                <Building2 className="h-4 w-4 inline mr-2" />
-                Business Name
-              </Label>
-              <Input
-                id="businessName"
-                value={profile?.businessName || ""}
-                onChange={(e) => setProfile({ ...profile, businessName: e.target.value })}
-                placeholder="Your Dealership Name"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="licenseNumber">
-                <FileText className="h-4 w-4 inline mr-2" />
-                Dealer License Number
-              </Label>
-              <Input
-                id="licenseNumber"
-                value={profile?.licenseNumber || ""}
-                onChange={(e) => setProfile({ ...profile, licenseNumber: e.target.value })}
-                placeholder="DL-123456"
-                required
-              />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">
-                  <Mail className="h-4 w-4 inline mr-2" />
-                  Business Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={profile?.user?.email || ""}
-                  disabled
-                  className="bg-muted"
-                />
-                <p className="text-xs text-muted-foreground">Email cannot be changed</p>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <div className="w-20 h-20 rounded-full bg-[#2D1B69]/10 flex items-center justify-center mx-auto mb-4">
+                <Building2 className="h-10 w-10 text-[#2D1B69]" />
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">
-                  <Phone className="h-4 w-4 inline mr-2" />
-                  Phone Number
-                </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={profile?.phone || ""}
-                  onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                  placeholder="(555) 123-4567"
-                  required
-                />
+              <h2 className="text-xl font-bold">{profile?.name || "Your Dealership"}</h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                {profile?.city}, {profile?.state}
+              </p>
+              <div className="mt-3">
+                <StatusPill status={profile?.status?.toLowerCase() || "active"} />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="website">
-                <Globe className="h-4 w-4 inline mr-2" />
-                Website (Optional)
-              </Label>
-              <Input
-                id="website"
-                type="url"
-                value={profile?.website || ""}
-                onChange={(e) => setProfile({ ...profile, website: e.target.value })}
-                placeholder="https://www.yourdealership.com"
-              />
-            </div>
+            <Separator className="my-6" />
 
-            <div className="space-y-2">
-              <Label htmlFor="address">
-                <MapPin className="h-4 w-4 inline mr-2" />
-                Street Address
-              </Label>
-              <Input
-                id="address"
-                value={profile?.address || ""}
-                onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-                placeholder="123 Main Street"
-                required
-              />
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
-                <Input
-                  id="city"
-                  value={profile?.city || ""}
-                  onChange={(e) => setProfile({ ...profile, city: e.target.value })}
-                  placeholder="Los Angeles"
-                  required
-                />
+            <div className="space-y-4 text-sm">
+              <div className="flex items-center gap-3">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span>{profile?.address || "Address not set"}</span>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="state">State</Label>
-                <Input
-                  id="state"
-                  value={profile?.state || ""}
-                  onChange={(e) => setProfile({ ...profile, state: e.target.value })}
-                  maxLength={2}
-                  placeholder="CA"
-                  required
-                />
+              <div className="flex items-center gap-3">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <span>{profile?.phone || "Phone not set"}</span>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="zipCode">ZIP Code</Label>
-                <Input
-                  id="zipCode"
-                  value={profile?.zipCode || ""}
-                  onChange={(e) => setProfile({ ...profile, zipCode: e.target.value })}
-                  maxLength={5}
-                  placeholder="90001"
-                  required
-                />
+              <div className="flex items-center gap-3">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <span>{profile?.email || "Email not set"}</span>
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">Business Description (Optional)</Label>
-              <Textarea
-                id="description"
-                value={profile?.description || ""}
-                onChange={(e) => setProfile({ ...profile, description: e.target.value })}
-                placeholder="Tell buyers about your dealership..."
-                rows={4}
-              />
-            </div>
-
-            <div className="flex justify-end gap-3">
-              <Button type="button" variant="outline" onClick={loadProfile}>
-                Reset
-              </Button>
-              <Button type="submit" disabled={saving}>
-                {saving ? "Saving..." : "Save Changes"}
-              </Button>
+              <div className="flex items-center gap-3">
+                <Globe className="h-4 w-4 text-muted-foreground" />
+                <span>{profile?.website || "Website not set"}</span>
+              </div>
             </div>
           </CardContent>
         </Card>
-      </form>
+
+        {/* Details */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Dealership Details</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isEditing ? (
+              <div className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Dealership Name</Label>
+                    <Input defaultValue={profile?.name || ""} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Phone</Label>
+                    <Input defaultValue={profile?.phone || ""} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Email</Label>
+                    <Input type="email" defaultValue={profile?.email || ""} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Website</Label>
+                    <Input defaultValue={profile?.website || ""} />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Address</Label>
+                  <Input defaultValue={profile?.address || ""} />
+                </div>
+                <div className="grid sm:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>City</Label>
+                    <Input defaultValue={profile?.city || ""} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>State</Label>
+                    <Input defaultValue={profile?.state || ""} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>ZIP Code</Label>
+                    <Input defaultValue={profile?.zipCode || ""} />
+                  </div>
+                </div>
+                <div className="flex gap-2 pt-4">
+                  <Button variant="outline" onClick={() => setIsEditing(false)} className="bg-transparent">
+                    Cancel
+                  </Button>
+                  <Button onClick={() => setShowModal(true)}>
+                    Save Changes
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <KeyValueGrid
+                items={[
+                  { label: "Dealership Name", value: profile?.name || "—" },
+                  { label: "Phone", value: profile?.phone || "—" },
+                  { label: "Email", value: profile?.email || "—" },
+                  { label: "Website", value: profile?.website || "—" },
+                  { label: "Address", value: profile?.address || "—" },
+                  { label: "City", value: profile?.city || "—" },
+                  { label: "State", value: profile?.state || "—" },
+                  { label: "ZIP Code", value: profile?.zipCode || "—" },
+                ]}
+              />
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <NotImplementedModal
+        open={showModal}
+        onOpenChange={setShowModal}
+        featureName="Profile update"
+      />
     </div>
   )
 }

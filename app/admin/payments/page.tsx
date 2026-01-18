@@ -18,14 +18,15 @@ import {
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
-import { DollarSign, RefreshCw, CreditCard, Undo2, Search } from "lucide-react"
+import { DollarSign, RefreshCw, CreditCard, Undo2, Search, BarChart3 } from "lucide-react"
+import { PaymentAnalyticsCharts } from "@/components/admin/payment-analytics-charts"
 
 export const dynamic = "force-dynamic"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function AdminPaymentsPage() {
-  const { data, error: _error, isLoading, mutate } = useSWR("/api/admin/payments", fetcher, {
+  const { data, error, isLoading, mutate } = useSWR("/api/admin/payments", fetcher, {
     refreshInterval: 30000,
   })
   const [searchTerm, setSearchTerm] = useState("")
@@ -229,11 +230,19 @@ export default function AdminPaymentsPage() {
       </div>
 
       {/* Payment Tables */}
-      <Tabs defaultValue="deposits">
+      <Tabs defaultValue="analytics">
         <TabsList>
+          <TabsTrigger value="analytics">
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Analytics
+          </TabsTrigger>
           <TabsTrigger value="deposits">Deposits ({deposits.length})</TabsTrigger>
           <TabsTrigger value="fees">Concierge Fees ({serviceFees.length})</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="analytics" className="mt-4">
+          <PaymentAnalyticsCharts deposits={deposits} serviceFees={serviceFees} />
+        </TabsContent>
 
         <TabsContent value="deposits" className="mt-4">
           <Card>

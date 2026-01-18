@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { Building2, Calendar, FileText, LayoutDashboard, Package, Settings, LogOut, Menu, X, Users, HandCoins, MessageSquare } from "lucide-react"
+import { Building2, Calendar, FileText, LayoutDashboard, Package, Settings, LogOut, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const iconMap: Record<string, any> = {
@@ -16,9 +16,6 @@ const iconMap: Record<string, any> = {
   FileText,
   Calendar,
   Settings,
-  Users,
-  HandCoins,
-  MessageSquare,
 }
 
 interface NavItem {
@@ -97,15 +94,20 @@ export function DealerLayoutClient({
               >
                 {userEmail}
               </span>
-              <form action="/api/auth/signout" method="POST">
-                <button
-                  className="flex items-center gap-2 text-sm text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-lg touch-target focus-ring"
-                  aria-label="Log out of your account"
-                >
-                  <LogOut className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
-                  <span className="hidden sm:inline">Log Out</span>
-                </button>
-              </form>
+              <button
+                onClick={async () => {
+                  try {
+                    await fetch("/api/auth/signout", { method: "POST", credentials: "include" })
+                  } finally {
+                    window.location.href = "/dealer/sign-in"
+                  }
+                }}
+                className="flex items-center gap-2 text-sm text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-lg touch-target focus-ring"
+                aria-label="Log out of your account"
+              >
+                <LogOut className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
+                <span className="hidden sm:inline">Log Out</span>
+              </button>
             </div>
           </div>
         </div>

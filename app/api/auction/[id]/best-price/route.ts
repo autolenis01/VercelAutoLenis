@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { BestPriceService } from "@/lib/services/best-price.service"
 
-export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const options = await BestPriceService.computeBestPriceOptions(id)
@@ -15,7 +15,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   }
 }
 
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const options = await BestPriceService.getBestPriceOptions(id)

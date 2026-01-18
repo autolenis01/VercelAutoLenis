@@ -1,7 +1,8 @@
 import "server-only"
-import { cookies } from "next/headers"
+import { cookies, headers } from "next/headers"
 import { supabase, isDatabaseConfigured } from "@/lib/db"
 import { logger } from "./logger"
+import { getAdminSessionCookieOptions, getClearCookieOptions } from "./utils/cookies"
 
 // Rate limiting store (in production, use Redis)
 const loginAttempts = new Map<string, { count: number; firstAttempt: number; lockedUntil?: number }>()
@@ -122,16 +123,33 @@ export function recordMfaAttempt(identifier: string, success: boolean): void {
 
 export async function getAdminUser(email: string): Promise<AdminUser | null> {
   if (!isDatabaseConfigured()) {
+    console.log("[v0] Database not configured")
     return null
   }
 
   try {
+    // First, check if user exists at all (any role)
+    const { data: anyUser, error: anyError } = await supabase
+      .from("User")
+      .select("id, email, passwordHash, role")
+      .eq("email", email.toLowerCase())
+      .maybeSingle()
+
+    console.log("[v0] User lookup result:", { email: email.toLowerCase(), found: !!anyUser, role: anyUser?.role, error: anyError?.message })
+
+    if (anyUser && anyUser.role !== "ADMIN") {
+      console.log("[v0] User found but not an admin, role:", anyUser.role)
+      return null
+    }
+
     const { data, error } = await supabase
       .from("User")
       .select("id, email, passwordHash, role")
       .eq("email", email.toLowerCase())
-      .in("role", ["ADMIN", "SUPER_ADMIN"])
+      .eq("role", "ADMIN")
       .maybeSingle()
+
+    console.log("[v0] Admin user lookup result:", { found: !!data, error: error?.message, hasPasswordHash: !!data?.passwordHash })
 
     if (error || !data) {
       return null
@@ -155,17 +173,21 @@ export async function setAdminSession(
     requiresPasswordReset: boolean
     factorId?: string
   },
+  hostname?: string,
 ): Promise<void> {
   adminSessions.set(sessionId, data)
 
   const cookieStore = await cookies()
-  cookieStore.set("admin_session", sessionId, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 60 * 60 * 24, // 24 hours
-    path: "/",
-  })
+  
+  // Get hostname from headers if not provided
+  let host = hostname
+  if (!host) {
+    const headerStore = await headers()
+    host = headerStore.get("host") || undefined
+  }
+
+  const options = getAdminSessionCookieOptions(host)
+  cookieStore.set("admin_session", sessionId, options)
 }
 
 export async function getAdminSession(): Promise<{
@@ -208,7 +230,7 @@ export async function updateAdminSession(
   }
 }
 
-export async function clearAdminSession(): Promise<void> {
+export async function clearAdminSession(hostname?: string): Promise<void> {
   const cookieStore = await cookies()
   const sessionId = cookieStore.get("admin_session")?.value
 
@@ -216,6 +238,20 @@ export async function clearAdminSession(): Promise<void> {
     adminSessions.delete(sessionId)
   }
 
+  // Get hostname from headers if not provided
+  let host = hostname
+  if (!host) {
+    const headerStore = await headers()
+    host = headerStore.get("host") || undefined
+  }
+
+  const options = getClearCookieOptions(host)
+  
+  // Clear both admin_session and session cookies with proper domain
+  cookieStore.set("admin_session", "", options)
+  cookieStore.set("session", "", options)
+  
+  // Also try deleting without domain for backwards compatibility
   cookieStore.delete("admin_session")
   cookieStore.delete("session")
 }
