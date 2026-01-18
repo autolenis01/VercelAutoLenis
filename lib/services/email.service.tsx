@@ -1,10 +1,9 @@
 // Email Service - Handles all outbound email communication
-// Using Resend or SendGrid for transactional emails
+// Using Resend for transactional emails
 
 import { logger } from "@/lib/logger"
 
 const RESEND_API_KEY = process.env["RESEND_API_KEY"]
-const SENDGRID_API_KEY = process.env["SENDGRID_API_KEY"]
 const FROM_EMAIL = process.env["FROM_EMAIL"] || "noreply@autolenis.com"
 const FROM_NAME = process.env["FROM_NAME"] || "AutoLenis"
 const APP_URL = process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"
@@ -19,16 +18,14 @@ interface EmailOptions {
 }
 
 export class EmailService {
-  private provider: "resend" | "sendgrid" | "mock"
+  private provider: "resend" | "mock"
 
   constructor() {
     if (RESEND_API_KEY) {
       this.provider = "resend"
-    } else if (SENDGRID_API_KEY) {
-      this.provider = "sendgrid"
     } else {
       this.provider = "mock"
-      logger.warn("EmailService: No provider configured, using mock mode")
+      logger.warn("EmailService: RESEND_API_KEY not configured, using mock mode")
     }
   }
 
@@ -39,8 +36,6 @@ export class EmailService {
     try {
       if (this.provider === "resend") {
         return await this.sendViaResend({ ...options, from })
-      } else if (this.provider === "sendgrid") {
-        return await this.sendViaSendGrid({ ...options, from })
       } else {
         logger.debug("Mock email sent", {
           to: options.to,
@@ -55,6 +50,10 @@ export class EmailService {
   }
 
   private async sendViaResend(options: EmailOptions & { from: string }) {
+    if (!RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY is not configured. Please add it to your environment variables.")
+    }
+
     // Add timeout to prevent hanging on firewall blocks
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
@@ -90,48 +89,6 @@ export class EmailService {
       clearTimeout(timeoutId)
       if (error.name === 'AbortError') {
         throw new Error('Resend API request timed out - possible firewall block')
-      }
-      throw error
-    }
-  }
-
-  private async sendViaSendGrid(options: EmailOptions & { from: string }) {
-    // Add timeout to prevent hanging on firewall blocks
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
-
-    try {
-      const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${SENDGRID_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          personalizations: [{ to: [{ email: options.to }] }],
-          from: { email: FROM_EMAIL, name: FROM_NAME },
-          subject: options.subject,
-          content: [
-            { type: "text/plain", value: options.text || options.html.replace(/<[^>]*>/g, "") },
-            { type: "text/html", value: options.html },
-          ],
-          reply_to: options.replyTo ? { email: options.replyTo } : undefined,
-        }),
-        signal: controller.signal,
-      })
-
-      clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        const error = await response.text()
-        throw new Error(`SendGrid API error: ${error}`)
-      }
-
-      return { success: true, messageId: response.headers.get("x-message-id") || undefined }
-    } catch (error: any) {
-      clearTimeout(timeoutId)
-      if (error.name === 'AbortError') {
-        throw new Error('SendGrid API request timed out - possible firewall block')
       }
       throw error
     }
