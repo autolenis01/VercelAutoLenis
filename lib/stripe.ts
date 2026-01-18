@@ -75,7 +75,7 @@ export async function createServiceFeeCheckoutSession(params: {
 
 // Verify webhook signature
 export function constructWebhookEvent(payload: string | Buffer, signature: string) {
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  const webhookSecret = process.env["STRIPE_WEBHOOK_SECRET"]
 
   if (!webhookSecret) {
     throw new Error("STRIPE_WEBHOOK_SECRET is not configured")
