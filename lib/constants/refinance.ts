@@ -3,7 +3,7 @@
  * Single source of truth for refinance URL generation
  */
 
-const OPENROAD_BASE_URL = "https://www.openroadlending.com/apply"
+const OPENROAD_BASE_URL = "https://www.openroadlending.com/applyone/"
 const AFFILIATE_ID = "1445"
 const DEFAULT_SUB_ID = "enteryoursubidhere"
 
