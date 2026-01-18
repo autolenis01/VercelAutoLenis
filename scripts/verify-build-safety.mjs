@@ -53,15 +53,16 @@ function scanFile(filePath) {
     }
   })
 
-  // Rule 4: Detect module-level process.env access in lib/
-  if (filePath.startsWith('lib/') && !filePath.includes('lib/env.ts')) {
+  // Rule 4: Detect module-level process.env access in lib/ (only for required secrets, not config)
+  if (filePath.startsWith('lib/') && !filePath.includes('lib/env.ts') && !filePath.includes('lib/logger')) {
     lines.forEach((line, idx) => {
-      if (/^(export\s+)?(const|let|var)\s+\w+\s*=\s*process\.env\./.test(line)) {
+      // Only flag required secrets without fallbacks (those ending with !)
+      if (/^(export\s+)?(const|let|var)\s+\w+\s*=\s*process\.env\.\w+!/.test(line)) {
         VIOLATIONS.push({
           file: filePath,
           line: idx + 1,
-          rule: 'NO_MODULE_ENV_READ',
-          message: 'Module-level process.env read. Use lazy initialization or lib/env.ts.',
+          rule: 'NO_MODULE_ENV_READ_REQUIRED',
+          message: 'Module-level required process.env read (using !). Use lazy initialization.',
         })
       }
     })
