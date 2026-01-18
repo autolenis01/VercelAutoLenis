@@ -1,5 +1,3 @@
-import sgMail from "@sendgrid/mail"
-
 // Email configuration - ALL emails use info@autolenis.com exclusively
 export const EMAIL_CONFIG = {
   // All outgoing emails come from this address
@@ -13,20 +11,8 @@ export const EMAIL_CONFIG = {
   notificationRecipient: "info@autolenis.com",
 } as const
 
-let isInitialized = false
-
+// SendGrid is deprecated - use Resend instead via lib/services/email.service.tsx
+// This file kept for backward compatibility only
 export function initSendGrid() {
-  if (!isInitialized) {
-    const apiKey = process.env["SENDGRID_API_KEY"]
-    if (!apiKey) {
-      console.error("[SendGrid] SENDGRID_API_KEY is not configured")
-      throw new Error("SendGrid API key is not configured")
-    }
-    sgMail.setApiKey(apiKey)
-    isInitialized = true
-  }
-  return sgMail
+  throw new Error("SendGrid is no longer supported. Please use Resend via EmailService.")
 }
-
-// Export SendGrid client getter
-export { sgMail }
