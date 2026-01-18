@@ -259,7 +259,7 @@ async function processVehicleRow(row: any, dealerId: string, action: string): Pr
   }
 }
 
-export async function POST(_req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || !["DEALER", "DEALER_USER"].includes(user.role)) {

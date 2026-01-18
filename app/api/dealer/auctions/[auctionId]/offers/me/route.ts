@@ -14,7 +14,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ auc
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const dealer = await dealerService.getDealerByUserId(user.id)
+    const dealer = await dealerService.getDealerByUserId(user.userId)
     if (!dealer) {
       return NextResponse.json({ error: "Dealer profile not found" }, { status: 404 })
     }

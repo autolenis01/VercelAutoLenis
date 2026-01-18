@@ -1,5 +1,5 @@
 import { getSupabase } from "@/lib/db"
-import { stripe } from "@/lib/stripe"
+import { getStripe } from "@/lib/stripe"
 import { DEPOSIT_AMOUNT_CENTS, FEE_STRUCTURE_CENTS } from "@/lib/constants"
 
 export class PaymentService {
@@ -26,7 +26,7 @@ export class PaymentService {
       return { payment: existing, alreadyPaid: true }
     }
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await getStripe().paymentIntents.create({
       amount: DEPOSIT_AMOUNT_CENTS,
       currency: "usd",
       metadata: {
@@ -157,7 +157,7 @@ export class PaymentService {
       return { payment: feeOptions.existingPayment, alreadyPaid: true }
     }
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await getStripe().paymentIntents.create({
       amount: feeOptions.remainingCents,
       currency: "usd",
       metadata: {
@@ -587,7 +587,7 @@ export class PaymentService {
       const providerPaymentId = payment.providerPaymentId || payment.provider_payment_id
 
       if (providerPaymentId) {
-        const refund = await stripe.refunds.create({
+        const refund = await getStripe().refunds.create({
           payment_intent: providerPaymentId,
           reason: "requested_by_customer",
         })
@@ -628,7 +628,7 @@ export class PaymentService {
       const providerPaymentId = payment.providerPaymentId || payment.provider_payment_id
 
       if (providerPaymentId && payment.method === "CARD_DIRECT") {
-        const refund = await stripe.refunds.create({
+        const refund = await getStripe().refunds.create({
           payment_intent: providerPaymentId,
           reason: "requested_by_customer",
         })
@@ -821,7 +821,7 @@ export class PaymentService {
       return { payment: existingPayment, alreadyPaid: true }
     }
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await getStripe().paymentIntents.create({
       amount: remainingCents,
       currency: "usd",
       metadata: {

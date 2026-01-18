@@ -21,17 +21,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm (corepack) FIRST
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.28.0 --activate
+          pnpm --version
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
-
-      - name: Setup pnpm (corepack)
-        run: |
-          corepack enable
-          corepack prepare pnpm@10.28.0 --activate
-          pnpm --version
 
       # Deterministic install
       - name: Install (frozen lockfile)
@@ -59,6 +59,10 @@ jobs:
           CHECKPOINT_DISABLE: 1
           PRISMA_TELEMETRY_INFORMATION: none
         run: pnpm build
+
+      # Build safety scan
+      - name: Build safety scan
+        run: node scripts/verify-build-safety.mjs
 
       # Security gate (example: ensure the happy-dom RCE patch is present)
       - name: Security gate: verify happy-dom >= 20.0.0

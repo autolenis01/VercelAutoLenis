@@ -6,13 +6,42 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+  
   typescript: {
     ignoreBuildErrors: false,
   },
+  
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
+  
   images: {
     unoptimized: true,
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+      },
+    ],
   },
+  
   serverExternalPackages: ['@prisma/client', 'prisma'],
+  
+  // Disable x-powered-by header
+  poweredByHeader: false,
+  
+  // Compression
+  compress: true,
+  
+  // Logging
+  logging: {
+    fetches: {
+      fullUrl: process.env.NODE_ENV === 'development',
+    },
+  },
+  
   async headers() {
     return [
       {
@@ -30,6 +59,7 @@ const nextConfig = {
       },
     ]
   },
+  
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },

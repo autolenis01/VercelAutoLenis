@@ -2,13 +2,22 @@ import { SignJWT, jwtVerify } from "jose"
 import type { UserRole } from "./types"
 import { logger } from "./logger"
 
-const jwtSecretString = process.env.JWT_SECRET
-// Only error in true production (not preview)
-if (!jwtSecretString && process.env.VERCEL_ENV === "production") {
-  logger.error("JWT_SECRET is not configured in production!")
-}
+// Lazy JWT secret initialization - avoid module-level env access
+let JWT_SECRET: Uint8Array | null = null
+let jwtSecretWarned = false
 
-const JWT_SECRET = new TextEncoder().encode(jwtSecretString || "your-secret-key-change-in-production")
+function getJwtSecret(): Uint8Array {
+  if (!JWT_SECRET) {
+    const jwtSecretString = process.env.JWT_SECRET
+    if (!jwtSecretString && process.env.NODE_ENV === "production" && !jwtSecretWarned) {
+      // Warn once only, and only at runtime when auth is actually used
+      logger.error("JWT_SECRET is not configured in production!")
+      jwtSecretWarned = true
+    }
+    JWT_SECRET = new TextEncoder().encode(jwtSecretString || "your-secret-key-change-in-production")
+  }
+  return JWT_SECRET
+}
 
 export interface SessionUser {
   userId: string
@@ -40,7 +49,7 @@ export async function createSession(user: {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(JWT_SECRET)
+    .sign(getJwtSecret())
 
   logger.debug("Session token created successfully")
   return token
@@ -48,7 +57,7 @@ export async function createSession(user: {
 
 export async function verifySession(token: string): Promise<SessionUser> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET)
+    const { payload } = await jwtVerify(token, getJwtSecret())
     return payload as SessionUser
   } catch (error: any) {
     logger.error("Session verification failed", { error: error.message })

@@ -18,7 +18,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ app
     const body = await req.json()
     const { reason } = schema.parse(body)
 
-    const result = await pickupService.cancelPickup(appointmentId, user.id, reason)
+    const result = await pickupService.cancelPickup(appointmentId, user.userId, reason)
 
     return NextResponse.json({ success: true, ...result })
   } catch (error: any) {
