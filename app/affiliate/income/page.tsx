@@ -38,7 +38,7 @@ export default function AffiliateIncomePage() {
     for (let i = 0; i < 3; i++) {
       const levelIncome = targetIncome * (INCOME_DISTRIBUTION[i] ?? 0)
       const commissionPerSale = pkg * (COMMISSION_RATES[i] ?? 0)
-      sales.push(Math.round(levelIncome / commissionPerSale))
+      sales.push(commissionPerSale > 0 ? Math.round(levelIncome / commissionPerSale) : 0)
     }
     return sales
   }
@@ -59,7 +59,7 @@ export default function AffiliateIncomePage() {
     for (let i = 0; i < 3; i++) {
       const levelIncome = goalIncome * (INCOME_DISTRIBUTION[i] ?? 0)
       const commissionPerSale = selectedPackage * (COMMISSION_RATES[i] ?? 0)
-      sales.push(Math.ceil(levelIncome / commissionPerSale))
+      sales.push(commissionPerSale > 0 ? Math.ceil(levelIncome / commissionPerSale) : 0)
     }
     return sales
   }

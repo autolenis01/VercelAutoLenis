@@ -16,7 +16,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ off
       return NextResponse.json({ error: "is_valid must be a boolean" }, { status: 400 })
     }
 
-    const updatedOffer = await offerService.overrideOfferValidity(offerId, user.id, is_valid, admin_note)
+    const updatedOffer = await offerService.overrideOfferValidity(offerId, user.userId, is_valid, admin_note)
 
     return NextResponse.json({
       success: true,

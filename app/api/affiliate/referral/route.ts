@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const { data: buyer, error } = await supabase
       .from("BuyerProfile")
       .select("*")
-      .eq("userId", user.userId)
+      .eq("userId", user.id)
       .maybeSingle()
 
     if (error) {
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const referral = await affiliateService.trackReferral(affiliate.id, buyer.id)
+    const referral = await affiliateService.buildReferralChain(buyer.userId || user.id, affiliate.id)
 
     return NextResponse.json(referral)
   } catch (error: any) {

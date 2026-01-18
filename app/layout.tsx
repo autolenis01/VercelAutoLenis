@@ -1,23 +1,8 @@
 import type React from "react"
 import type { Metadata } from "next"
-import localFont from "next/font/local"
 import "./globals.css"
 import { SkipLink } from "@/components/skip-link"
 import "@/lib/monitoring"
-
-// Use local font fallback to prevent build failures when Google Fonts is unavailable
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-  fallback: ["system-ui", "arial"],
-})
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-  fallback: ["ui-monospace", "monospace"],
-})
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://autolenis.com"),

@@ -32,7 +32,7 @@ export async function GET(_request: NextRequest) {
 }
 
 // POST - Trigger manual reconciliation
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const session = await requireAuth()
     if (!session || session.role !== "ADMIN") {
