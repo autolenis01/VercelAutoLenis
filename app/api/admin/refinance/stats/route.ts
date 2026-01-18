@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get("startDate")
     const endDate = searchParams.get("endDate")
 
-    const supabase = await createClient()
+    const supabase = createClient()
     let baseQuery = supabase.from("RefinanceLead").select("*", { count: "exact", head: true })
 
     if (startDate) {

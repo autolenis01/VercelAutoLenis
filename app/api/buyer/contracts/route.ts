@@ -5,7 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 export const dynamic = "force-dynamic"
 
 // Get buyer's contract shield status and documents
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || user.role !== "BUYER") {
@@ -17,7 +17,7 @@ export async function GET(_req: NextRequest) {
     const { data: deal, error: dealError } = await supabase
       .from("SelectedDeal")
       .select("*")
-      .eq("buyerId", user.userId)
+      .eq("buyerId", user.id)
       .order("createdAt", { ascending: false })
       .limit(1)
       .maybeSingle()

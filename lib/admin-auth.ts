@@ -161,7 +161,7 @@ export async function setAdminSession(
   const cookieStore = await cookies()
   cookieStore.set("admin_session", sessionId, {
     httpOnly: true,
-    secure: process.env["NODE_ENV"] === "production",
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     maxAge: 60 * 60 * 24, // 24 hours
     path: "/",
@@ -285,8 +285,7 @@ function generateTotpCode(secret: string, time: number): string {
 
   let hash = 0
   for (let i = 0; i < combined.length; i++) {
-    const byte = combined[i] ?? 0
-    hash = ((hash << 5) - hash + byte) | 0
+    hash = ((hash << 5) - hash + combined[i]) | 0
   }
 
   // Generate 6-digit code
@@ -295,9 +294,10 @@ function generateTotpCode(secret: string, time: number): string {
 }
 
 export async function generateQrCodeDataUrl(uri: string): Promise<string> {
-  // Use local QR code generation to avoid external API calls that may be blocked by firewalls
-  const QRCode = await import('qrcode')
-  return QRCode.toDataURL(uri, { width: 200, margin: 1 })
+  // Use a QR code generation service or library
+  // For now, return a placeholder URL that can be used with a QR code service
+  const encoded = encodeURIComponent(uri)
+  return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encoded}`
 }
 
 export async function logAdminAction(action: string, details: Record<string, any>): Promise<void> {

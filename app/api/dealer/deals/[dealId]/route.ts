@@ -3,7 +3,7 @@ import { requireAuth } from "@/lib/auth-server"
 import { DealService } from "@/lib/services/deal.service"
 import { createClient } from "@/lib/supabase/server"
 
-export async function GET(_request: Request, { params }: { params: Promise<{ dealId: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ dealId: string }> }) {
   try {
     const session = await requireAuth(["DEALER_USER"])
     const { dealId } = await params

@@ -1,17 +1,17 @@
-// import { createClient } from "@supabase/supabase-js"
+import { createClient } from "@supabase/supabase-js"
 import { readFileSync, readdirSync } from "fs"
 import { join } from "path"
 import { logger } from "../../lib/logger"
 
-const supabaseUrl = process.env["SUPABASE_URL"]!
-const supabaseServiceKey = process.env["SUPABASE_SERVICE_ROLE_KEY"]!
+const supabaseUrl = process.env.SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 if (!supabaseUrl || !supabaseServiceKey) {
   logger.error("Missing required environment variables for migrations")
   process.exit(1)
 }
 
-// const supabase = createClient(supabaseUrl, supabaseServiceKey)
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 async function runMigrations() {
   logger.info("Starting database migrations")
@@ -25,8 +25,7 @@ async function runMigrations() {
     logger.info(`Running migration: ${file}`)
 
     try {
-      // const sql = readFileSync(join(scriptsDir, file), "utf-8")
-      readFileSync(join(scriptsDir, file), "utf-8")
+      const sql = readFileSync(join(scriptsDir, file), "utf-8")
 
       logger.warn(`Please run this script manually via Supabase Dashboard: ${file}`)
     } catch (error) {

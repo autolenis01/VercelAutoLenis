@@ -30,7 +30,7 @@ export async function GET() {
     }
 
     // Get or create shortlist
-    let { data: shortlist } = await supabase
+    let { data: shortlist, error: shortlistError } = await supabase
       .from("Shortlist")
       .select("id, name, active")
       .eq("buyerId", buyer.id)

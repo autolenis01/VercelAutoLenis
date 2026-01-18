@@ -5,8 +5,8 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js"
 import { logger } from "./logger"
 
 // Get Supabase connection details
-const supabaseUrl = process.env["SUPABASE_URL"] || process.env["NEXT_PUBLIC_SUPABASE_URL"] || ""
-const supabaseServiceKey = process.env["SUPABASE_SERVICE_ROLE_KEY"] || ""
+const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || ""
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ""
 
 // Track configuration status
 let configurationError: string | null = null
@@ -46,6 +46,7 @@ export const supabase: SupabaseClient = createSupabaseClient()
 
 // Prisma client is only loaded when actually needed
 let _prismaInstance: any = null
+const _prismaPromise: Promise<any> | null = null
 
 // Get Prisma client (lazy loaded)
 export function getPrisma() {
@@ -54,7 +55,7 @@ export function getPrisma() {
     _prismaInstance = new Proxy(
       {},
       {
-        get: (_target: any, prop) => {
+        get: (target: any, prop) => {
           if (prop === "then") return undefined // Allow await checks
           if (prop === "$connect" || prop === "$disconnect") {
             return async () => {} // No-op for connection methods
@@ -67,7 +68,7 @@ export function getPrisma() {
             {},
             {
               get: (_, method) => {
-                return async (..._args: any[]) => {
+                return async (...args: any[]) => {
                   console.warn(`[DB] prisma.${String(prop)}.${String(method)} not available in this environment`)
                   throw new Error(
                     `Database query prisma.${String(prop)}.${String(method)} not available. Use Supabase client instead.`,

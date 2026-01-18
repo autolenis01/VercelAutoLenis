@@ -1,12 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { ContractShieldService } from "@/lib/services/contract-shield.service"
-import { getSession } from "@/lib/auth-server"
+import { getServerSession } from "@/lib/auth-server"
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getSession()
+    const session = await getServerSession(req)
 
-    if (!session || session.role !== "BUYER") {
+    if (!session?.user || session.user.role !== "BUYER") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Override ID is required" }, { status: 400 })
     }
 
-    const override = await ContractShieldService.buyerAcknowledgeOverride(overrideId, session.userId, comment)
+    const override = await ContractShieldService.buyerAcknowledgeOverride(overrideId, session.user.id, comment)
 
     return NextResponse.json({
       success: true,

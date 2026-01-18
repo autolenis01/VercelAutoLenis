@@ -110,7 +110,7 @@ export class AdminService {
       take: limit,
     })
 
-    return dealers.map((dealer: any) => ({
+    return dealers.map((dealer) => ({
       id: dealer.id,
       name: dealer.name || dealer.businessName || "Unknown",
       integrityScore: dealer.integrityScore || 0,
@@ -137,7 +137,7 @@ export class AdminService {
       take: limit,
     })
 
-    return affiliates.map((a: any) => ({
+    return affiliates.map((a) => ({
       id: a.id,
       name: `${a.firstName || ""} ${a.lastName || ""}`.trim() || a.user?.email || "Unknown",
       email: a.user?.email || "",
@@ -194,7 +194,7 @@ export class AdminService {
     ])
 
     return {
-      buyers: buyers.map((u: any) => ({
+      buyers: buyers.map((u) => ({
         id: u.id,
         email: u.email,
         firstName: u.first_name || u.buyer?.profile?.firstName || "",
@@ -306,7 +306,7 @@ export class AdminService {
     ])
 
     return {
-      dealers: dealers.map((d: any) => ({
+      dealers: dealers.map((d) => ({
         id: d.id,
         name: d.name || d.businessName || "Unknown",
         email: d.email || "",
@@ -372,7 +372,7 @@ export class AdminService {
     ])
 
     return {
-      auctions: auctions.map((a: any) => ({
+      auctions: auctions.map((a) => ({
         id: a.id,
         buyerName:
           `${a.buyer?.profile?.firstName || ""} ${a.buyer?.profile?.lastName || ""}`.trim() ||
@@ -444,7 +444,7 @@ export class AdminService {
     ])
 
     return {
-      deals: deals.map((d: any) => ({
+      deals: deals.map((d) => ({
         id: d.id,
         buyerName:
           `${d.buyer?.profile?.firstName || ""} ${d.buyer?.profile?.lastName || ""}`.trim() ||
@@ -545,7 +545,7 @@ export class AdminService {
     }
 
     return {
-      deposits: deposits.map((d: any) => ({
+      deposits: deposits.map((d) => ({
         id: d.id,
         type: "DEPOSIT",
         buyerName:
@@ -559,7 +559,7 @@ export class AdminService {
         createdAt: d.createdAt,
         refundedAt: d.refundedAt,
       })),
-      fees: fees.map((f: any) => ({
+      fees: fees.map((f) => ({
         id: f.id,
         type: "SERVICE_FEE",
         dealId: f.dealId,
@@ -623,20 +623,20 @@ export class AdminService {
     ])
 
     return {
-      affiliates: affiliates.map((a: any) => ({
+      affiliates: affiliates.map((a) => ({
         id: a.id,
         name: `${a.firstName || ""} ${a.lastName || ""}`.trim() || a.user?.email || "Unknown",
         email: a.user?.email || "",
         refCode: a.referralCode || a.refCode || a.ref_code || "",
         totalClicks: a.clicks?.length || 0,
-        level1Referrals: a.referrals?.filter((r: any) => r.level === 1).length || 0,
-        level2Referrals: a.referrals?.filter((r: any) => r.level === 2).length || 0,
-        level3Referrals: a.referrals?.filter((r: any) => r.level === 3).length || 0,
-        level4Referrals: a.referrals?.filter((r: any) => r.level === 4).length || 0,
-        level5Referrals: a.referrals?.filter((r: any) => r.level === 5).length || 0,
+        level1Referrals: a.referrals?.filter((r) => r.level === 1).length || 0,
+        level2Referrals: a.referrals?.filter((r) => r.level === 2).length || 0,
+        level3Referrals: a.referrals?.filter((r) => r.level === 3).length || 0,
+        level4Referrals: a.referrals?.filter((r) => r.level === 4).length || 0,
+        level5Referrals: a.referrals?.filter((r) => r.level === 5).length || 0,
         totalEarnings: a.totalEarnings || 0,
         pendingEarnings: a.pendingEarnings || 0,
-        totalPayouts: a.payouts?.reduce((sum: any, p: any) => sum + (p?.amount || 0), 0) || 0,
+        totalPayouts: a.payouts?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0,
         createdAt: a.createdAt,
       })),
       total,
@@ -685,7 +685,7 @@ export class AdminService {
     ])
 
     return {
-      events: events.map((e: any) => ({
+      events: events.map((e) => ({
         id: e.id,
         type: e.type || e.eventType || "UNKNOWN",
         severity: e.severity || "INFO",
@@ -743,7 +743,7 @@ export class AdminService {
     ])
 
     return {
-      scans: scans.map((s: any) => ({
+      scans: scans.map((s) => ({
         id: s.id,
         dealId: s.selectedDealId,
         buyerName:
@@ -759,7 +759,7 @@ export class AdminService {
         paymentMatch: s.paymentMatch,
         junkFeesDetected: s.junkFeesDetected,
         issues:
-          s.fixListItems?.map((i: any) => ({
+          s.fixListItems?.map((i) => ({
             id: i.id,
             category: i.category,
             description: i.description,
@@ -821,7 +821,7 @@ export class AdminService {
     ])
 
     return {
-      quotes: quotes.map((q: any) => ({
+      quotes: quotes.map((q) => ({
         id: q.id,
         buyerName:
           `${q.buyer?.profile?.firstName || ""} ${q.buyer?.profile?.lastName || ""}`.trim() ||
@@ -834,7 +834,7 @@ export class AdminService {
         expiresAt: q.expiresAt,
         createdAt: q.createdAt,
       })),
-      policies: policies.map((p: any) => ({
+      policies: policies.map((p) => ({
         id: p.id,
         buyerName:
           `${p.deal?.buyer?.profile?.firstName || ""} ${p.deal?.buyer?.profile?.lastName || ""}`.trim() ||
@@ -861,24 +861,24 @@ export class AdminService {
     const settings = await prisma.adminSettings.findMany()
 
     const settingsMap: Record<string, any> = {}
-    settings.forEach((s: any) => {
+    settings.forEach((s) => {
       settingsMap[s.key] = s.valueJson || s.value || null
     })
 
     return {
-      depositAmount: settingsMap["deposit_amount"] || 99,
-      feeTierOneCents: settingsMap["fee_tier_one_cents"] || 49900,
-      feeTierTwoCents: settingsMap["fee_tier_two_cents"] || 75000,
-      feeThresholdCents: settingsMap["fee_threshold_cents"] || 3500000,
-      auctionDurationHours: settingsMap["auction_duration_hours"] || 48,
-      depositGracePeriodHours: settingsMap["deposit_grace_period_hours"] || 24,
-      feeFinancingEnabled: settingsMap["fee_financing_enabled"] !== false,
-      affiliateCommissionL1: settingsMap["affiliate_commission_l1"] || 0.2,
-      affiliateCommissionL2: settingsMap["affiliate_commission_l2"] || 0.15,
-      affiliateCommissionL3: settingsMap["affiliate_commission_l3"] || 0.1,
-      affiliateCommissionL4: settingsMap["affiliate_commission_l4"] || 0.05,
-      affiliateCommissionL5: settingsMap["affiliate_commission_l5"] || 0.03,
-      affiliateMinPayout: settingsMap["affiliate_min_payout"] || 50,
+      depositAmount: settingsMap.deposit_amount || 99,
+      feeTierOneCents: settingsMap.fee_tier_one_cents || 49900,
+      feeTierTwoCents: settingsMap.fee_tier_two_cents || 75000,
+      feeThresholdCents: settingsMap.fee_threshold_cents || 3500000,
+      auctionDurationHours: settingsMap.auction_duration_hours || 48,
+      depositGracePeriodHours: settingsMap.deposit_grace_period_hours || 24,
+      feeFinancingEnabled: settingsMap.fee_financing_enabled !== false,
+      affiliateCommissionL1: settingsMap.affiliate_commission_l1 || 0.2,
+      affiliateCommissionL2: settingsMap.affiliate_commission_l2 || 0.15,
+      affiliateCommissionL3: settingsMap.affiliate_commission_l3 || 0.1,
+      affiliateCommissionL4: settingsMap.affiliate_commission_l4 || 0.05,
+      affiliateCommissionL5: settingsMap.affiliate_commission_l5 || 0.03,
+      affiliateMinPayout: settingsMap.affiliate_min_payout || 50,
     }
   }
 
@@ -1004,7 +1004,7 @@ export class AdminService {
       },
     })
 
-    return dealers.map((dealer: any) => ({
+    return dealers.map((dealer) => ({
       id: dealer.id,
       name: dealer.name || dealer.businessName || "Unknown",
       integrityScore: dealer.integrityScore || 0,

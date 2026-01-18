@@ -46,9 +46,9 @@ export async function GET(req: NextRequest) {
     startDate.setDate(startDate.getDate() - days)
 
     const [
-      { data: clicks },
-      { data: referrals },
-      { data: commissions },
+      { data: clicks, error: clicksError },
+      { data: referrals, error: referralsError },
+      { data: commissions, error: commissionsError },
     ] = await Promise.all([
       supabase
         .from("Click")
@@ -114,10 +114,10 @@ function groupByDay(data: any[], dateField: string, days: number) {
   for (let i = 0; i < days; i++) {
     const date = new Date()
     date.setDate(date.getDate() - (days - i - 1))
-    const dateStr = date.toISOString().split("T")[0] ?? ""
+    const dateStr = date.toISOString().split("T")[0]
 
     const count = data.filter((item) => {
-      const itemDate = new Date(item[dateField]).toISOString().split("T")[0] ?? ""
+      const itemDate = new Date(item[dateField]).toISOString().split("T")[0]
       return itemDate === dateStr
     }).length
 
@@ -134,11 +134,11 @@ function groupCommissionsByDay(commissions: any[], days: number) {
   for (let i = 0; i < days; i++) {
     const date = new Date()
     date.setDate(date.getDate() - (days - i - 1))
-    const dateStr = date.toISOString().split("T")[0] ?? ""
+    const dateStr = date.toISOString().split("T")[0]
 
     const amount = commissions
       .filter((item) => {
-        const itemDate = new Date(item.createdAt).toISOString().split("T")[0] ?? ""
+        const itemDate = new Date(item.createdAt).toISOString().split("T")[0]
         return itemDate === dateStr
       })
       .reduce((sum, item) => sum + (item.commissionAmount || 0), 0)

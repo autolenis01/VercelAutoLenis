@@ -3,7 +3,7 @@ import { requireAuth } from "@/lib/auth-server"
 import { createClient } from "@/lib/supabase/server"
 import { BestPriceService } from "@/lib/services/best-price.service"
 
-export async function GET(_request: Request, { params }: { params: Promise<{ auctionId: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ auctionId: string }> }) {
   try {
     const { auctionId } = await params
     await requireAuth(["ADMIN"])
@@ -66,7 +66,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ auc
           valid_offers: validOfferCount || 0,
           best_price_options_count: options.length,
         },
-        options: options.map((opt: any) => ({
+        options: options.map((opt) => ({
           id: opt.id,
           type: opt.type,
           rank: opt.rank,

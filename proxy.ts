@@ -11,21 +11,14 @@ export async function proxy(request: NextRequest) {
       path: "/",
     })
 
-    // Track click asynchronously with proper error handling and timeout
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
-    
+    // Track click asynchronously with proper error handling
     fetch(`${request.nextUrl.origin}/api/affiliate/click`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code: ref }),
-      signal: controller.signal,
+    }).catch((err) => {
+      console.error("[v0] Failed to track affiliate click:", err)
     })
-      .then(() => clearTimeout(timeoutId))
-      .catch((err) => {
-        clearTimeout(timeoutId)
-        console.error("[v0] Failed to track affiliate click:", err)
-      })
 
     return response
   }

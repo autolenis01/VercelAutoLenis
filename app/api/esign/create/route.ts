@@ -17,8 +17,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { dealId } = schema.parse(body)
 
-    const dealerUserId = (user as any).userId || (user as any).id
-    const envelope = await esignService.createEnvelope(dealId, dealerUserId)
+    const envelope = await esignService.createEnvelope(dealId)
 
     return NextResponse.json(envelope)
   } catch (error: any) {

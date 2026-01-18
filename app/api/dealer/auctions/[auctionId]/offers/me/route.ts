@@ -5,7 +5,7 @@ import { offerService } from "@/lib/services/offer.service"
 
 export const dynamic = "force-dynamic"
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ auctionId: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ auctionId: string }> }) {
   try {
     const { auctionId } = await params
     const user = await getSessionUser()
@@ -14,7 +14,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ auc
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const dealer = await dealerService.getDealerByUserId(user.userId)
+    const dealer = await dealerService.getDealerByUserId(user.id)
     if (!dealer) {
       return NextResponse.json({ error: "Dealer profile not found" }, { status: 404 })
     }

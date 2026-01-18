@@ -19,8 +19,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const data = schema.parse(body)
 
-    const buyerId = (user as any).userId || user.id
-    const pickup = await pickupService.schedulePickup(data.dealId, buyerId, data.scheduledAt, data.notes)
+    const pickup = await pickupService.schedulePickup(data.dealId, data.scheduledAt, data.notes)
 
     return NextResponse.json(pickup)
   } catch (error: any) {

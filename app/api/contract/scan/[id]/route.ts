@@ -4,7 +4,7 @@ import { ContractShieldService } from "@/lib/services/contract-shield.service"
 
 export const dynamic = "force-dynamic"
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await getSessionUser()
     if (!user) {
@@ -29,7 +29,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 // Trigger re-scan
-export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await getSessionUser()
     if (!user || !["DEALER", "DEALER_USER", "ADMIN"].includes(user.role)) {

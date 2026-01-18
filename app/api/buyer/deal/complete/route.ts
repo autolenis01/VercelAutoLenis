@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { dealId } = await req.json()
-    const supabase = await createClient()
+    const supabase = createClient()
 
     // Get the deal
     const { data: deal, error: dealError } = await supabase
@@ -51,12 +51,9 @@ export async function POST(req: NextRequest) {
 
       // Send welcome email for new affiliate
       if (user.email) {
-        const buyerFirstName = (deal as any)?.buyer?.firstName || "there"
-        await emailService.sendWelcomeEmail(user.email, buyerFirstName, "AFFILIATE")
+        await emailService.sendWelcomeEmail(user.email, user.first_name || "there", "AFFILIATE")
       }
     }
-
-    const buyerFullName = `${(deal as any)?.buyer?.firstName || ""} ${(deal as any)?.buyer?.lastName || ""}`.trim() || "A buyer"
 
     // Send commission notifications to all affiliates who earned
     for (const commission of commissions) {
@@ -73,7 +70,7 @@ export async function POST(req: NextRequest) {
         await emailService.sendReferralCommissionEmail(
           affiliateUser.user.email,
           `${affiliateUser.firstName} ${affiliateUser.lastName}`.trim() || "Affiliate",
-          buyerFullName,
+          `${user.first_name} ${user.last_name}`.trim() || "A buyer",
           commission.commissionAmount || 0,
           commission.level || 1,
           (affiliateUser.pendingEarnings || 0) + (commission.commissionAmount || 0),
@@ -87,7 +84,7 @@ export async function POST(req: NextRequest) {
         ? {
             id: affiliate.id,
             referralCode: affiliate.refCode || affiliate.referralCode,
-            referralLink: `${process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"}/ref/${affiliate.refCode || affiliate.referralCode}`,
+            referralLink: `${process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"}/ref/${affiliate.refCode || affiliate.referralCode}`,
           }
         : null,
       commissionsProcessed: commissions.length,

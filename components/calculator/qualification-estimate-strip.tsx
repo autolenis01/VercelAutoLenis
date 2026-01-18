@@ -25,6 +25,18 @@ const PTI_CAP = 0.12 // 12% Payment-to-Income cap
 const HOUSING_PRESSURE_THRESHOLD = 0.3 // If housing > 30% of income, reduce affordability
 const INSURANCE_MAINTENANCE_BUFFER = 275 // Monthly buffer for insurance/maintenance
 
+// Standard amortization formula
+function calculatePayment(principal: number, annualRate: number, termMonths: number): number {
+  if (principal <= 0 || termMonths <= 0) return 0
+  if (annualRate === 0) return principal / termMonths
+
+  const monthlyRate = annualRate / 100 / 12
+  const payment =
+    (principal * (monthlyRate * Math.pow(1 + monthlyRate, termMonths))) / (Math.pow(1 + monthlyRate, termMonths) - 1)
+
+  return Math.max(0, payment)
+}
+
 // Reverse: calculate principal from payment
 function calculatePrincipal(payment: number, annualRate: number, termMonths: number): number {
   if (payment <= 0 || termMonths <= 0) return 0
@@ -47,7 +59,7 @@ export function QualificationEstimateStrip() {
     const income = Math.max(0, Number.parseFloat(monthlyIncome) || 0)
     const housing = Math.max(0, Number.parseFloat(monthlyHousing) || 0)
     const down = Math.max(0, Number.parseFloat(downPayment) || 0)
-    const aprData = (APR_BANDS[creditScore] ?? APR_BANDS["680-719"])!
+    const aprData = APR_BANDS[creditScore] || APR_BANDS["680-719"]
 
     // Step 1: Calculate base max payment from PTI cap
     let maxPayment = income * PTI_CAP

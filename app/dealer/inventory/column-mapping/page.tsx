@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -32,6 +32,7 @@ const AUTOLENIS_FIELDS = [
 
 export default function ColumnMappingPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { toast } = useToast()
 
   const [fileHeaders, setFileHeaders] = useState<string[]>([])

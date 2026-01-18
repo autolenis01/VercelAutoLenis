@@ -35,9 +35,7 @@ export async function rateLimit(request: NextRequest, config: RateLimitConfig): 
   const { maxRequests, windowMs, keyGenerator } = config
 
   // Generate rate limit key (default: IP address)
-  const key = keyGenerator
-    ? keyGenerator(request)
-    : (request as any).ip || request.headers.get("x-forwarded-for") || "unknown"
+  const key = keyGenerator ? keyGenerator(request) : request.ip || request.headers.get("x-forwarded-for") || "unknown"
 
   const now = Date.now()
   const entry = rateLimitStore.get(key)

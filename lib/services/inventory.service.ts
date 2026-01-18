@@ -448,11 +448,6 @@ export class InventoryService {
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i]
-      if (!row) {
-        results.failed++
-        results.errors.push({ rowIndex: i, message: "Row is undefined" })
-        continue
-      }
       try {
         // Validate required fields
         if (!row.make || !row.model || !row.year || row.price === undefined) {
@@ -543,7 +538,7 @@ export class InventoryService {
       select: { make: true },
       orderBy: { make: "asc" },
     })
-    return vehicles.map((v: any) => v.make).filter(Boolean)
+    return vehicles.map((v) => v.make).filter(Boolean)
   }
 
   static async getAvailableBodyStyles() {
@@ -552,7 +547,7 @@ export class InventoryService {
       select: { bodyStyle: true },
       orderBy: { bodyStyle: "asc" },
     })
-    return vehicles.map((v: any) => v.bodyStyle).filter(Boolean)
+    return vehicles.map((v) => v.bodyStyle).filter(Boolean)
   }
 
   static async getModelsForMake(make: string) {
@@ -562,7 +557,7 @@ export class InventoryService {
       select: { model: true },
       orderBy: { model: "asc" },
     })
-    return vehicles.map((v: any) => v.model).filter(Boolean)
+    return vehicles.map((v) => v.model).filter(Boolean)
   }
 }
 

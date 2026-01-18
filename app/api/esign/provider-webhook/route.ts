@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { esignService } from "@/lib/services/esign.service"
 
-const WEBHOOK_SECRET = process.env["ESIGN_WEBHOOK_SECRET"] || "dev-secret"
+const WEBHOOK_SECRET = process.env.ESIGN_WEBHOOK_SECRET || "dev-secret"
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     const result = await esignService.handleWebhook(normalizedPayload)
 
-    return NextResponse.json({ success: true, result })
+    return NextResponse.json({ success: true, ...result })
   } catch (error: any) {
     console.error("[E-Sign Webhook] Error:", error)
     // Return 200 to prevent provider retries for known errors

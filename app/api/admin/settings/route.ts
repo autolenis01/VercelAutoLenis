@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { key, value } = await request.json()
-    const result = await adminService.updateSystemSettings(key, value, user.userId)
+    const result = await adminService.updateSystemSettings(key, value, user.id)
     return NextResponse.json(result)
   } catch (error) {
     console.error("[Admin Settings Update Error]", error)

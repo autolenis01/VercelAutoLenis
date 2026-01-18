@@ -67,7 +67,7 @@ interface BindPolicyResponse {
 class MockInsuranceProvider implements InsuranceProviderAdapter {
   name = "AutoLenis Partner Network"
 
-  async requestQuotes(_input: QuoteRequestInput): Promise<ProviderQuoteResponse[]> {
+  async requestQuotes(input: QuoteRequestInput): Promise<ProviderQuoteResponse[]> {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 800))
 
@@ -170,45 +170,6 @@ export class InsuranceService {
     `
   }
 
-  static async getQuotes(selectedDealId: string) {
-    return prisma.insuranceQuote.findMany({
-      where: {
-        OR: [{ selected_deal_id: selectedDealId }, { dealId: selectedDealId }],
-      },
-      orderBy: { createdAt: "desc" },
-    })
-  }
-
-  static async selectPolicy(selectedDealId: string, quoteId: string) {
-    const quote = await prisma.insuranceQuote.findUnique({
-      where: { id: quoteId },
-    })
-
-    if (!quote) {
-      throw new Error("Quote not found")
-    }
-
-    const policy = await prisma.insurancePolicy.upsert({
-      where: { quoteId },
-      update: {},
-      create: {
-        selected_deal_id: selectedDealId,
-        dealId: selectedDealId,
-        quoteId,
-        carrierName: quote.carrierName || quote.carrier_name || "Carrier",
-        policyNumber: quote.policyNumber || quote.policy_number || `POL-${quoteId}`,
-        status: "PENDING",
-      },
-    })
-
-    await this.logEvent("POLICY_SELECTED", selectedDealId, quote.userId || null, quote.providerName || null, {
-      quoteId,
-      policyId: policy.id,
-    })
-
-    return policy
-  }
-
   // Get insurance overview for a deal
   static async getInsuranceOverview(userId: string, dealId: string) {
     // Verify ownership
@@ -245,7 +206,7 @@ export class InsuranceService {
         id: deal.id,
         insurance_status: deal.insurance_status || "NOT_SELECTED",
       },
-      quotes: quotes.map((q: any) => ({
+      quotes: quotes.map((q) => ({
         id: q.id,
         carrier_name: q.carrier_name || q.carrier,
         product_name: q.product_name || q.productName,
@@ -258,7 +219,7 @@ export class InsuranceService {
         valid_until: q.valid_until || q.expiresAt,
         created_at: q.createdAt,
       })),
-      policies: policies.map((p: any) => ({
+      policies: policies.map((p) => ({
         id: p.id,
         type: p.type || "AUTOLENIS",
         carrier_name: p.carrier,
@@ -400,10 +361,10 @@ export class InsuranceService {
       // Log success
       await this.logEvent("QUOTE_RECEIVED", dealId, userId, getProvider().name, {
         quoteCount: savedQuotes.length,
-        carriers: savedQuotes.map((q: any) => q.carrier_name),
+        carriers: savedQuotes.map((q) => q.carrier_name),
       })
 
-      return savedQuotes.map((q: any) => ({
+      return savedQuotes.map((q) => ({
         id: q.id,
         carrier_name: q.carrier_name,
         product_name: q.product_name,
@@ -789,7 +750,7 @@ export class InsuranceService {
         insurance_status: deal.insurance_status,
         user_id: deal.user_id || deal.buyerId,
       },
-      quotes: quotes.map((q: any) => ({
+      quotes: quotes.map((q) => ({
         id: q.id,
         carrier_name: q.carrier_name || q.carrier,
         product_name: q.product_name || q.productName,
@@ -804,7 +765,7 @@ export class InsuranceService {
         provider_name: q.provider_name,
         created_at: q.createdAt,
       })),
-      policies: policies.map((p: any) => ({
+      policies: policies.map((p) => ({
         id: p.id,
         type: p.type,
         carrier: p.carrier,

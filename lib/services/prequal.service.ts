@@ -135,22 +135,22 @@ export class PreQualService {
     // Convert cents fields if provided
     const updateData: Record<string, unknown> = {}
 
-    if (data.dateOfBirth) updateData["date_of_birth"] = new Date(data.dateOfBirth)
-    if (data.addressLine1) updateData["address_line1"] = data.addressLine1
-    if (data.addressLine2 !== undefined) updateData["address_line2"] = data.addressLine2
-    if (data.city) updateData["city"] = data.city
-    if (data.state) updateData["state"] = data.state
-    if (data.postalCode) updateData["postal_code"] = data.postalCode
-    if (data.country) updateData["country"] = data.country
-    if (data.employmentStatus) updateData["employmentStatus"] = data.employmentStatus
-    if (data.employerName) updateData["employerName"] = data.employerName
-    if (data.monthlyIncomeCents !== undefined) updateData["monthly_income_cents"] = data.monthlyIncomeCents
-    if (data.monthlyHousingCents !== undefined) updateData["monthly_housing_cents"] = data.monthlyHousingCents
-    if (data.firstName) updateData["firstName"] = data.firstName
-    if (data.lastName) updateData["lastName"] = data.lastName
-    if (data.phone) updateData["phone"] = data.phone
+    if (data.dateOfBirth) updateData.date_of_birth = new Date(data.dateOfBirth)
+    if (data.addressLine1) updateData.address_line1 = data.addressLine1
+    if (data.addressLine2 !== undefined) updateData.address_line2 = data.addressLine2
+    if (data.city) updateData.city = data.city
+    if (data.state) updateData.state = data.state
+    if (data.postalCode) updateData.postal_code = data.postalCode
+    if (data.country) updateData.country = data.country
+    if (data.employmentStatus) updateData.employmentStatus = data.employmentStatus
+    if (data.employerName) updateData.employerName = data.employerName
+    if (data.monthlyIncomeCents !== undefined) updateData.monthly_income_cents = data.monthlyIncomeCents
+    if (data.monthlyHousingCents !== undefined) updateData.monthly_housing_cents = data.monthlyHousingCents
+    if (data.firstName) updateData.firstName = data.firstName
+    if (data.lastName) updateData.lastName = data.lastName
+    if (data.phone) updateData.phone = data.phone
 
-    updateData["updatedAt"] = new Date()
+    updateData.updatedAt = new Date()
 
     return prisma.buyerProfile.upsert({
       where: { userId },
@@ -219,17 +219,17 @@ export class PreQualService {
       return { valid: false, missingFields: ["Profile not found. Please complete your profile first."] }
     }
 
-    if (!(profile as any)["date_of_birth"] && !(profile as any).dateOfBirth) missingFields.push("dateOfBirth")
-    if (!(profile as any)["address_line1"] && !(profile as any).address) missingFields.push("addressLine1")
-    if (!(profile as any)["city"]) missingFields.push("city")
-    if (!(profile as any)["state"]) missingFields.push("state")
-    if (!(profile as any)["postal_code"] && !(profile as any).postalCode && !(profile as any).zip) missingFields.push("postalCode")
-    if (!(profile as any)["monthly_income_cents"] && !(profile as any).monthlyIncomeCents && !(profile as any).annualIncome)
+    if (!profile.date_of_birth && !profile.dateOfBirth) missingFields.push("dateOfBirth")
+    if (!profile.address_line1 && !profile.address) missingFields.push("addressLine1")
+    if (!profile.city) missingFields.push("city")
+    if (!profile.state) missingFields.push("state")
+    if (!profile.postal_code && !profile.postalCode && !profile.zip) missingFields.push("postalCode")
+    if (!profile.monthly_income_cents && !profile.monthlyIncomeCents && !profile.annualIncome)
       missingFields.push("monthlyIncomeCents")
     if (
-      (profile as any)["monthly_housing_cents"] === undefined &&
-      (profile as any).monthlyHousingCents === undefined &&
-      (profile as any).monthlyHousing === undefined
+      profile.monthly_housing_cents === undefined &&
+      profile.monthlyHousingCents === undefined &&
+      profile.monthlyHousing === undefined
     ) {
       missingFields.push("monthlyHousingCents")
     }
@@ -455,7 +455,7 @@ export class PreQualService {
       >`SELECT * FROM prequal_provider_events WHERE user_id = ${userId} ORDER BY created_at DESC`,
     ])
 
-    const activePreQual = preQuals.find((p: any) => p.prequal_status === "ACTIVE" && p.expiresAt && p.expiresAt > new Date())
+    const activePreQual = preQuals.find((p) => p.prequal_status === "ACTIVE" && p.expiresAt && p.expiresAt > new Date())
 
     return {
       activePreQualification: activePreQual || null,

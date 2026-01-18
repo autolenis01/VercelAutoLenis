@@ -8,9 +8,8 @@ import { CheckCircle, ExternalLink, FileText } from "lucide-react"
 
 export default function ESignPage() {
   const params = useParams()
-  const dealId = (params as any)?.dealId as string
   const router = useRouter()
-  const [_loading, _setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [envelope, setEnvelope] = useState<any>(null)
   const [error, setError] = useState("")
 
@@ -33,7 +32,7 @@ export default function ESignPage() {
       const res = await fetch(`/api/esign/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dealId }),
+        body: JSON.stringify({ dealId: params.dealId }),
       })
 
       if (!res.ok) throw new Error("Failed to create envelope")
@@ -122,7 +121,7 @@ export default function ESignPage() {
               <CheckCircle className="h-12 w-12 text-primary mx-auto mb-2" />
               <p className="font-semibold">All Documents Signed</p>
               <p className="text-sm text-muted-foreground">Your deal is complete!</p>
-              <Button onClick={() => router.push(`/buyer/pickup/${dealId}`)} className="mt-4">
+              <Button onClick={() => router.push(`/buyer/pickup/${params.dealId}`)} className="mt-4">
                 Schedule Pickup
               </Button>
             </div>

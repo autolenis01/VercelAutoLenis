@@ -11,7 +11,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const dealer = await dealerService.getDealerByUserId(user.userId)
+    const dealer = await dealerService.getDealerByUserId(user.id)
     if (!dealer) {
       return NextResponse.json({ error: "Dealer not found" }, { status: 404 })
     }
@@ -27,7 +27,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 // Delete inventory item
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const user = await getSessionUser()
@@ -35,7 +35,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const dealer = await dealerService.getDealerByUserId(user.userId)
+    const dealer = await dealerService.getDealerByUserId(user.id)
     if (!dealer) {
       return NextResponse.json({ error: "Dealer not found" }, { status: 404 })
     }

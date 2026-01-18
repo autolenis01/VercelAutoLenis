@@ -167,7 +167,7 @@ export default function AuctionOffersPage({ params }: { params: Promise<{ id: st
         description: "Best combination of price, dealer reputation, and terms",
       },
     }
-    return types[type] || (types as any)["BALANCED"]
+    return types[type] || types.BALANCED
   }
 
   if (loading || computing) {

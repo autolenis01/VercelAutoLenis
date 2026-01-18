@@ -39,7 +39,7 @@ export async function setSessionCookie(token: string) {
 
   cookieStore.set("session", token, {
     httpOnly: true,
-    secure: process.env["NODE_ENV"] === "production",
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: 60 * 60 * 24 * 7, // 7 days
     path: "/",
@@ -83,7 +83,6 @@ export async function getCurrentUser() {
 
     return {
       id: session.userId,
-      userId: session.userId,
       email: session.email,
       role: session.role,
     }

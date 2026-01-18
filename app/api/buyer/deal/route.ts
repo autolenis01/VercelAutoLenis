@@ -6,13 +6,12 @@ import { createClient } from "@/lib/supabase/server"
 export async function GET() {
   try {
     const session = await getServerSession(authOptions)
-    const userId = (session as any)?.user?.id as string | undefined
 
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
     }
 
-    const supabase = await createClient()
+    const supabase = createClient()
 
     const { data: deal, error } = await supabase
       .from("SelectedDeal")
@@ -37,7 +36,7 @@ export async function GET() {
         ),
         insurancePolicy:InsurancePolicy(*)
       `)
-      .eq("buyerId", userId)
+      .eq("buyerId", session.user.id)
       .in("status", [
         "SELECTED",
         "FINANCING_APPROVED",

@@ -117,6 +117,13 @@ export default function BuyerPreQualPage() {
     return days !== null && days <= 0
   }
 
+  const getExpiryStatusColor = () => {
+    const days = getDaysUntilExpiry()
+    if (days === null || days <= 0) return "destructive"
+    if (days <= 7) return "warning"
+    return "default"
+  }
+
   const getCreditTierInfo = (tier: string | undefined) => {
     const tiers: Record<string, { label: string; color: string; description: string }> = {
       EXCELLENT: { label: "Excellent", color: "bg-green-500", description: "Best rates available" },

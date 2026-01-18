@@ -58,13 +58,11 @@ function parseCSV(content: string): any[] {
   const lines = content.split("\n").filter((line) => line.trim())
   if (lines.length < 2) return []
 
-  const headerLine = lines[0] || ""
-  const headers = headerLine.split(",").map((h) => h.trim())
+  const headers = lines[0].split(",").map((h) => h.trim())
   const rows: any[] = []
 
   for (let i = 1; i < lines.length; i++) {
-    const line = lines[i] || ""
-    const values = line.split(",").map((v) => v.trim())
+    const values = lines[i].split(",").map((v) => v.trim())
     const row: any = {}
 
     headers.forEach((header, index) => {

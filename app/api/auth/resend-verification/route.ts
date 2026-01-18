@@ -9,7 +9,7 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const result = await emailVerificationService.resendVerification(user.userId)
+    const result = await emailVerificationService.resendVerification(user.id)
 
     if (!result.success) {
       return NextResponse.json({ error: result.message }, { status: 400 })

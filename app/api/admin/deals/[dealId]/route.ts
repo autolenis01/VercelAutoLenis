@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { requireAuth } from "@/lib/auth-server"
 import { DealService } from "@/lib/services/deal.service"
 
-export async function GET(_request: Request, { params }: { params: Promise<{ dealId: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ dealId: string }> }) {
   try {
     await requireAuth(["ADMIN"])
     const { dealId } = await params

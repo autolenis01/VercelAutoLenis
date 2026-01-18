@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic"
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function BuyerBillingPage() {
-  const { data, isLoading, mutate } = useSWR("/api/buyer/billing", fetcher, {
+  const { data, error, isLoading, mutate } = useSWR("/api/buyer/billing", fetcher, {
     refreshInterval: 30000,
   })
 

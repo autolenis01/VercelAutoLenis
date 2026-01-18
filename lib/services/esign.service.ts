@@ -20,7 +20,7 @@ interface ESignProvider {
 
 // Mock provider for development
 class MockESignProvider implements ESignProvider {
-  async createEnvelope(_params: any) {
+  async createEnvelope(params: any) {
     const envelopeId = `env_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`
     return {
       envelopeId,
@@ -28,11 +28,11 @@ class MockESignProvider implements ESignProvider {
     }
   }
 
-  async voidEnvelope(_envelopeId: string, _reason: string) {
+  async voidEnvelope(envelopeId: string, reason: string) {
     // Mock void - in production, call provider API
   }
 
-  async getEnvelopeStatus(_envelopeId: string) {
+  async getEnvelopeStatus(envelopeId: string) {
     return { status: "SENT" as const }
   }
 }
@@ -128,7 +128,7 @@ export class ESignService {
 
     // Call provider to create envelope
     const providerName = options?.provider || "mock"
-    const redirectUrl = `${process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"}/buyer/deal/esign/complete`
+    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"}/buyer/deal/esign/complete`
 
     const providerResult = await this.provider.createEnvelope({
       documents,
@@ -251,10 +251,6 @@ export class ESignService {
           }
         : null,
     }
-  }
-
-  async getEnvelopeStatus(envelopeId: string) {
-    return this.provider.getEnvelopeStatus(envelopeId)
   }
 
   // Handle webhook from e-sign provider

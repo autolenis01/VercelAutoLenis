@@ -154,7 +154,7 @@ export class OfferService {
         name: dealer?.businessName || dealer?.name,
       },
       hasSubmittedOffer: !!existingOffer,
-      inventory: inventory.map((item: any) => ({
+      inventory: inventory.map((item) => ({
         inventoryItemId: item.id,
         year: item.vehicle?.year,
         make: item.vehicle?.make,
@@ -178,7 +178,7 @@ export class OfferService {
           }
         : null,
       shortlistVehicles:
-        auction.shortlist?.items.map((item: any) => ({
+        auction.shortlist?.items.map((item) => ({
           inventoryItemId: item.inventoryItemId,
           year: item.inventoryItem.vehicle?.year,
           make: item.inventoryItem.vehicle?.make,
@@ -240,15 +240,6 @@ export class OfferService {
     if (feeBreakdown.add_ons) {
       for (let i = 0; i < feeBreakdown.add_ons.length; i++) {
         const addon = feeBreakdown.add_ons[i]
-        if (!addon) {
-          errors.push({
-            code: "INVALID_FINANCING_OPTION",
-            message: "Add-on entry is missing",
-            field: `fee_breakdown.add_ons[${i}]`,
-            severity: "error",
-          })
-          continue
-        }
         if (addon.amount_cents < 0) {
           errors.push({
             code: "NEGATIVE_FEE",
@@ -304,16 +295,6 @@ export class OfferService {
 
     for (let i = 0; i < options.length; i++) {
       const opt = options[i]
-
-      if (!opt) {
-        errors.push({
-          code: "INVALID_FINANCING_OPTION",
-          message: `Financing option ${i + 1} is missing`,
-          field: `financing_options[${i}]`,
-          severity: "error",
-        })
-        continue
-      }
 
       if (!opt.lender_name || opt.lender_name.trim() === "") {
         errors.push({
@@ -496,13 +477,13 @@ export class OfferService {
     }
 
     // If there are critical errors, return them
-    const criticalErrors = validationErrors.filter((e: any) => e.severity === "error")
+    const criticalErrors = validationErrors.filter((e) => e.severity === "error")
     if (criticalErrors.length > 0) {
       return { success: false, errors: validationErrors }
     }
 
     // 8. Create the offer
-    const isValid = validationErrors.filter((e: any) => e.severity === "error").length === 0
+    const isValid = validationErrors.filter((e) => e.severity === "error").length === 0
     const offer = await prisma.auctionOffer.create({
       data: {
         auctionId,
@@ -528,7 +509,7 @@ export class OfferService {
     // 9. Create financing options
     if (input.financing_options.length > 0) {
       await prisma.auctionOfferFinancingOption.createMany({
-        data: input.financing_options.map((opt: any) => ({
+        data: input.financing_options.map((opt) => ({
           offerId: offer.id,
           lender_name: opt.lender_name,
           lenderName: opt.lender_name,
@@ -624,7 +605,7 @@ export class OfferService {
           stockNumber: offer.inventoryItem?.stockNumber,
           vehicle: offer.inventoryItem?.vehicle,
         },
-        financingOptions: offer.financingOptions.map((fo: any) => ({
+        financingOptions: offer.financingOptions.map((fo) => ({
           id: fo.id,
           lenderName: fo.lender_name || fo.lenderName,
           apr: fo.apr,
@@ -653,15 +634,15 @@ export class OfferService {
     })
 
     // Get dealer info separately
-    const dealerIds = offers.map((o: any) => o.dealer_id).filter(Boolean) as string[]
+    const dealerIds = offers.map((o) => o.dealer_id).filter(Boolean) as string[]
     const dealers = await prisma.dealer.findMany({
       where: { id: { in: dealerIds } },
       select: { id: true, businessName: true, name: true, integrityScore: true },
     })
-    const dealerMap = new Map(dealers.map((d: any) => [d.id, d]))
+    const dealerMap = new Map(dealers.map((d) => [d.id, d]))
 
-    return offers.map((offer: any) => {
-      const dealer = offer.dealer_id ? (dealerMap.get(offer.dealer_id) as any) : null
+    return offers.map((offer) => {
+      const dealer = offer.dealer_id ? dealerMap.get(offer.dealer_id) : null
       return {
         id: offer.id,
         dealerId: offer.dealer_id,
@@ -736,7 +717,7 @@ export class OfferService {
       submittedAt: offer.submitted_at || offer.createdAt,
       isValid: offer.is_valid ?? true,
       validationErrors: offer.validation_errors_json,
-      financingOptions: offer.financingOptions.map((fo: any) => ({
+      financingOptions: offer.financingOptions.map((fo) => ({
         id: fo.id,
         lenderName: fo.lender_name || fo.lenderName,
         apr: fo.apr,
@@ -837,7 +818,7 @@ export class OfferService {
       orderBy: [{ cash_otd_cents: "asc" }, { createdAt: "asc" }],
     })
 
-    return offers.map((offer: any) => ({
+    return offers.map((offer) => ({
       id: offer.id,
       dealerId: offer.dealer_id,
       dealer: offer.inventoryItem?.dealer,
@@ -845,7 +826,7 @@ export class OfferService {
       feeBreakdown: offer.fee_breakdown_json || offer.feeBreakdownJson,
       inventoryItem: offer.inventoryItem,
       vehicle: offer.inventoryItem?.vehicle,
-      financingOptions: offer.financingOptions.map((fo: any) => ({
+      financingOptions: offer.financingOptions.map((fo) => ({
         id: fo.id,
         lenderName: fo.lender_name || fo.lenderName,
         apr: fo.apr,

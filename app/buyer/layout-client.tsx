@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   CheckCircle2,
@@ -59,6 +59,7 @@ export function BuyerLayoutClient({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [expandedItems, setExpandedItems] = useState<string[]>([])
+  const router = useRouter()
   const pathname = usePathname()
 
   useEffect(() => {

@@ -41,8 +41,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, message: result.message })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const firstError = error.errors[0]?.message || "Invalid input"
-      return NextResponse.json({ success: false, error: firstError }, { status: 400 })
+      return NextResponse.json({ success: false, error: error.errors[0].message }, { status: 400 })
     }
 
     console.error("[ResetPassword] Error:", error)

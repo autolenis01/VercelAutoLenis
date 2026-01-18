@@ -3,7 +3,7 @@ import { getSessionUser } from "@/lib/auth-server"
 import { createAdminClient } from "@/lib/supabase/admin"
 
 // GET - Dealer fetches trade-in info for an auction (read-only)
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: auctionId } = await params
     const user = await getSessionUser()
@@ -17,7 +17,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     const { data: dealer, error: dealerError } = await supabase
       .from("Dealer")
       .select("id")
-      .eq("userId", user.userId)
+      .eq("userId", user.id)
       .maybeSingle()
 
     if (dealerError) {
@@ -26,7 +26,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     }
 
     if (!dealer) {
-      console.error("[Dealer TradeIn API] Dealer not found for user:", user.userId)
+      console.error("[Dealer TradeIn API] Dealer not found for user:", user.id)
       return NextResponse.json({ success: false, error: "Dealer profile not found" }, { status: 404 })
     }
 

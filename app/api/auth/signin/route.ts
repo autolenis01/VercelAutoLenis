@@ -10,7 +10,7 @@ import { logger } from "@/lib/logger"
 export async function POST(request: Request) {
   logger.info("SignIn request received")
 
-  if (!process.env["NEXT_PUBLIC_SUPABASE_URL"] || !process.env["SUPABASE_SERVICE_ROLE_KEY"]) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     logger.error("Missing required environment variables for signin")
     return NextResponse.json(
       {

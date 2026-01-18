@@ -16,10 +16,8 @@ function isIpInRange(ip: string, range: string): boolean {
     return ip === range
   }
 
-  const [rangeIpRaw, prefixLength] = range.split("/")
-  const rangeIp = rangeIpRaw || range
-  const parsedPrefix = Number.parseInt(prefixLength || "32")
-  const mask = -1 << (32 - parsedPrefix)
+  const [rangeIp, prefixLength] = range.split("/")
+  const mask = -1 << (32 - Number.parseInt(prefixLength))
 
   const ipNum = ipToNumber(ip)
   const rangeNum = ipToNumber(rangeIp)
@@ -34,7 +32,7 @@ function ipToNumber(ip: string): number {
 export async function validateCronRequest(request: NextRequest): Promise<NextResponse | null> {
   // Check cron secret
   const authHeader = request.headers.get("authorization")
-  const cronSecret = process.env["CRON_SECRET"]
+  const cronSecret = process.env.CRON_SECRET
 
   if (!cronSecret) {
     console.error("[CronSecurity] CRON_SECRET not configured")
@@ -47,9 +45,8 @@ export async function validateCronRequest(request: NextRequest): Promise<NextRes
   }
 
   // In production, also verify IP address
-  if (process.env["NODE_ENV"] === "production") {
-    const ip =
-      (request as any).ip || request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || undefined
+  if (process.env.NODE_ENV === "production") {
+    const ip = request.ip || request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip")
 
     if (!ip) {
       console.warn("[CronSecurity] No IP address found in request")

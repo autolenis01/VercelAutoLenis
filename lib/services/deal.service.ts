@@ -133,7 +133,7 @@ export class DealService {
 
     // Create financing offer from selected option
     const selectedFinancingOption = financingOptionId
-      ? offer.financingOptions.find((f: any) => f.id === financingOptionId)
+      ? offer.financingOptions.find((f) => f.id === financingOptionId)
       : offer.financingOptions[0]
 
     if (selectedFinancingOption) {
@@ -369,7 +369,7 @@ export class DealService {
         if (!primaryFinancingOfferId) {
           throw new Error("Primary financing offer ID required for financed payment type")
         }
-        const financingOffer = deal.financingOffers.find((f: any) => f.id === primaryFinancingOfferId)
+        const financingOffer = deal.financingOffers.find((f) => f.id === primaryFinancingOfferId)
         if (!financingOffer) {
           throw new Error("Financing offer not found")
         }
@@ -458,7 +458,7 @@ export class DealService {
       updateData.deal_status = "FINANCING_CHOSEN"
     }
 
-    await prisma.selectedDeal.update({
+    const updatedDeal = await prisma.selectedDeal.update({
       where: { id: dealId },
       data: updateData,
     })
@@ -494,7 +494,7 @@ export class DealService {
   }
 
   // Update concierge fee choice - Pay by Card
-  static async payConciergeFeeByCard(userId: string, dealId: string, _paymentMethodId?: string) {
+  static async payConciergeFeeByCard(userId: string, dealId: string, paymentMethodId?: string) {
     const dealData = await this.getSelectedDealForBuyer(userId, dealId)
     const deal = dealData.deal
 
@@ -755,8 +755,7 @@ export class DealService {
         break
     }
 
-    const transitions = (VALID_TRANSITIONS as any)[currentStatus] as DealStatus[] | undefined
-    if (newStatus && transitions?.includes(newStatus)) {
+    if (newStatus && VALID_TRANSITIONS[currentStatus]?.includes(newStatus)) {
       await prisma.selectedDeal.update({
         where: { id: dealId },
         data: {

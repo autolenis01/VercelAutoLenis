@@ -24,8 +24,8 @@ export default function AffiliateIncomePlanner() {
     const targetIncome = 2500
     const sales: number[] = []
     for (let i = 0; i < 3; i++) {
-      const levelIncome = targetIncome * (INCOME_DISTRIBUTION[i] ?? 0)
-      const commissionPerSale = pkg * (COMMISSION_RATES[i] ?? 0)
+      const levelIncome = targetIncome * INCOME_DISTRIBUTION[i]
+      const commissionPerSale = pkg * COMMISSION_RATES[i]
       sales.push(Math.round(levelIncome / commissionPerSale))
     }
     return sales
@@ -37,7 +37,7 @@ export default function AffiliateIncomePlanner() {
   // Calculate total income
   const calculateIncome = () => {
     return salesByLevel.reduce((total, sales, index) => {
-      return total + sales * selectedPackage * (COMMISSION_RATES[index] ?? 0)
+      return total + sales * selectedPackage * COMMISSION_RATES[index]
     }, 0)
   }
 
@@ -45,8 +45,8 @@ export default function AffiliateIncomePlanner() {
   const calculateSalesForGoal = () => {
     const sales: number[] = []
     for (let i = 0; i < 3; i++) {
-      const levelIncome = goalIncome * (INCOME_DISTRIBUTION[i] ?? 0)
-      const commissionPerSale = selectedPackage * (COMMISSION_RATES[i] ?? 0)
+      const levelIncome = goalIncome * INCOME_DISTRIBUTION[i]
+      const commissionPerSale = selectedPackage * COMMISSION_RATES[i]
       sales.push(Math.ceil(levelIncome / commissionPerSale))
     }
     return sales
@@ -117,35 +117,25 @@ export default function AffiliateIncomePlanner() {
                 <h3 className="font-semibold text-[#3d2066] text-lg">Adjust Car Sales by Origin</h3>
                 {salesByLevel.map((sales, index) => (
                   <div key={index} className="space-y-2">
-                    {(() => {
-                      const rate = COMMISSION_RATES[index] ?? 0
-                      const levelName = LEVEL_NAMES[index] ?? `Level ${index + 1}`
-                      const levelColor = LEVEL_COLORS[index] ?? "#666"
-                      return (
-                        <>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-medium" style={{ color: levelColor }}>
-                              {levelName} ({(rate * 100).toFixed(0)}%)
-                            </span>
-                            <span className="text-sm text-[#666]">
-                              {sales} sales = ${(sales * selectedPackage * rate).toFixed(2)}
-                            </span>
-                          </div>
-                          <Slider
-                            value={[sales]}
-                            onValueChange={(value) => {
-                              const newSales = [...salesByLevel]
-                              const nextValue = value?.[0] ?? 0
-                              newSales[index] = nextValue
-                              setSalesByLevel(newSales)
-                            }}
-                            max={index === 0 ? 50 : 100}
-                            step={1}
-                            className="w-full"
-                          />
-                        </>
-                      )
-                    })()}
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium" style={{ color: LEVEL_COLORS[index] }}>
+                        {LEVEL_NAMES[index]} ({(COMMISSION_RATES[index] * 100).toFixed(0)}%)
+                      </span>
+                      <span className="text-sm text-[#666]">
+                        {sales} sales = ${(sales * selectedPackage * COMMISSION_RATES[index]).toFixed(2)}
+                      </span>
+                    </div>
+                    <Slider
+                      value={[sales]}
+                      onValueChange={(value) => {
+                        const newSales = [...salesByLevel]
+                        newSales[index] = value[0]
+                        setSalesByLevel(newSales)
+                      }}
+                      max={index === 0 ? 50 : 100}
+                      step={1}
+                      className="w-full"
+                    />
                   </div>
                 ))}
               </div>
@@ -154,22 +144,19 @@ export default function AffiliateIncomePlanner() {
                 <h3 className="font-semibold text-[#3d2066] text-lg">Your Income Breakdown</h3>
                 <div className="space-y-3">
                   {salesByLevel.map((sales, index) => {
-                    const rate = COMMISSION_RATES[index] ?? 0
-                    const levelName = LEVEL_NAMES[index] ?? `Level ${index + 1}`
-                    const levelColor = LEVEL_COLORS[index] ?? "#666"
-                    const earnings = sales * selectedPackage * rate
+                    const earnings = sales * selectedPackage * COMMISSION_RATES[index]
                     const percentage = totalIncome > 0 ? (earnings / totalIncome) * 100 : 0
                     return (
                       <div
                         key={index}
                         className="p-4 rounded-lg"
-                        style={{ backgroundColor: levelColor + "10" }}
+                        style={{ backgroundColor: LEVEL_COLORS[index] + "10" }}
                       >
                         <div className="flex justify-between items-center mb-2">
-                          <span className="font-medium" style={{ color: levelColor }}>
-                            {levelName}
+                          <span className="font-medium" style={{ color: LEVEL_COLORS[index] }}>
+                            {LEVEL_NAMES[index]}
                           </span>
-                          <span className="font-bold" style={{ color: levelColor }}>
+                          <span className="font-bold" style={{ color: LEVEL_COLORS[index] }}>
                             ${earnings.toFixed(2)}
                           </span>
                         </div>
@@ -219,33 +206,26 @@ export default function AffiliateIncomePlanner() {
 
                 <div className="space-y-4">
                   {salesForGoal.map((sales, index) => (
-                    (() => {
-                      const rate = COMMISSION_RATES[index] ?? 0
-                      const levelName = LEVEL_NAMES[index] ?? `Level ${index + 1}`
-                      const levelColor = LEVEL_COLORS[index] ?? "#666"
-                      return (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-4 bg-white rounded-lg border-2"
-                          style={{ borderColor: levelColor + "40" }}
-                        >
-                          <div>
-                            <div className="font-semibold" style={{ color: levelColor }}>
-                              {levelName}
-                            </div>
-                            <div className="text-xs text-[#666]">
-                              ${(selectedPackage * rate).toFixed(2)} per sale
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-2xl font-bold" style={{ color: levelColor }}>
-                              {sales}
-                            </div>
-                            <div className="text-xs text-[#666]">sales/month</div>
-                          </div>
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-4 bg-white rounded-lg border-2"
+                      style={{ borderColor: LEVEL_COLORS[index] + "40" }}
+                    >
+                      <div>
+                        <div className="font-semibold" style={{ color: LEVEL_COLORS[index] }}>
+                          {LEVEL_NAMES[index]}
                         </div>
-                      )
-                    })()
+                        <div className="text-xs text-[#666]">
+                          ${(selectedPackage * COMMISSION_RATES[index]).toFixed(2)} per sale
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold" style={{ color: LEVEL_COLORS[index] }}>
+                          {sales}
+                        </div>
+                        <div className="text-xs text-[#666]">sales/month</div>
+                      </div>
+                    </div>
                   ))}
                 </div>
 

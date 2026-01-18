@@ -3,7 +3,6 @@ import { isDatabaseConfigured } from "@/lib/db"
 import { emailService } from "@/lib/services/email.service"
 import { EMAIL_CONFIG } from "@/lib/resend"
 import { logger } from "@/lib/logger"
-import { getOpenRoadRefiUrl } from "@/lib/constants/refinance"
 
 // OpenRoad Lending - Allowed States
 const ALLOWED_STATES_OPENROAD = [
@@ -50,7 +49,8 @@ const ALLOWED_STATES_OPENROAD = [
   "WY",
 ]
 
-
+// OpenRoad Partner ID
+const OPENROAD_PARTNER_ID = process.env.OPENROAD_PARTNER_ID || "autolenis"
 
 interface RefinanceFormData {
   firstName: string
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (qualified) {
-      const redirectUrl = getOpenRoadRefiUrl(leadId)
+      const redirectUrl = `https://openroadlending.com/apply?partner_id=${OPENROAD_PARTNER_ID}&sub_id=${leadId}`
 
       try {
         const qualifiedResult = await emailService.sendRefinanceQualifiedEmail(

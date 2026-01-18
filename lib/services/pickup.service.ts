@@ -481,7 +481,7 @@ export class PickupService {
       },
     })
 
-    return appointments.map((apt: any) => {
+    return appointments.map((apt) => {
       const user = apt.deal?.user
       const profile = apt.deal?.buyerProfile
       const dealer = apt.deal?.auctionOffer?.dealer
@@ -506,24 +506,6 @@ export class PickupService {
         createdAt: apt.createdAt,
       }
     })
-  }
-
-  async checkIn(qrCodeValue: string, dealerUserId: string) {
-    return this.checkInByQR(qrCodeValue, dealerUserId)
-  }
-
-  async generateQRCode(appointmentId: string) {
-    const codeValue = `PICKUP:${appointmentId}:${crypto.randomUUID()}`
-    return { qrCode: codeValue, qrCodeValue: codeValue }
-  }
-
-  async validatePickupCode(code: string) {
-    const parts = code.split(":")
-    const isValid = parts[0] === "PICKUP" && parts.length >= 3
-    return {
-      valid: isValid,
-      appointmentId: isValid ? parts[1] : null,
-    }
   }
 
   // Helper: Log pickup event

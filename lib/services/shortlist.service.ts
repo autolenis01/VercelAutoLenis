@@ -116,11 +116,11 @@ export class ShortlistService {
     }
 
     // 2. Get active pre-qualification for budget computation
-    const preQualResult = await new PreQualService().getActivePrequalification(buyerId)
+    const preQualResult = await PreQualService.getCurrentPreQual(buyerId)
     const maxOtdCents = preQualResult.active ? preQualResult.preQualification?.maxOtdAmountCents || null : null
 
     // 3. Transform items with computed fields
-    const items: ShortlistItemWithComputed[] = shortlist.items.map((item: any) => {
+    const items: ShortlistItemWithComputed[] = shortlist.items.map((item) => {
       const inv = item.inventoryItem
       const vehicle = inv?.vehicle
       const dealer = inv?.dealer
@@ -249,7 +249,7 @@ export class ShortlistService {
     const result = await this.getOrCreateShortlist(buyerId)
 
     // Find the added item to return its computed fields
-    const addedItem = result.shortlist.items.find((i: any) => i.inventoryItemId === inventoryItemId)
+    const addedItem = result.shortlist.items.find((i) => i.inventoryItemId === inventoryItemId)
 
     return {
       ...result,
@@ -360,7 +360,7 @@ export class ShortlistService {
     const shortlistData = await this.getOrCreateShortlist(buyerId)
 
     return shortlistData.shortlist.items
-      .filter((item: any) => {
+      .filter((item) => {
         // Must be AVAILABLE
         if (!item.isValidForAuction) return false
 
@@ -371,7 +371,7 @@ export class ShortlistService {
 
         return true
       })
-      .map((item: any) => item.inventoryItemId)
+      .map((item) => item.inventoryItemId)
   }
 
   static async getShortlistById(shortlistId: string) {
@@ -419,7 +419,7 @@ export class ShortlistService {
     })
 
     // Filter by hasItems if specified
-    let result = shortlists.map((s: any) => ({
+    let result = shortlists.map((s) => ({
       id: s.id,
       buyerId: s.buyerId,
       name: s.name,
@@ -430,7 +430,7 @@ export class ShortlistService {
     }))
 
     if (filters?.hasItems !== undefined) {
-      result = result.filter((s: any) => (filters.hasItems ? s.itemCount > 0 : s.itemCount === 0))
+      result = result.filter((s) => (filters.hasItems ? s.itemCount > 0 : s.itemCount === 0))
     }
 
     const total = await prisma.shortlist.count({ where })
@@ -475,7 +475,7 @@ export class ShortlistService {
       active: shortlist.active,
       createdAt: shortlist.createdAt,
       updatedAt: shortlist.updatedAt,
-      items: shortlist.items.map((item: any) => ({
+      items: shortlist.items.map((item) => ({
         id: item.id,
         inventoryItemId: item.inventoryItemId,
         addedAt: item.addedAt,

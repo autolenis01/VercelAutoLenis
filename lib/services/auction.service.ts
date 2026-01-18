@@ -101,10 +101,10 @@ export class AuctionService {
     }
 
     // Invite dealers (unique dealers from shortlist + nearby dealers with matching inventory)
-    const shortlistDealerIds = Array.from(new Set(shortlist.items.map((item: any) => item.inventoryItem.dealerId)))
+    const shortlistDealerIds = Array.from(new Set(shortlist.items.map((item) => item.inventoryItem.dealerId)))
 
     // Also find dealers with matching vehicles in their inventory
-    const vehicleIds = shortlist.items.map((item: any) => item.inventoryItem.vehicleId)
+    const vehicleIds = shortlist.items.map((item) => item.inventoryItem.vehicleId)
     const matchingInventory = await prisma.inventoryItem.findMany({
       where: {
         vehicleId: { in: vehicleIds },
@@ -114,7 +114,7 @@ export class AuctionService {
       select: { dealerId: true },
     })
 
-    const allDealerIds = Array.from(new Set([...shortlistDealerIds, ...matchingInventory.map((i: any) => i.dealerId)]))
+    const allDealerIds = Array.from(new Set([...shortlistDealerIds, ...matchingInventory.map((i) => i.dealerId)]))
 
     await Promise.all(
       allDealerIds.map((dealerId) =>
@@ -292,7 +292,7 @@ export class AuctionService {
       orderBy: { invitedAt: "desc" },
     })
 
-    return participants.map((p: any) => ({
+    return participants.map((p) => ({
       ...p.auction,
       participantId: p.id,
       invitedAt: p.invitedAt,
@@ -320,14 +320,14 @@ export class AuctionService {
     })
 
     // Get dealer's matching inventory
-    const vehicleIds = auction?.shortlist?.items.map((item: any) => item.inventoryItem.vehicleId) || []
+    const vehicleIds = auction?.shortlist?.items.map((item) => item.inventoryItem.vehicleId) || []
     const dealerInventory = await prisma.inventoryItem.findMany({
       where: {
         dealerId,
         status: "AVAILABLE",
         OR: [
           { vehicleId: { in: vehicleIds } },
-          { id: { in: auction?.shortlist?.items.map((i: any) => i.inventoryItemId) || [] } },
+          { id: { in: auction?.shortlist?.items.map((i) => i.inventoryItemId) || [] } },
         ],
       },
       include: { vehicle: true },
@@ -418,7 +418,7 @@ export class AuctionService {
         taxAmount: offerData.taxAmountCents / 100,
         feesBreakdown: offerData.feesBreakdown,
         financingOptions: {
-          create: offerData.financingOptions.map((opt: any) => ({
+          create: offerData.financingOptions.map((opt) => ({
             lenderName: opt.lenderName || "Dealer Finance",
             apr: opt.apr,
             termMonths: opt.termMonths,

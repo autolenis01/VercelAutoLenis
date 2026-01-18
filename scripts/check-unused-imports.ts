@@ -33,6 +33,7 @@ function getAllFiles(dirPath: string, arrayOfFiles: string[] = []): string[] {
 
 function checkUnusedImports(filePath: string): string[] {
   const content = readFileSync(filePath, "utf-8")
+  const lines = content.split("\n")
   const unused: string[] = []
 
   // Simple regex-based check (not perfect, but catches common cases)
@@ -47,6 +48,7 @@ function checkUnusedImports(filePath: string): string[] {
 
     importNames.forEach((importName) => {
       // Check if import is used in the file (excluding the import line itself)
+      const importLineIndex = lines.findIndex((line) => line.includes(`import`) && line.includes(importName))
       const usageCount = content.split(importName).length - 1
 
       // If appears only once (in the import statement), it's likely unused

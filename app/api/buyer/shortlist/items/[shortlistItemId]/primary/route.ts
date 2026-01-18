@@ -14,7 +14,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ sho
       return NextResponse.json({ success: false, error: "isPrimaryChoice (boolean) is required" }, { status: 400 })
     }
 
-    const supabase = await createClient()
+    const supabase = createClient()
     const { data: buyer, error: buyerError } = await supabase
       .from("BuyerProfile")
       .select("id")

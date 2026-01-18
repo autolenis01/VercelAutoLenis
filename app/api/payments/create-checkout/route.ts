@@ -22,6 +22,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Buyer profile not found" }, { status: 400 })
     }
 
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"
+
     if (type === "deposit") {
       if (!auctionId) {
         return NextResponse.json({ success: false, error: "Auction ID required" }, { status: 400 })
@@ -51,11 +53,13 @@ export async function POST(request: Request) {
         buyerId: buyer.id,
         auctionId,
         amount: DEPOSIT_AMOUNT,
+        successUrl: `${baseUrl}/buyer/auction?success=deposit`,
+        cancelUrl: `${baseUrl}/buyer/auction?canceled=true`,
       })
 
       return NextResponse.json({
         success: true,
-        data: { clientSecret: checkoutSession },
+        data: { url: checkoutSession.url },
       })
     }
 
@@ -107,11 +111,13 @@ export async function POST(request: Request) {
         dealId,
         buyerId: buyer.id,
         amount: finalAmount,
+        successUrl: `${baseUrl}/buyer/deal?success=fee`,
+        cancelUrl: `${baseUrl}/buyer/deal/fee?canceled=true`,
       })
 
       return NextResponse.json({
         success: true,
-        data: { clientSecret: checkoutSession },
+        data: { url: checkoutSession.url },
       })
     }
 

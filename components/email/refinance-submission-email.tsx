@@ -2,10 +2,11 @@ import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } fr
 
 interface RefinanceSubmissionEmailProps {
   firstName: string
+  email: string
   referenceId: string
 }
 
-export const RefinanceSubmissionEmail = ({ firstName, referenceId }: RefinanceSubmissionEmailProps) => (
+export const RefinanceSubmissionEmail = ({ firstName, email, referenceId }: RefinanceSubmissionEmailProps) => (
   <Html>
     <Head />
     <Preview>We received your refinance request</Preview>

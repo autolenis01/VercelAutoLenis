@@ -8,8 +8,8 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js"
  * NEVER expose this client to the browser or use in client components.
  */
 export function createAdminClient() {
-  const supabaseUrl = process.env["NEXT_PUBLIC_SUPABASE_URL"]
-  const supabaseServiceKey = process.env["SUPABASE_SERVICE_ROLE_KEY"]
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl) {
     console.error("[createAdminClient] NEXT_PUBLIC_SUPABASE_URL is not configured")
