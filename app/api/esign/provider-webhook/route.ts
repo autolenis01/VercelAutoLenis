@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     const result = await esignService.handleWebhook(normalizedPayload)
 
-    return NextResponse.json({ success: true, ...result })
+    return NextResponse.json(result)
   } catch (error: any) {
     console.error("[E-Sign Webhook] Error:", error)
     // Return 200 to prevent provider retries for known errors

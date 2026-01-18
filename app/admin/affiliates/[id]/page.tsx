@@ -4,7 +4,7 @@ import { use } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Users, Link as LinkIcon, TrendingUp, DollarSign, MousePointer, UserPlus } from "lucide-react"
+import { ArrowLeft, Users, TrendingUp, DollarSign, MousePointer, UserPlus } from "lucide-react"
 import useSWR from "swr"
 import Link from "next/link"
 
