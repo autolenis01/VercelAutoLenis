@@ -2,6 +2,11 @@ import { describe, it, expect, beforeAll } from "vitest"
 import { AuthService } from "@/lib/services/auth.service"
 import { signInSchema, signUpSchema } from "@/lib/validators/auth"
 
+const TEST_VALID_USER = {
+  email: "valid@example.com",
+  password: "ValidPassword123!",
+}
+
 describe("Authentication Service", () => {
   let authService: AuthService
 
@@ -44,7 +49,7 @@ describe("Authentication Service", () => {
           return new Response(JSON.stringify({ success: false, error: "Too many requests" }), { status: 429 })
         }
 
-        if (body.email !== "valid@example.com" || body.password !== "ValidPassword123!") {
+        if (body.email !== TEST_VALID_USER.email || body.password !== TEST_VALID_USER.password) {
           return new Response(JSON.stringify({ success: false, error: "Invalid credentials" }), { status: 401 })
         }
 

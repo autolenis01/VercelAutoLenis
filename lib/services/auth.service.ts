@@ -273,14 +273,23 @@ export class AuthService {
   }
 
   async hashPassword(password: string) {
+    if (!password) {
+      throw new Error("Password is required for hashing")
+    }
     return hashPasswordUtil(password)
   }
 
   async verifyPassword(password: string, hashedPassword: string) {
+    if (!password || !hashedPassword) {
+      throw new Error("Password and hash are required for verification")
+    }
     return verifyPasswordUtil(password, hashedPassword)
   }
 
   async generateToken(input: { userId: string; email: string; role: string; is_affiliate?: boolean }) {
+    if (!input?.userId || !input.email || !input.role) {
+      throw new Error("userId, email, and role are required to generate a token")
+    }
     return createSession({
       userId: input.userId,
       email: input.email,

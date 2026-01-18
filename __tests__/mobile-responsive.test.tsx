@@ -3,6 +3,17 @@ import "@testing-library/jest-dom"
 
 // Mock components to test responsive behavior
 describe("Mobile Responsiveness", () => {
+  let originalInnerWidth: number
+
+  beforeEach(() => {
+    originalInnerWidth = global.innerWidth
+  })
+
+  afterEach(() => {
+    ;(global as any).innerWidth = originalInnerWidth
+    global.dispatchEvent(new Event("resize"))
+  })
+
   describe("Navigation", () => {
     it("should show mobile menu button on small screens", () => {
       // Mock viewport
