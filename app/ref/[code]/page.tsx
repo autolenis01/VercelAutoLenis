@@ -1,15 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight, Car, Users, Shield, DollarSign, CheckCircle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function ReferralLandingPage() {
   const params = useParams()
-  const router = useRouter()
-  const code = params.code as string
+  const code = (params as Record<string, string | undefined>)["code"] || ""
   const [isTracking, setIsTracking] = useState(true)
   const [affiliateName, setAffiliateName] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)

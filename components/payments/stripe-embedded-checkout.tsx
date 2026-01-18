@@ -6,7 +6,7 @@ import { loadStripe } from "@stripe/stripe-js"
 
 import { startDepositCheckout, startServiceFeeCheckout } from "@/app/actions/stripe"
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+const stripePromise = loadStripe(process.env["NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"]!)
 
 interface StripeEmbeddedCheckoutProps {
   type: "deposit" | "service_fee"
@@ -18,9 +18,13 @@ interface StripeEmbeddedCheckoutProps {
 export function StripeEmbeddedCheckout({ type, auctionId, dealId, onComplete }: StripeEmbeddedCheckoutProps) {
   const fetchClientSecret = useCallback(async () => {
     if (type === "deposit" && auctionId) {
-      return await startDepositCheckout(auctionId)
+      const secret = await startDepositCheckout(auctionId)
+      if (!secret) throw new Error("Missing client secret")
+      return secret
     } else if (type === "service_fee" && dealId) {
-      return await startServiceFeeCheckout(dealId)
+      const secret = await startServiceFeeCheckout(dealId)
+      if (!secret) throw new Error("Missing client secret")
+      return secret
     }
     throw new Error("Invalid checkout configuration")
   }, [type, auctionId, dealId])

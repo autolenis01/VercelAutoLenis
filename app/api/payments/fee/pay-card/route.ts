@@ -4,10 +4,10 @@ import { PaymentService } from "@/lib/services/payment.service"
 
 export async function POST(request: Request) {
   try {
-    await requireAuth(["BUYER"])
+    const user = await requireAuth(["BUYER"])
     const body = await request.json()
 
-    const result = await PaymentService.createServiceFeePayment(body.dealId)
+    const result = await PaymentService.createServiceFeePayment(body.dealId, user.userId)
 
     return NextResponse.json({
       success: true,

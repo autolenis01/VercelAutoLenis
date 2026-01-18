@@ -307,7 +307,12 @@ export default function BuyerDealPage() {
       </div>
 
       {showFeeModal && (
-        <FeePaymentModal dealId={deal.id} onClose={() => setShowFeeModal(false)} onSuccess={handleFeePaymentComplete} />
+        <FeePaymentModal
+          open={showFeeModal}
+          dealId={deal.id}
+          onClose={() => setShowFeeModal(false)}
+          onComplete={handleFeePaymentComplete}
+        />
       )}
     </ProtectedRoute>
   )

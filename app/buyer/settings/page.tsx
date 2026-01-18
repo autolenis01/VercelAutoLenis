@@ -11,7 +11,6 @@ import { User, Mail, Phone, Lock, Bell, Shield } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 
 export default function BuyerSettingsPage() {
-  const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState({
@@ -37,7 +36,6 @@ export default function BuyerSettingsPage() {
       const data = await response.json()
 
       if (data.success) {
-        setUser(data.user)
         setFormData({
           firstName: data.user.buyerProfile?.firstName || "",
           lastName: data.user.buyerProfile?.lastName || "",

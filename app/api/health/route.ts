@@ -32,7 +32,7 @@ export async function GET() {
       database: "up",
       responseTime,
       timestamp: new Date().toISOString(),
-      version: process.env.npm_package_version || "unknown",
+      version: process.env["npm_package_version"] || "unknown",
     })
   } catch (error) {
     const responseTime = Date.now() - startTime

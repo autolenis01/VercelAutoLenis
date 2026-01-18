@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     await requireAuth(["DEALER"])
     const body = await request.json()
 
-    const contract = await ContractShieldService.uploadContract(
+    const contract = await ContractShieldService.uploadDocument(
       body.dealId,
       body.dealerId,
       body.documentUrl,

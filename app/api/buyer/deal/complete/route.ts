@@ -51,9 +51,12 @@ export async function POST(req: NextRequest) {
 
       // Send welcome email for new affiliate
       if (user.email) {
-        await emailService.sendWelcomeEmail(user.email, user.first_name || "there", "AFFILIATE")
+        const buyerFirstName = (deal as any)?.buyer?.firstName || "there"
+        await emailService.sendWelcomeEmail(user.email, buyerFirstName, "AFFILIATE")
       }
     }
+
+    const buyerFullName = `${(deal as any)?.buyer?.firstName || ""} ${(deal as any)?.buyer?.lastName || ""}`.trim() || "A buyer"
 
     // Send commission notifications to all affiliates who earned
     for (const commission of commissions) {
@@ -70,7 +73,7 @@ export async function POST(req: NextRequest) {
         await emailService.sendReferralCommissionEmail(
           affiliateUser.user.email,
           `${affiliateUser.firstName} ${affiliateUser.lastName}`.trim() || "Affiliate",
-          `${user.first_name} ${user.last_name}`.trim() || "A buyer",
+          buyerFullName,
           commission.commissionAmount || 0,
           commission.level || 1,
           (affiliateUser.pendingEarnings || 0) + (commission.commissionAmount || 0),

@@ -636,7 +636,7 @@ export class AdminService {
         level5Referrals: a.referrals?.filter((r: any) => r.level === 5).length || 0,
         totalEarnings: a.totalEarnings || 0,
         pendingEarnings: a.pendingEarnings || 0,
-        totalPayouts: a.payouts?.reduce((sum: any, p) => sum + (p.amount || 0), 0) || 0,
+        totalPayouts: a.payouts?.reduce((sum: any, p: any) => sum + (p?.amount || 0), 0) || 0,
         createdAt: a.createdAt,
       })),
       total,
@@ -866,19 +866,19 @@ export class AdminService {
     })
 
     return {
-      depositAmount: settingsMap.deposit_amount || 99,
-      feeTierOneCents: settingsMap.fee_tier_one_cents || 49900,
-      feeTierTwoCents: settingsMap.fee_tier_two_cents || 75000,
-      feeThresholdCents: settingsMap.fee_threshold_cents || 3500000,
-      auctionDurationHours: settingsMap.auction_duration_hours || 48,
-      depositGracePeriodHours: settingsMap.deposit_grace_period_hours || 24,
-      feeFinancingEnabled: settingsMap.fee_financing_enabled !== false,
-      affiliateCommissionL1: settingsMap.affiliate_commission_l1 || 0.2,
-      affiliateCommissionL2: settingsMap.affiliate_commission_l2 || 0.15,
-      affiliateCommissionL3: settingsMap.affiliate_commission_l3 || 0.1,
-      affiliateCommissionL4: settingsMap.affiliate_commission_l4 || 0.05,
-      affiliateCommissionL5: settingsMap.affiliate_commission_l5 || 0.03,
-      affiliateMinPayout: settingsMap.affiliate_min_payout || 50,
+      depositAmount: settingsMap["deposit_amount"] || 99,
+      feeTierOneCents: settingsMap["fee_tier_one_cents"] || 49900,
+      feeTierTwoCents: settingsMap["fee_tier_two_cents"] || 75000,
+      feeThresholdCents: settingsMap["fee_threshold_cents"] || 3500000,
+      auctionDurationHours: settingsMap["auction_duration_hours"] || 48,
+      depositGracePeriodHours: settingsMap["deposit_grace_period_hours"] || 24,
+      feeFinancingEnabled: settingsMap["fee_financing_enabled"] !== false,
+      affiliateCommissionL1: settingsMap["affiliate_commission_l1"] || 0.2,
+      affiliateCommissionL2: settingsMap["affiliate_commission_l2"] || 0.15,
+      affiliateCommissionL3: settingsMap["affiliate_commission_l3"] || 0.1,
+      affiliateCommissionL4: settingsMap["affiliate_commission_l4"] || 0.05,
+      affiliateCommissionL5: settingsMap["affiliate_commission_l5"] || 0.03,
+      affiliateMinPayout: settingsMap["affiliate_min_payout"] || 50,
     }
   }
 

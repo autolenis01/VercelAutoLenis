@@ -6,8 +6,9 @@ import { createClient } from "@/lib/supabase/server"
 export async function GET() {
   try {
     const session = await getServerSession(authOptions)
+    const userId = (session as any)?.user?.id as string | undefined
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
     }
 
@@ -36,7 +37,7 @@ export async function GET() {
         ),
         insurancePolicy:InsurancePolicy(*)
       `)
-      .eq("buyerId", session.user.id)
+      .eq("buyerId", userId)
       .in("status", [
         "SELECTED",
         "FINANCING_APPROVED",

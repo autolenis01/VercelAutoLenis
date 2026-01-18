@@ -285,7 +285,8 @@ function generateTotpCode(secret: string, time: number): string {
 
   let hash = 0
   for (let i = 0; i < combined.length; i++) {
-    hash = ((hash << 5) - hash + combined[i]) | 0
+    const byte = combined[i] ?? 0
+    hash = ((hash << 5) - hash + byte) | 0
   }
 
   // Generate 6-digit code

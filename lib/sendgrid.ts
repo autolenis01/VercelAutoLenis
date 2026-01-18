@@ -17,7 +17,7 @@ let isInitialized = false
 
 export function initSendGrid() {
   if (!isInitialized) {
-    const apiKey = process.env.SENDGRID_API_KEY
+    const apiKey = process.env["SENDGRID_API_KEY"]
     if (!apiKey) {
       console.error("[SendGrid] SENDGRID_API_KEY is not configured")
       throw new Error("SendGrid API key is not configured")

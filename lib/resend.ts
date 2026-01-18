@@ -14,7 +14,7 @@ let resendInstance: Resend | null = null
 
 export function initResend(): Resend {
   if (!resendInstance) {
-    const apiKey = process.env.RESEND_API_KEY
+    const apiKey = process.env["RESEND_API_KEY"]
     if (!apiKey) {
       console.error("[Resend] RESEND_API_KEY is not configured")
       throw new Error("Resend API key is not configured")

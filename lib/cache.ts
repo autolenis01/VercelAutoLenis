@@ -77,7 +77,7 @@ export async function withCache<T>(key: string, fetcher: () => Promise<T>, ttlSe
 export function invalidatePattern(pattern: string): void {
   const keys = Array.from((cache as any).cache.keys())
   keys.forEach((key) => {
-    if (key.includes(pattern)) {
+    if (typeof key === "string" && key.includes(pattern)) {
       cache.delete(key)
     }
   })

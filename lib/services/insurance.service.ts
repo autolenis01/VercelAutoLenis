@@ -67,7 +67,7 @@ interface BindPolicyResponse {
 class MockInsuranceProvider implements InsuranceProviderAdapter {
   name = "AutoLenis Partner Network"
 
-  async requestQuotes(input: QuoteRequestInput): Promise<ProviderQuoteResponse[]> {
+  async requestQuotes(_input: QuoteRequestInput): Promise<ProviderQuoteResponse[]> {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 800))
 
@@ -168,6 +168,45 @@ export class InsuranceService {
       INSERT INTO "insurance_events" ("id", "selected_deal_id", "user_id", "type", "provider_name", "details", "created_at")
       VALUES (gen_random_uuid()::text, ${selectedDealId}, ${userId}, ${type}, ${providerName}, ${JSON.stringify(details)}::jsonb, NOW())
     `
+  }
+
+  static async getQuotes(selectedDealId: string) {
+    return prisma.insuranceQuote.findMany({
+      where: {
+        OR: [{ selected_deal_id: selectedDealId }, { dealId: selectedDealId }],
+      },
+      orderBy: { createdAt: "desc" },
+    })
+  }
+
+  static async selectPolicy(selectedDealId: string, quoteId: string) {
+    const quote = await prisma.insuranceQuote.findUnique({
+      where: { id: quoteId },
+    })
+
+    if (!quote) {
+      throw new Error("Quote not found")
+    }
+
+    const policy = await prisma.insurancePolicy.upsert({
+      where: { quoteId },
+      update: {},
+      create: {
+        selected_deal_id: selectedDealId,
+        dealId: selectedDealId,
+        quoteId,
+        carrierName: quote.carrierName || quote.carrier_name || "Carrier",
+        policyNumber: quote.policyNumber || quote.policy_number || `POL-${quoteId}`,
+        status: "PENDING",
+      },
+    })
+
+    await this.logEvent("POLICY_SELECTED", selectedDealId, quote.userId || null, quote.providerName || null, {
+      quoteId,
+      policyId: policy.id,
+    })
+
+    return policy
   }
 
   // Get insurance overview for a deal

@@ -54,7 +54,7 @@ export class AuthService {
         throw new Error("Failed to create user account")
       }
 
-      const user = newUsers[0]
+      const user = newUsers[0]!
 
       if (input.role === "BUYER") {
         await supabase.from("BuyerProfile").insert({
@@ -104,12 +104,13 @@ export class AuthService {
           .or(`refCode.eq.${refCodeValue},ref_code.eq.${refCodeValue}`)
           .limit(1)
 
-        if (affiliate && affiliate.length > 0) {
+        const affiliateUser = affiliate?.[0]
+        if (affiliateUser) {
           await supabase.from("Referral").insert({
             id: crypto.randomUUID(),
             referredUserId: user.id,
             referred_user_id_v2: user.id,
-            affiliateId: affiliate[0].id,
+            affiliateId: affiliateUser.id,
             createdAt: now,
           })
         }
@@ -156,7 +157,7 @@ export class AuthService {
         throw new Error("Invalid email or password")
       }
 
-      const user = users[0]
+      const user = users[0]!
       const firstName = user.first_name || ""
       const lastName = user.last_name || ""
 
@@ -239,7 +240,7 @@ export class AuthService {
       return null
     }
 
-    const user = users[0]
+    const user = users[0]!
     return {
       ...user,
       firstName: user.first_name,
@@ -260,7 +261,7 @@ export class AuthService {
       return null
     }
 
-    const user = users[0]
+    const user = users[0]!
     return {
       ...user,
       firstName: user.first_name,

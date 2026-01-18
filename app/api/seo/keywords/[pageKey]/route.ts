@@ -19,7 +19,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ pag
   }
 }
 
-export async function PUT(_request: Request, { params }: { params: Promise<{ pageKey: string }> }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ pageKey: string }> }) {
   try {
     const user = await requireAuth(["ADMIN"])
     if (!user) {

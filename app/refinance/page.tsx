@@ -92,10 +92,6 @@ const VEHICLE_CONDITIONS = [
   { value: "POOR", label: "Poor" },
 ]
 
-// Generate year options (last 15 years)
-const currentYear = new Date().getFullYear()
-const VEHICLE_YEARS = Array.from({ length: 15 }, (_, i) => currentYear - i)
-
 const VEHICLE_DATA: Record<string, string[]> = {
   Acura: ["ILX", "Integra", "MDX", "NSX", "RDX", "RLX", "TL", "TLX", "TSX", "ZDX"],
   "Alfa Romeo": ["4C", "Giulia", "Giulietta", "Stelvio", "Tonale"],
@@ -580,8 +576,10 @@ export default function RefinancePage() {
 
     if (Object.keys(errors).length > 0) {
       setError("Please complete all required fields")
-      const firstErrorField = Object.keys(errors)[0]
-      document.getElementById(firstErrorField)?.focus()
+      const firstErrorField = Object.keys(errors)[0] || ""
+      if (firstErrorField) {
+        document.getElementById(firstErrorField)?.focus()
+      }
       return false
     }
 

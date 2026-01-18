@@ -2,11 +2,11 @@ import "server-only"
 
 import Stripe from "stripe"
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+export const stripe = new Stripe(process.env["STRIPE_SECRET_KEY"]!)
 
 // Helper to get Stripe publishable key for client
 export const getStripePublishableKey = () => {
-  return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+  return process.env["NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"]!
 }
 
 export async function createDepositCheckoutSession(params: {

@@ -247,7 +247,9 @@ export default function DealerContractDetailPage({ params }: { params: Promise<{
                 <div
                   key={fix.id}
                   className={`p-4 border rounded-lg ${
-                    fix.resolved ? "bg-green-50 border-green-200" : severityColors[fix.severity] || severityColors.INFO
+                    fix.resolved
+                      ? "bg-green-50 border-green-200"
+                      : severityColors[fix.severity] || (severityColors as any)["INFO"]
                   }`}
                 >
                   <div className="flex items-start gap-4">
@@ -255,7 +257,7 @@ export default function DealerContractDetailPage({ params }: { params: Promise<{
                       {fix.resolved ? (
                         <CheckCircle className="h-6 w-6 text-green-600" />
                       ) : (
-                        severityIcons[fix.severity] || severityIcons.INFO
+                        severityIcons[fix.severity] || (severityIcons as any)["INFO"]
                       )}
                     </div>
                     <div className="flex-1">

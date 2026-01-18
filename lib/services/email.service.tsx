@@ -3,10 +3,10 @@
 
 import { logger } from "@/lib/logger"
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY
-const FROM_EMAIL = process.env.FROM_EMAIL || "noreply@autolenis.com"
-const FROM_NAME = process.env.FROM_NAME || "AutoLenis"
+const RESEND_API_KEY = process.env["RESEND_API_KEY"]
+const SENDGRID_API_KEY = process.env["SENDGRID_API_KEY"]
+const FROM_EMAIL = process.env["FROM_EMAIL"] || "noreply@autolenis.com"
+const FROM_NAME = process.env["FROM_NAME"] || "AutoLenis"
 const APP_URL = process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"
 
 interface EmailOptions {
@@ -296,6 +296,244 @@ export class EmailService {
             <li>Proof of insurance</li>
             <li>Any required documentation</li>
           </ul>
+        </div>
+      `,
+    })
+  }
+
+  async sendWelcomeEmail(email: string, firstName: string, role: string) {
+    return this.send({
+      to: email,
+      subject: "Welcome to AutoLenis",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #1a1a1a;">Welcome, ${firstName}!</h1>
+          <p>We're excited to have you onboard as an ${role}.</p>
+        </div>
+      `,
+    })
+  }
+
+  async sendAuctionStartedEmail(
+    to: string,
+    buyerName: string,
+    vehicleName: string,
+    auctionId: string,
+    endsAt: Date,
+    dealerCount: number,
+  ) {
+    return this.send({
+      to,
+      subject: "Your auction has started - AutoLenis",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #1a1a1a;">Auction Started</h1>
+          <p>Hi ${buyerName}, your auction for ${vehicleName} is live.</p>
+          <p>Auction ID: ${auctionId}. Ending: ${endsAt.toISOString()}</p>
+          <p>Dealers invited: ${dealerCount}</p>
+        </div>
+      `,
+    })
+  }
+
+  async sendNewOfferEmail(
+    to: string,
+    buyerName: string,
+    vehicleName: string,
+    auctionId: string,
+    offerCount: number,
+    lowestPriceCents: number,
+  ) {
+    return this.send({
+      to,
+      subject: "New offer received - AutoLenis",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #1a1a1a;">You have a new offer</h1>
+          <p>Hi ${buyerName}, you have ${offerCount} offer(s) for ${vehicleName}.</p>
+          <p>Lowest price: $${(lowestPriceCents / 100).toFixed(2)}</p>
+          <p>Auction ID: ${auctionId}</p>
+        </div>
+      `,
+    })
+  }
+
+  async sendAuctionWonEmail(
+    to: string,
+    dealerName: string,
+    vehicleName: string,
+    buyerName: string,
+    winningPriceCents: number,
+    auctionId: string,
+  ) {
+    return this.send({
+      to,
+      subject: "Auction won - AutoLenis",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #1a1a1a;">Auction Result</h1>
+          <p>Congrats ${dealerName}, you won the auction for ${vehicleName}.</p>
+          <p>Buyer: ${buyerName}</p>
+          <p>Winning price: $${(winningPriceCents / 100).toFixed(2)}</p>
+          <p>Auction ID: ${auctionId}</p>
+        </div>
+      `,
+    })
+  }
+
+  async sendContractShieldEmail(
+    toOrOptions:
+      | string
+      | {
+          to: string
+          recipientName?: string
+          status?: string
+          vehicleName?: string
+          dealId?: string
+          issueCount?: number
+          isDealer?: boolean
+        },
+    recipientName?: string,
+    status?: string,
+    vehicleName?: string,
+    dealId?: string,
+    issueCount?: number,
+    isDealer?: boolean,
+  ) {
+    const options =
+      typeof toOrOptions === "string"
+        ? { to: toOrOptions, recipientName, status, vehicleName, dealId, issueCount, isDealer }
+        : toOrOptions
+
+    return this.send({
+      to: options.to,
+      subject: "Contract Shield update - AutoLenis",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #1a1a1a;">Contract Shield Update</h1>
+          <p>Hi ${options.recipientName || "there"},</p>
+          <p>Status: ${options.status || "Update"}${options.vehicleName ? ` for ${options.vehicleName}` : ""}.</p>
+          ${options.issueCount !== undefined ? `<p>Issue count: ${options.issueCount}</p>` : ""}
+          ${options.dealId ? `<p>Deal ID: ${options.dealId}</p>` : ""}
+        </div>
+      `,
+    })
+  }
+
+  async sendPaymentConfirmationEmail(
+    to: string,
+    buyerName: string,
+    paymentType: string,
+    amountCents: number,
+    transactionId: string,
+    vehicleName: string,
+  ) {
+    return this.send({
+      to,
+      subject: "Payment confirmation - AutoLenis",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #1a1a1a;">Payment Received</h1>
+          <p>Hi ${buyerName}, we received your ${paymentType} payment for ${vehicleName}.</p>
+          <p>Amount: $${(amountCents / 100).toFixed(2)}</p>
+          <p>Transaction ID: ${transactionId}</p>
+        </div>
+      `,
+    })
+  }
+
+  async sendDealCompleteEmail(
+    to: string,
+    buyerName: string,
+    vehicleName: string,
+    dealerName: string,
+    totalPriceCents: number,
+    savingsCents: number,
+    pickupDate: Date,
+    pickupLocation: string,
+  ) {
+    return this.send({
+      to,
+      subject: "Deal completed - AutoLenis",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #1a1a1a;">Your deal is complete</h1>
+          <p>Hi ${buyerName}, congratulations on your ${vehicleName} with ${dealerName}!</p>
+          <p>Total price: $${(totalPriceCents / 100).toFixed(2)}. Estimated savings: $${(savingsCents / 100).toFixed(2)}.</p>
+          <p>Pickup: ${pickupDate.toISOString()} at ${pickupLocation}</p>
+        </div>
+      `,
+    })
+  }
+
+  async sendReferralCommissionEmail(
+    to: string,
+    affiliateName: string,
+    referredBuyerName: string,
+    commissionCents: number,
+    tier: number,
+    totalEarningsCents: number,
+  ) {
+    return this.send({
+      to,
+      subject: "Referral commission earned - AutoLenis",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #1a1a1a;">You earned a commission!</h1>
+          <p>Hi ${affiliateName},</p>
+          <p>You earned $${(commissionCents / 100).toFixed(2)} from ${referredBuyerName} (Tier ${tier}).</p>
+          <p>Total earnings: $${(totalEarningsCents / 100).toFixed(2)}</p>
+        </div>
+      `,
+    })
+  }
+
+  async sendAffiliateCommissionEmail(to: string, firstName: string, amount: number, level?: number) {
+    return this.send({
+      to,
+      subject: "Affiliate commission earned - AutoLenis",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #1a1a1a;">Commission Earned</h1>
+          <p>Hi ${firstName}, you earned $${amount.toFixed(2)}${level ? ` on level ${level}` : ""}.</p>
+        </div>
+      `,
+    })
+  }
+
+  async sendNotificationEmail(to: string, subject: string, html: string) {
+    return this.send({ to, subject, html })
+  }
+
+  async sendRefinanceQualifiedEmail(to: string, firstName: string, redirectUrl: string, leadId: string) {
+    return this.send({
+      to,
+      subject: "You're qualified! - AutoLenis Refinance",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #1a1a1a;">Great news, ${firstName}!</h1>
+          <p>You pre-qualified for refinancing. Reference ID: ${leadId}</p>
+          <a href="${redirectUrl}" style="display: inline-block; background-color: #0066cc; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0;">
+            Continue Application
+          </a>
+        </div>
+      `,
+    })
+  }
+
+  async sendRefinanceDeclinedEmail(to: string, firstName: string, reasons: string[], leadId: string) {
+    return this.send({
+      to,
+      subject: "Refinance update - AutoLenis",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #1a1a1a;">Hi ${firstName},</h1>
+          <p>We couldn't pre-qualify you at this time. Reference ID: ${leadId}</p>
+          ${
+            reasons.length > 0
+              ? `<ul>${reasons.map((r) => `<li>${r.replace(/_/g, " ")}</li>`).join("")}</ul>`
+              : "<p>No specific reasons provided.</p>"
+          }
         </div>
       `,
     })

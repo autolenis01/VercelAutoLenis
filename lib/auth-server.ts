@@ -83,6 +83,7 @@ export async function getCurrentUser() {
 
     return {
       id: session.userId,
+      userId: session.userId,
       email: session.email,
       role: session.role,
     }

@@ -20,7 +20,7 @@ interface ESignProvider {
 
 // Mock provider for development
 class MockESignProvider implements ESignProvider {
-  async createEnvelope(params: any) {
+  async createEnvelope(_params: any) {
     const envelopeId = `env_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`
     return {
       envelopeId,
@@ -28,11 +28,11 @@ class MockESignProvider implements ESignProvider {
     }
   }
 
-  async voidEnvelope(envelopeId: string, reason: string) {
+  async voidEnvelope(_envelopeId: string, _reason: string) {
     // Mock void - in production, call provider API
   }
 
-  async getEnvelopeStatus(envelopeId: string) {
+  async getEnvelopeStatus(_envelopeId: string) {
     return { status: "SENT" as const }
   }
 }
@@ -251,6 +251,10 @@ export class ESignService {
           }
         : null,
     }
+  }
+
+  async getEnvelopeStatus(envelopeId: string) {
+    return this.provider.getEnvelopeStatus(envelopeId)
   }
 
   // Handle webhook from e-sign provider

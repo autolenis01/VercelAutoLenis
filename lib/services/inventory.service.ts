@@ -448,6 +448,11 @@ export class InventoryService {
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i]
+      if (!row) {
+        results.failed++
+        results.errors.push({ rowIndex: i, message: "Row is undefined" })
+        continue
+      }
       try {
         // Validate required fields
         if (!row.make || !row.model || !row.year || row.price === undefined) {

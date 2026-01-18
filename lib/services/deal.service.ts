@@ -458,7 +458,7 @@ export class DealService {
       updateData.deal_status = "FINANCING_CHOSEN"
     }
 
-    const updatedDeal = await prisma.selectedDeal.update({
+    await prisma.selectedDeal.update({
       where: { id: dealId },
       data: updateData,
     })
@@ -494,7 +494,7 @@ export class DealService {
   }
 
   // Update concierge fee choice - Pay by Card
-  static async payConciergeFeeByCard(userId: string, dealId: string, paymentMethodId?: string) {
+  static async payConciergeFeeByCard(userId: string, dealId: string, _paymentMethodId?: string) {
     const dealData = await this.getSelectedDealForBuyer(userId, dealId)
     const deal = dealData.deal
 
@@ -755,7 +755,8 @@ export class DealService {
         break
     }
 
-    if (newStatus && VALID_TRANSITIONS[currentStatus]?.includes(newStatus)) {
+    const transitions = (VALID_TRANSITIONS as any)[currentStatus] as DealStatus[] | undefined
+    if (newStatus && transitions?.includes(newStatus)) {
       await prisma.selectedDeal.update({
         where: { id: dealId },
         data: {

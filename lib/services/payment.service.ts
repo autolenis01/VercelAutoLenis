@@ -86,7 +86,7 @@ export class PaymentService {
       type: "DEPOSIT_PAID",
       userId: payment.buyerId,
       details: {
-        amountCents: payment.amountCents || payment.amount_cents,
+        amountCents: (payment as any).amountCents || (payment as any).amount_cents,
         paymentIntentId,
       },
       createdAt: new Date().toISOString(),
@@ -114,7 +114,7 @@ export class PaymentService {
     const totalOtdCents =
       deal.totalOtdAmountCents || deal.total_otd_amount_cents || (deal.cashOtd ? Math.round(deal.cashOtd * 100) : 0)
 
-    const baseFeeCents = this.calculateBaseFee(totalOtdCents)
+    const baseFeeCents = PaymentService.calculateBaseFee(totalOtdCents)
 
     const { data: depositPayment } = await supabase
       .from("DepositPayment")
@@ -259,18 +259,18 @@ export class PaymentService {
 
         if (referral) {
           const baseFee = payment.baseFeeCents || payment.base_fee_cents || 0
-          await this.processCommissions(referral.affiliateId, payment.id, baseFee)
+          await PaymentService.processCommissions(referral.affiliateId, payment.id, baseFee)
         }
       }
 
-      await supabase.from("ComplianceEvent").insert({
-        id: crypto.randomUUID(),
-        eventType: "SERVICE_FEE_PAYMENT",
-        type: "FEE_PAID",
-        userId: payment.user_id || deal?.buyerId,
-        relatedId: payment.dealId,
-        details: {
-          baseFeeCents: payment.baseFeeCents || payment.base_fee_cents,
+        await supabase.from("ComplianceEvent").insert({
+          id: crypto.randomUUID(),
+          eventType: "SERVICE_FEE_PAYMENT",
+          type: "FEE_PAID",
+          userId: (payment as any).user_id || payment.buyerId || deal?.buyerId,
+          relatedId: payment.dealId,
+          details: {
+            baseFeeCents: payment.baseFeeCents || payment.base_fee_cents,
           depositAppliedCents: payment.depositAppliedCents || payment.deposit_applied_cents,
           remainingCents: payment.remainingCents || payment.remaining_cents,
           method: "CARD_DIRECT",
@@ -290,7 +290,7 @@ export class PaymentService {
     let level = 1
 
     while (currentAffiliateId && level <= 5) {
-      const { data: affiliate } = await supabase
+      const { data: affiliate }: { data: any } = await supabase
         .from("Affiliate")
         .select(`
           *,
@@ -301,7 +301,7 @@ export class PaymentService {
 
       if (!affiliate) break
 
-      const commissionRate = commissionRates[level - 1]
+      const commissionRate = commissionRates[level - 1] ?? 0
       const commissionCents = Math.round(baseFeeCents * commissionRate)
 
       await supabase.from("Commission").insert({
@@ -769,7 +769,7 @@ export class PaymentService {
       type: "DEPOSIT_PAID",
       userId: payment.buyerId,
       details: {
-        amountCents: payment.amountCents || payment.amount_cents,
+        amountCents: (payment as any).amountCents || (payment as any).amount_cents || payment.amount || 0,
         paymentIntentId,
       },
       createdAt: new Date().toISOString(),
@@ -796,7 +796,7 @@ export class PaymentService {
     const totalOtdCents =
       deal.totalOtdAmountCents || deal.total_otd_amount_cents || (deal.cashOtd ? Math.round(deal.cashOtd * 100) : 0)
 
-    const baseFeeCents = this.calculateBaseFee(totalOtdCents)
+    const baseFeeCents = PaymentService.calculateBaseFee(totalOtdCents)
 
     const { data: depositPayment } = await supabase
       .from("DepositPayment")
@@ -929,7 +929,7 @@ export class PaymentService {
 
         if (referral) {
           const baseFee = payment.baseFeeCents || payment.base_fee_cents || 0
-          await this.processCommissions(referral.affiliateId, payment.id, baseFee)
+          await PaymentService.processCommissions(referral.affiliateId, payment.id, baseFee)
         }
       }
 
@@ -937,12 +937,13 @@ export class PaymentService {
         id: crypto.randomUUID(),
         eventType: "SERVICE_FEE_PAYMENT",
         type: "FEE_PAID",
-        userId: payment.user_id || deal?.buyerId,
+        userId: (payment as any).user_id || payment.buyerId || deal?.buyerId,
         relatedId: payment.dealId,
         details: {
           baseFeeCents: payment.baseFeeCents || payment.base_fee_cents,
-          depositAppliedCents: payment.depositAppliedCents || payment.deposit_applied_cents,
-          remainingCents: payment.remainingCents || payment.remaining_cents,
+          depositAppliedCents:
+            (payment as any).depositAppliedCents || (payment as any).deposit_applied_cents || 0,
+          remainingCents: (payment as any).remainingCents || (payment as any).remaining_cents || 0,
           method: "CARD_DIRECT",
           paymentIntentId,
         },

@@ -5,7 +5,7 @@
  * when POSTGRES_PRISMA_URL is not set.
  */
 
-const { execSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -16,11 +16,12 @@ if (!process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_PRISMA_URL === '') 
 
 try {
   const command = 'prisma generate';
-  
+
   // Check if we're in a pnpm workspace by looking for pnpm-lock.yaml
   const hasPnpm = fs.existsSync(path.join(process.cwd(), 'pnpm-lock.yaml'));
-  
-  if (hasPnpm) {
+  const pnpmAvailable = spawnSync('pnpm', ['--version'], { stdio: 'ignore' }).status === 0;
+
+  if (hasPnpm && pnpmAvailable) {
     execSync(`pnpm exec ${command}`, { stdio: 'inherit' });
   } else {
     execSync(`npx ${command}`, { stdio: 'inherit' });

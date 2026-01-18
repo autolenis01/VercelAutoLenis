@@ -16,8 +16,10 @@ function isIpInRange(ip: string, range: string): boolean {
     return ip === range
   }
 
-  const [rangeIp, prefixLength] = range.split("/")
-  const mask = -1 << (32 - Number.parseInt(prefixLength))
+  const [rangeIpRaw, prefixLength] = range.split("/")
+  const rangeIp = rangeIpRaw || range
+  const parsedPrefix = Number.parseInt(prefixLength || "32")
+  const mask = -1 << (32 - parsedPrefix)
 
   const ipNum = ipToNumber(ip)
   const rangeNum = ipToNumber(rangeIp)
@@ -46,7 +48,8 @@ export async function validateCronRequest(request: NextRequest): Promise<NextRes
 
   // In production, also verify IP address
   if (process.env["NODE_ENV"] === "production") {
-    const ip = request.ip || request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip")
+    const ip =
+      (request as any).ip || request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || undefined
 
     if (!ip) {
       console.warn("[CronSecurity] No IP address found in request")

@@ -116,7 +116,7 @@ export class ShortlistService {
     }
 
     // 2. Get active pre-qualification for budget computation
-    const preQualResult = await PreQualService.getCurrentPreQual(buyerId)
+    const preQualResult = await new PreQualService().getActivePrequalification(buyerId)
     const maxOtdCents = preQualResult.active ? preQualResult.preQualification?.maxOtdAmountCents || null : null
 
     // 3. Transform items with computed fields

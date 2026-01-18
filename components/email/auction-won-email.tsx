@@ -5,10 +5,9 @@ interface AuctionWonEmailProps {
   vehicleName: string
   buyerName: string
   winningPrice: string
-  auctionId: string
 }
 
-export function AuctionWonEmail({ dealerName, vehicleName, buyerName, winningPrice, auctionId }: AuctionWonEmailProps) {
+export function AuctionWonEmail({ dealerName, vehicleName, buyerName, winningPrice }: AuctionWonEmailProps) {
   return (
     <EmailLayout previewText={`Congratulations! You won the auction for ${vehicleName}`}>
       <div style={{ textAlign: "center", marginBottom: "24px" }}>
