@@ -41,7 +41,8 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: pnpm lint || true # TODO: enforce lint after cleanup
+        run: pnpm lint
+        continue-on-error: true # TODO: enforce lint after cleanup
 
       - name: Verify Prisma schema is valid
         run: |
