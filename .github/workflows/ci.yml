@@ -11,7 +11,7 @@ jobs:
     name: Install, Validate, and Build
     runs-on: ubuntu-latest
     env:
-      CHECKPOINT_DISABLE: "1"
+      PRISMA_CHECKPOINT_DISABLE: "1"
       PRISMA_DISABLE_TELEMETRY: "1"
     
     steps:
