@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { createClient } from "@/lib/supabase/server"
-import { hashPassword, verifyPassword } from "@/lib/auth-server"
+import { hashPassword as hashPasswordUtil, verifyPassword as verifyPasswordUtil } from "@/lib/auth-server"
 import { createSession } from "@/lib/auth"
 import type { SignUpInput, SignInInput } from "@/lib/validators/auth"
 
@@ -26,7 +26,7 @@ export class AuthService {
         throw new Error("User with this email already exists")
       }
 
-      const passwordHash = await hashPassword(input.password)
+      const passwordHash = await hashPasswordUtil(input.password)
       const referralCode = AuthService.generateReferralCode()
 
       const { data: newUsers, error: createError } = await supabase
@@ -160,7 +160,7 @@ export class AuthService {
       const firstName = user.first_name || ""
       const lastName = user.last_name || ""
 
-      const isValid = await verifyPassword(input.password, user.passwordHash)
+       const isValid = await verifyPasswordUtil(input.password, user.passwordHash)
       if (!isValid) {
         throw new Error("Invalid email or password")
       }
@@ -270,6 +270,23 @@ export class AuthService {
 
   static generateReferralCode(): string {
     return "AL" + Math.random().toString(36).substring(2, 10).toUpperCase()
+  }
+
+  async hashPassword(password: string) {
+    return hashPasswordUtil(password)
+  }
+
+  async verifyPassword(password: string, hashedPassword: string) {
+    return verifyPasswordUtil(password, hashedPassword)
+  }
+
+  async generateToken(input: { userId: string; email: string; role: string; is_affiliate?: boolean }) {
+    return createSession({
+      userId: input.userId,
+      email: input.email,
+      role: input.role,
+      is_affiliate: input.is_affiliate,
+    })
   }
 }
 

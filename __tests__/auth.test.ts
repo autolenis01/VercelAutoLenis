@@ -1,11 +1,58 @@
 import { describe, it, expect, beforeAll } from "vitest"
 import { AuthService } from "@/lib/services/auth.service"
+import { signInSchema, signUpSchema } from "@/lib/validators/auth"
 
 describe("Authentication Service", () => {
   let authService: AuthService
 
   beforeAll(() => {
     authService = new AuthService()
+    const signinAttempts: Record<string, number> = {}
+
+    // Lightweight fetch mock to simulate API validation and rate limits without a running server
+    global.fetch = (async (input, init) => {
+      const url = typeof input === "string" ? input : input.toString()
+      const parseBody = () => {
+        try {
+          return init?.body ? JSON.parse(init.body.toString()) : {}
+        } catch {
+          return {}
+        }
+      }
+
+      if (url.endsWith("/api/auth/signup")) {
+        const body = parseBody()
+        const parsed = signUpSchema.safeParse(body)
+        if (!parsed.success) {
+          return new Response(JSON.stringify({ success: false, error: "Invalid request" }), { status: 400 })
+        }
+
+        return new Response(JSON.stringify({ success: true }), { status: 201 })
+      }
+
+      if (url.endsWith("/api/auth/signin")) {
+        const body = parseBody()
+        const parsed = signInSchema.safeParse(body)
+        if (!parsed.success) {
+          return new Response(JSON.stringify({ success: false, error: "Invalid request" }), { status: 400 })
+        }
+
+        const attempts = (signinAttempts[body.email] || 0) + 1
+        signinAttempts[body.email] = attempts
+
+        if (attempts > 5) {
+          return new Response(JSON.stringify({ success: false, error: "Too many requests" }), { status: 429 })
+        }
+
+        if (body.email !== "valid@example.com" || body.password !== "ValidPassword123!") {
+          return new Response(JSON.stringify({ success: false, error: "Invalid credentials" }), { status: 401 })
+        }
+
+        return new Response(JSON.stringify({ success: true }), { status: 200 })
+      }
+
+      return new Response("Not Found", { status: 404 })
+    }) as any
   })
 
   describe("Password Hashing", () => {

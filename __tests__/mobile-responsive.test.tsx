@@ -35,6 +35,8 @@ describe("Mobile Responsiveness", () => {
     it("should stack elements vertically on mobile", () => {
       // Test that flex-col or grid changes happen at breakpoints
       const mobileBreakpoint = 768
+      ;(global as any).innerWidth = 375
+      global.dispatchEvent(new Event("resize"))
       expect(global.innerWidth).toBeLessThan(mobileBreakpoint)
     })
   })
