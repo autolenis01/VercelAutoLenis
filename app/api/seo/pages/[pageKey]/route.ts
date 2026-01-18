@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { requireAuth } from "@/lib/auth-server"
 import { seoService } from "@/lib/services/seo.service"
+import { seoPageSchema } from "@/lib/validators/seo.validators"
 
 export async function GET(request: Request, { params }: { params: Promise<{ pageKey: string }> }) {
   try {
@@ -28,7 +29,16 @@ export async function PUT(request: Request, { params }: { params: Promise<{ page
     const { pageKey } = await params
     const body = await request.json()
 
-    const updatedPage = await seoService.updatePageSEO(pageKey, body)
+    // Validate input
+    const validation = seoPageSchema.safeParse({ ...body, pageKey })
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: "Validation failed", details: validation.error.errors },
+        { status: 400 }
+      )
+    }
+
+    const updatedPage = await seoService.updatePageSEO(pageKey, validation.data)
 
     // Recalculate health score
     await seoService.calculateHealthScore(pageKey)
