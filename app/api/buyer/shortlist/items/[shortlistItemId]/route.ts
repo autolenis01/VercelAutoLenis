@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { ShortlistService } from "@/lib/services/shortlist.service"
 
 // DELETE - Remove specific shortlist item by ID
-export async function DELETE(request: Request, { params }: { params: Promise<{ shortlistItemId: string }> }) {
+export async function DELETE(_request: Request, { params }: { params: Promise<{ shortlistItemId: string }> }) {
   try {
     const session = await requireAuth(["BUYER"])
     const { shortlistItemId } = await params
