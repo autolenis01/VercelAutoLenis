@@ -1,12 +1,16 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import "@fontsource/geist/400.css"
+import "@fontsource/geist/500.css"
+import "@fontsource/geist/600.css"
+import "@fontsource/geist/700.css"
+import "@fontsource/geist-mono/400.css"
+import "@fontsource/geist-mono/500.css"
+import "@fontsource/geist-mono/600.css"
+import "@fontsource/geist-mono/700.css"
 import "./globals.css"
 import { SkipLink } from "@/components/skip-link"
 import "@/lib/monitoring"
-
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://autolenis.com"),

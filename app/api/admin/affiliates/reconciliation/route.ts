@@ -4,7 +4,7 @@ import { requireAuth } from "@/lib/auth-server"
 import { affiliateService } from "@/lib/services/affiliate.service"
 
 // GET - View reconciliation logs
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const session = await requireAuth()
     if (!session || session.role !== "ADMIN") {
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 }
 
 // POST - Trigger manual reconciliation
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const session = await requireAuth()
     if (!session || session.role !== "ADMIN") {
