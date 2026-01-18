@@ -13,6 +13,7 @@ jobs:
     env:
       PRISMA_CHECKPOINT_DISABLE: "1"
       PRISMA_DISABLE_TELEMETRY: "1"
+      POSTGRES_PRISMA_URL: postgresql://user:password@localhost:5432/placeholder?schema=public
     
     steps:
       - name: Checkout code
@@ -28,22 +29,14 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        env:
-          # Prisma generate runs in postinstall with placeholder URL fallback
-          POSTGRES_PRISMA_URL: postgresql://user:password@localhost:5432/placeholder?schema=public
 
       - name: Verify Prisma schema is valid
         run: |
           echo "Validating Prisma schema..."
           pnpm prisma validate
-        env:
-          POSTGRES_PRISMA_URL: postgresql://user:password@localhost:5432/placeholder?schema=public
 
       - name: Build application
         run: pnpm build
-        env:
-          # Prisma generate already ran in postinstall
-          POSTGRES_PRISMA_URL: postgresql://user:password@localhost:5432/placeholder?schema=public
 
       - name: Verify security patches
         run: |
