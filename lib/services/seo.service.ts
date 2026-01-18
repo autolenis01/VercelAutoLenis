@@ -46,7 +46,7 @@ export class SEOService {
   async getPageSEO(pageKey: string): Promise<SEOPageData | null> {
     const supabase = this.getSupabase()
     const { data, error } = await supabase
-      .from("SeoPages")
+      .from("seo_pages")
       .select(
         "id, pageKey, title, description, keywords, canonicalUrl, ogTitle, ogDescription, ogImageUrl, robotsRule, indexable, updatedAt",
       )
@@ -65,11 +65,11 @@ export class SEOService {
     const supabase = this.getSupabase()
 
     // Try to update first
-    const { data: existing } = await supabase.from("SeoPages").select("id").eq("pageKey", pageKey).maybeSingle()
+    const { data: existing } = await supabase.from("seo_pages").select("id").eq("pageKey", pageKey).maybeSingle()
 
     if (existing) {
       const { data: updated, error } = await supabase
-        .from("SeoPages")
+        .from("seo_pages")
         .update({ ...data, updatedAt: new Date().toISOString() })
         .eq("pageKey", pageKey)
         .select()
@@ -82,7 +82,7 @@ export class SEOService {
       return updated
     } else {
       const { data: created, error } = await supabase
-        .from("SeoPages")
+        .from("seo_pages")
         .insert({ pageKey, ...data })
         .select()
         .single()
@@ -99,7 +99,7 @@ export class SEOService {
   async getAllPages(): Promise<SEOPageData[]> {
     const supabase = this.getSupabase()
     const { data, error } = await supabase
-      .from("SeoPages")
+      .from("seo_pages")
       .select(
         "id, pageKey, title, description, keywords, canonicalUrl, ogTitle, ogDescription, ogImageUrl, robotsRule, indexable, updatedAt",
       )
@@ -116,7 +116,7 @@ export class SEOService {
   async getPageSchema(pageKey: string): Promise<SEOSchema[]> {
     const supabase = this.getSupabase()
     const { data, error } = await supabase
-      .from("SeoSchema")
+      .from("seo_schema")
       .select("id, pageKey, schemaType, schemaJson")
       .eq("pageKey", pageKey)
 
@@ -136,7 +136,7 @@ export class SEOService {
     const supabase = this.getSupabase()
 
     const { data: existing } = await supabase
-      .from("SeoSchema")
+      .from("seo_schema")
       .select("id")
       .eq("pageKey", pageKey)
       .eq("schemaType", schemaType)
@@ -144,7 +144,7 @@ export class SEOService {
 
     if (existing) {
       const { data: updated, error } = await supabase
-        .from("SeoSchema")
+        .from("seo_schema")
         .update({ schemaJson, updatedAt: new Date().toISOString() })
         .eq("pageKey", pageKey)
         .eq("schemaType", schemaType)
@@ -158,7 +158,7 @@ export class SEOService {
       return updated
     } else {
       const { data: created, error } = await supabase
-        .from("SeoSchema")
+        .from("seo_schema")
         .insert({ pageKey, schemaType, schemaJson })
         .select()
         .single()
@@ -174,7 +174,7 @@ export class SEOService {
   // Delete schema
   async deletePageSchema(id: string): Promise<void> {
     const supabase = this.getSupabase()
-    const { error } = await supabase.from("SeoSchema").delete().eq("id", id)
+    const { error } = await supabase.from("seo_schema").delete().eq("id", id)
 
     if (error) {
       console.error("[SEO] Error deleting page schema:", error)
@@ -185,7 +185,7 @@ export class SEOService {
   async getPageHealth(pageKey: string): Promise<SEOHealth | null> {
     const supabase = this.getSupabase()
     const { data, error } = await supabase
-      .from("SeoHealth")
+      .from("seo_health")
       .select("pageKey, score, issuesJson, lastScanAt")
       .eq("pageKey", pageKey)
       .maybeSingle()
@@ -269,12 +269,12 @@ export class SEOService {
       lastScanAt: new Date().toISOString(),
     }
 
-    const { data: existing } = await supabase.from("SeoHealth").select("id").eq("pageKey", pageKey).maybeSingle()
+    const { data: existing } = await supabase.from("seo_health").select("id").eq("pageKey", pageKey).maybeSingle()
 
     let result
     if (existing) {
       const { data, error } = await supabase
-        .from("SeoHealth")
+        .from("seo_health")
         .update(healthData)
         .eq("pageKey", pageKey)
         .select()
@@ -287,7 +287,7 @@ export class SEOService {
       result = data
     } else {
       const { data, error } = await supabase
-        .from("SeoHealth")
+        .from("seo_health")
         .insert({ pageKey, ...healthData })
         .select()
         .single()
@@ -311,7 +311,7 @@ export class SEOService {
   async getPageKeywords(pageKey: string): Promise<SEOKeywords | null> {
     const supabase = this.getSupabase()
     const { data, error } = await supabase
-      .from("SeoKeywords")
+      .from("seo_keywords")
       .select("pageKey, primaryKeyword, secondaryKeywords, targetDensity, actualDensity")
       .eq("pageKey", pageKey)
       .maybeSingle()
@@ -336,12 +336,12 @@ export class SEOService {
   async updatePageKeywords(pageKey: string, data: Partial<SEOKeywords>): Promise<SEOKeywords | null> {
     const supabase = this.getSupabase()
 
-    const { data: existing } = await supabase.from("SeoKeywords").select("id").eq("pageKey", pageKey).maybeSingle()
+    const { data: existing } = await supabase.from("seo_keywords").select("id").eq("pageKey", pageKey).maybeSingle()
 
     let result
     if (existing) {
       const { data: updated, error } = await supabase
-        .from("SeoKeywords")
+        .from("seo_keywords")
         .update({ ...data, updatedAt: new Date().toISOString() })
         .eq("pageKey", pageKey)
         .select()
@@ -354,7 +354,7 @@ export class SEOService {
       result = updated
     } else {
       const { data: created, error } = await supabase
-        .from("SeoKeywords")
+        .from("seo_keywords")
         .insert({ pageKey, ...data })
         .select()
         .single()
@@ -381,7 +381,7 @@ export class SEOService {
 
     const supabase = this.getSupabase()
     const { data: healthRecords, error } = await supabase
-      .from("SeoHealth")
+      .from("seo_health")
       .select("pageKey, score, issuesJson, lastScanAt")
 
     if (error) {
@@ -413,62 +413,68 @@ export class SEOService {
 
   // Generate sitemap data
   async generateSitemap() {
-    const supabase = this.getSupabase()
-    const { data: pages, error } = await supabase
-      .from("SeoPages")
-      .select("pageKey, canonicalUrl, updatedAt")
-      .eq("indexable", true)
+    try {
+      const supabase = this.getSupabase()
+      const { data: pages, error } = await supabase
+        .from("seo_pages")
+        .select("pageKey, canonicalUrl, updatedAt")
+        .eq("indexable", true)
 
-    if (error) {
-      console.error("[SEO] Error generating sitemap:", error)
-      // Return default pages if database query fails
       const baseUrl = process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"
-      return [
-        { loc: baseUrl, lastmod: new Date().toISOString().split("T")[0], changefreq: "weekly", priority: "1.0" },
-        {
-          loc: `${baseUrl}/about`,
-          lastmod: new Date().toISOString().split("T")[0],
-          changefreq: "monthly",
-          priority: "0.8",
-        },
-        {
-          loc: `${baseUrl}/contact`,
-          lastmod: new Date().toISOString().split("T")[0],
-          changefreq: "monthly",
-          priority: "0.7",
-        },
-      ]
+
+      if (error) {
+        console.error("[SEO] Error generating sitemap (returning fallback):", error)
+        // Return default pages if database query fails
+        return [
+          { loc: baseUrl, lastmod: new Date().toISOString().split("T")[0], changefreq: "weekly", priority: "1.0" },
+          {
+            loc: `${baseUrl}/about`,
+            lastmod: new Date().toISOString().split("T")[0],
+            changefreq: "monthly",
+            priority: "0.8",
+          },
+          {
+            loc: `${baseUrl}/contact`,
+            lastmod: new Date().toISOString().split("T")[0],
+            changefreq: "monthly",
+            priority: "0.7",
+          },
+        ]
+      }
+
+      if (!pages || pages.length === 0) {
+        // Return default sitemap entries if no SEO pages configured
+        return [
+          { loc: baseUrl, lastmod: new Date().toISOString().split("T")[0], changefreq: "weekly", priority: "1.0" },
+          {
+            loc: `${baseUrl}/about`,
+            lastmod: new Date().toISOString().split("T")[0],
+            changefreq: "monthly",
+            priority: "0.8",
+          },
+          {
+            loc: `${baseUrl}/contact`,
+            lastmod: new Date().toISOString().split("T")[0],
+            changefreq: "monthly",
+            priority: "0.7",
+          },
+        ]
+      }
+
+      const urls = pages.map((page) => ({
+        loc: page.canonicalUrl || `${baseUrl}/${page.pageKey === "home" ? "" : page.pageKey}`,
+        lastmod: new Date(page.updatedAt).toISOString().split("T")[0],
+        changefreq: "weekly",
+        priority: page.pageKey === "home" ? "1.0" : "0.8",
+      }))
+
+      return urls
+    } catch (err) {
+      // Defensive: never throw from sitemap generation
+      console.error("[SEO] Unexpected error in generateSitemap (returning minimal fallback):", err)
+      const baseUrl = process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"
+      return [{ loc: baseUrl, lastmod: new Date().toISOString().split("T")[0], changefreq: "weekly", priority: "1.0" }]
     }
-
-    const baseUrl = process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"
-
-    if (!pages || pages.length === 0) {
-      // Return default sitemap entries if no SEO pages configured
-      return [
-        { loc: baseUrl, lastmod: new Date().toISOString().split("T")[0], changefreq: "weekly", priority: "1.0" },
-        {
-          loc: `${baseUrl}/about`,
-          lastmod: new Date().toISOString().split("T")[0],
-          changefreq: "monthly",
-          priority: "0.8",
-        },
-        {
-          loc: `${baseUrl}/contact`,
-          lastmod: new Date().toISOString().split("T")[0],
-          changefreq: "monthly",
-          priority: "0.7",
-        },
-      ]
-    }
-
-    const urls = pages.map((page) => ({
-      loc: page.canonicalUrl || `${baseUrl}/${page.pageKey === "home" ? "" : page.pageKey}`,
-      lastmod: new Date(page.updatedAt).toISOString().split("T")[0],
-      changefreq: "weekly",
-      priority: page.pageKey === "home" ? "1.0" : "0.8",
-    }))
-
-    return urls
   }
 
   // Generate robots.txt rules
