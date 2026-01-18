@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { dealId } = await req.json()
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // Get the deal
     const { data: deal, error: dealError } = await supabase

@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { affiliateService } from "@/lib/services/affiliate.service"
 import { validateCronRequest } from "@/lib/middleware/cron-security"
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const securityCheck = await validateCronRequest(request)
     if (securityCheck) {
@@ -22,6 +22,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   return GET(request)
 }

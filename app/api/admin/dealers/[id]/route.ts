@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 
 export const dynamic = "force-dynamic"
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await getSessionUser()
     if (!user || user.role !== "ADMIN") {
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const { id } = await params
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const [dealerResult, inventoryResult, offersResult, dealsResult] = await Promise.all([
       supabase.from("Dealer").select("*").eq("id", id).single(),

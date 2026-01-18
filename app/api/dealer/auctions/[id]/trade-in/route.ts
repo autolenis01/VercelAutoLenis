@@ -3,7 +3,7 @@ import { getSessionUser } from "@/lib/auth-server"
 import { createAdminClient } from "@/lib/supabase/admin"
 
 // GET - Dealer fetches trade-in info for an auction (read-only)
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: auctionId } = await params
     const user = await getSessionUser()

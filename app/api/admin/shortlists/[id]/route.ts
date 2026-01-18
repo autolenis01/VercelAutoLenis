@@ -3,7 +3,7 @@ import { requireAuth } from "@/lib/auth-server"
 import { ShortlistService } from "@/lib/services/shortlist.service"
 
 // GET - Admin: Get single shortlist detail
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAuth(["ADMIN"])
     const { id } = await params

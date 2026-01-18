@@ -6,7 +6,7 @@ import { affiliateService } from "@/lib/services/affiliate.service"
 export const dynamic = "force-dynamic"
 
 // GET - List payouts for an affiliate
-export async function GET(request: NextRequest, { params }: { params: Promise<{ affiliateId: string }> }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ affiliateId: string }> }) {
   try {
     const session = await requireAuth()
     if (!session || session.role !== "ADMIN") {
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 // POST - Create a new payout for an affiliate
-export async function POST(request: NextRequest, { params }: { params: Promise<{ affiliateId: string }> }) {
+export async function POST(_request: NextRequest, { params }: { params: Promise<{ affiliateId: string }> }) {
   try {
     const session = await requireAuth()
     if (!session || session.role !== "ADMIN") {
