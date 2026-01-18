@@ -5,7 +5,7 @@ import { dealerService } from "@/lib/services/dealer.service"
 export const dynamic = "force-dynamic"
 
 // Get submitted offers
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || !["DEALER", "DEALER_USER"].includes(user.role)) {

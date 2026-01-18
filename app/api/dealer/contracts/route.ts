@@ -5,7 +5,7 @@ import { supabase, isDatabaseConfigured } from "@/lib/db"
 export const dynamic = "force-dynamic"
 
 // Get contracts
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || !["DEALER", "DEALER_USER"].includes(user.role)) {
