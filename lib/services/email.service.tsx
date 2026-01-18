@@ -55,56 +55,86 @@ export class EmailService {
   }
 
   private async sendViaResend(options: EmailOptions & { from: string }) {
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: options.from,
-        to: options.to,
-        subject: options.subject,
-        html: options.html,
-        text: options.text,
-        reply_to: options.replyTo,
-      }),
-    })
+    // Add timeout to prevent hanging on firewall blocks
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
 
-    if (!response.ok) {
-      const error = await response.text()
-      throw new Error(`Resend API error: ${error}`)
+    try {
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: options.from,
+          to: options.to,
+          subject: options.subject,
+          html: options.html,
+          text: options.text,
+          reply_to: options.replyTo,
+        }),
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        const error = await response.text()
+        throw new Error(`Resend API error: ${error}`)
+      }
+
+      const data = await response.json()
+      return { success: true, messageId: data.id }
+    } catch (error: any) {
+      clearTimeout(timeoutId)
+      if (error.name === 'AbortError') {
+        throw new Error('Resend API request timed out - possible firewall block')
+      }
+      throw error
     }
-
-    const data = await response.json()
-    return { success: true, messageId: data.id }
   }
 
   private async sendViaSendGrid(options: EmailOptions & { from: string }) {
-    const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${SENDGRID_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        personalizations: [{ to: [{ email: options.to }] }],
-        from: { email: FROM_EMAIL, name: FROM_NAME },
-        subject: options.subject,
-        content: [
-          { type: "text/plain", value: options.text || options.html.replace(/<[^>]*>/g, "") },
-          { type: "text/html", value: options.html },
-        ],
-        reply_to: options.replyTo ? { email: options.replyTo } : undefined,
-      }),
-    })
+    // Add timeout to prevent hanging on firewall blocks
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
 
-    if (!response.ok) {
-      const error = await response.text()
-      throw new Error(`SendGrid API error: ${error}`)
+    try {
+      const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${SENDGRID_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          personalizations: [{ to: [{ email: options.to }] }],
+          from: { email: FROM_EMAIL, name: FROM_NAME },
+          subject: options.subject,
+          content: [
+            { type: "text/plain", value: options.text || options.html.replace(/<[^>]*>/g, "") },
+            { type: "text/html", value: options.html },
+          ],
+          reply_to: options.replyTo ? { email: options.replyTo } : undefined,
+        }),
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        const error = await response.text()
+        throw new Error(`SendGrid API error: ${error}`)
+      }
+
+      return { success: true, messageId: response.headers.get("x-message-id") || undefined }
+    } catch (error: any) {
+      clearTimeout(timeoutId)
+      if (error.name === 'AbortError') {
+        throw new Error('SendGrid API request timed out - possible firewall block')
+      }
+      throw error
     }
-
-    return { success: true, messageId: response.headers.get("x-message-id") || undefined }
   }
 
   // ============================================
