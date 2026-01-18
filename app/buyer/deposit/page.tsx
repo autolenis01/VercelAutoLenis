@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import { DollarSign, CheckCircle2, ArrowLeft, CreditCard, Shield, Info } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -14,7 +13,6 @@ export default function BuyerDepositPage() {
   const [depositStatus, setDepositStatus] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
-  const router = useRouter()
   const { toast } = useToast()
 
   useEffect(() => {
