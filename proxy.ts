@@ -2,7 +2,213 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { verifySessionEdge } from "@/lib/auth-edge"
 
+// In-memory cache for redirects with TTL
+interface RedirectCacheEntry {
+  redirects: Array<{
+    id: string
+    fromPath: string
+    toPath: string
+    statusCode: number
+    isWildcard: boolean
+  }>
+  timestamp: number
+}
+
+let redirectCache: RedirectCacheEntry | null = null
+const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+
+/**
+ * Fetch redirects from database with caching
+ */
+async function getRedirects(request: NextRequest) {
+  const now = Date.now()
+
+  // Return cached redirects if still valid
+  if (redirectCache && now - redirectCache.timestamp < CACHE_TTL) {
+    return redirectCache.redirects
+  }
+
+  try {
+    // Fetch from API
+    const apiUrl = `${request.nextUrl.origin}/api/seo/redirects`
+
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      // Use short timeout to avoid blocking middleware
+      signal: AbortSignal.timeout(2000),
+    })
+
+    if (!response.ok) {
+      console.error("[Proxy] Failed to fetch redirects:", response.status)
+      return []
+    }
+
+    const data = await response.json()
+    const redirects = data.redirects || []
+
+    // Update cache
+    redirectCache = {
+      redirects,
+      timestamp: now,
+    }
+
+    return redirects
+  } catch (error) {
+    console.error("[Proxy] Error fetching redirects:", error)
+    // Return cached redirects even if expired, better than nothing
+    return redirectCache?.redirects || []
+  }
+}
+
+/**
+ * Match a path against a wildcard pattern
+ * Supports: /path/* and /path/:param
+ */
+function matchWildcard(pattern: string, path: string): { match: boolean } {
+  // Exact match
+  if (pattern === path) {
+    return { match: true }
+  }
+
+  // Wildcard match: /path/*
+  if (pattern.endsWith("/*")) {
+    const basePattern = pattern.slice(0, -2)
+    if (path.startsWith(basePattern)) {
+      return { match: true }
+    }
+  }
+
+  // Parameter match: /path/:param
+  if (pattern.includes(":")) {
+    const patternParts = pattern.split("/")
+    const pathParts = path.split("/")
+
+    if (patternParts.length !== pathParts.length) {
+      return { match: false }
+    }
+
+    let matches = true
+
+    for (let i = 0; i < patternParts.length; i++) {
+      const patternPart = patternParts[i]
+      const pathPart = pathParts[i]
+
+      if (patternPart.startsWith(":")) {
+        // Capture parameter - continue
+        continue
+      } else if (patternPart !== pathPart) {
+        matches = false
+        break
+      }
+    }
+
+    return { match: matches }
+  }
+
+  return { match: false }
+}
+
+/**
+ * Find matching redirect for a given path
+ */
+function findRedirect(
+  path: string,
+  redirects: Array<{
+    id: string
+    fromPath: string
+    toPath: string
+    statusCode: number
+    isWildcard: boolean
+  }>
+): { toPath: string; statusCode: number } | null {
+  for (const redirect of redirects) {
+    if (redirect.isWildcard) {
+      const { match } = matchWildcard(redirect.fromPath, path)
+      if (match) {
+        // For wildcard redirects, preserve the suffix
+        let toPath = redirect.toPath
+        if (redirect.fromPath.endsWith("/*") && redirect.toPath.endsWith("/*")) {
+          const suffix = path.slice(redirect.fromPath.length - 2)
+          toPath = redirect.toPath.slice(0, -2) + suffix
+        }
+        return { toPath, statusCode: redirect.statusCode }
+      }
+    } else {
+      // Exact match
+      if (redirect.fromPath === path) {
+        return { toPath: redirect.toPath, statusCode: redirect.statusCode }
+      }
+    }
+  }
+
+  return null
+}
+
+/**
+ * Detect redirect loops
+ */
+const redirectHistory = new Map<string, number>()
+const MAX_REDIRECT_CHAIN = 5
+
+function hasRedirectLoop(path: string): boolean {
+  const count = redirectHistory.get(path) || 0
+  if (count >= MAX_REDIRECT_CHAIN) {
+    return true
+  }
+  redirectHistory.set(path, count + 1)
+
+  // Clear old entries after some time to prevent memory leaks
+  setTimeout(() => {
+    redirectHistory.delete(path)
+  }, 60000) // 1 minute
+
+  return false
+}
+
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // Check for SEO redirects first (before any other logic)
+  // Skip for static files, API routes, and special Next.js paths
+  if (
+    !pathname.startsWith("/_next/") &&
+    !pathname.startsWith("/api/") &&
+    !pathname.startsWith("/static/") &&
+    !pathname.includes(".") // Files with extensions
+  ) {
+    try {
+      // Check for redirect loops
+      if (!hasRedirectLoop(pathname)) {
+        // Get redirects from cache or database
+        const redirects = await getRedirects(request)
+
+        // Find matching redirect
+        const redirect = findRedirect(pathname, redirects)
+
+        if (redirect) {
+          const { toPath, statusCode } = redirect
+
+          // Build the redirect URL
+          // Check if toPath is a full URL or relative path
+          if (toPath.startsWith("http")) {
+            return NextResponse.redirect(toPath, statusCode)
+          } else {
+            const url = request.nextUrl.clone()
+            url.pathname = toPath
+            return NextResponse.redirect(url, statusCode)
+          }
+        }
+      }
+    } catch (error) {
+      console.error("[Proxy] Error processing redirects:", error)
+      // Continue to the rest of the proxy logic on error
+    }
+  }
+
+  // Original affiliate ref logic
   const ref = request.nextUrl.searchParams.get("ref")
   if (ref && request.nextUrl.pathname === "/") {
     const response = NextResponse.next()
@@ -23,7 +229,6 @@ export async function proxy(request: NextRequest) {
     return response
   }
 
-  const { pathname } = request.nextUrl
   const hostname = request.headers.get("host") || ""
 
   if (hostname.startsWith("admin.") && !pathname.startsWith("/admin")) {

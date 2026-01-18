@@ -6,7 +6,7 @@ import { seoService } from "@/lib/services/seo.service"
  * POST /api/admin/seo/audit
  * Run a complete SEO audit
  */
-export async function POST(request: Request) {
+export async function POST() {
   try {
     const user = await requireAuth(["ADMIN"])
     if (!user) {

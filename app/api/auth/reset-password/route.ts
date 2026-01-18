@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, message: result.message })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ success: false, error: error.errors[0].message }, { status: 400 })
+      return NextResponse.json({ success: false, error: error.errors[0]?.message || "Validation error" }, { status: 400 })
     }
 
     console.error("[ResetPassword] Error:", error)
