@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getCurrentUser } from "@/lib/auth-server"
 import { pickupService } from "@/lib/services/pickup.service"
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await getCurrentUser()
     if (!user || user.role !== "DEALER") {

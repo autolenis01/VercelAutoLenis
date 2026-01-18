@@ -5,7 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 export const dynamic = "force-dynamic"
 
 // Get buyer's contract shield status and documents
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user || user.role !== "BUYER") {

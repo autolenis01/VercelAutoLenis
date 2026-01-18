@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const limit = 20
     const skip = (page - 1) * limit
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const [tradeInsResult, countResult] = await Promise.all([
       supabase

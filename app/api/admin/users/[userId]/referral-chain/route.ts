@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { requireAuth } from "@/lib/auth-server"
 import { affiliateService } from "@/lib/services/affiliate.service"
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   try {
     const session = await requireAuth()
     if (!session || session.role !== "ADMIN") {

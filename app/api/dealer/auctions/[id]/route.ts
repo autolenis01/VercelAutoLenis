@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic"
 
 const RESERVED_SEGMENTS = ["offers", "invited", "loading", "settings", "undefined"]
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: auctionId } = await params
 

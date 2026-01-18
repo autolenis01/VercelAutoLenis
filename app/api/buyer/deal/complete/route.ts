@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { dealId } = await req.json()
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // Get the deal
     const { data: deal, error: dealError } = await supabase
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
         ? {
             id: affiliate.id,
             referralCode: affiliate.refCode || affiliate.referralCode,
-            referralLink: `${process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"}/ref/${affiliate.refCode || affiliate.referralCode}`,
+            referralLink: `${process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"}/ref/${affiliate.refCode || affiliate.referralCode}`,
           }
         : null,
       commissionsProcessed: commissions.length,

@@ -4,7 +4,7 @@ import { PaymentService } from "@/lib/services/payment.service"
 
 export const dynamic = "force-dynamic"
 
-export async function GET(request: Request, { params }: { params: Promise<{ dealId: string }> }) {
+export async function GET(_request: Request, { params }: { params: Promise<{ dealId: string }> }) {
   try {
     await requireAuth(["BUYER"])
     const { dealId } = await params

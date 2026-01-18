@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { InsuranceService } from "@/lib/services/insurance.service"
 
-export async function GET(request: Request, { params }: { params: Promise<{ dealId: string }> }) {
+export async function GET(_request: Request, { params }: { params: Promise<{ dealId: string }> }) {
   try {
     const { dealId } = await params
     const quotes = await InsuranceService.getQuotes(dealId)
