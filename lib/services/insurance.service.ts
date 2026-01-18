@@ -67,7 +67,7 @@ interface BindPolicyResponse {
 class MockInsuranceProvider implements InsuranceProviderAdapter {
   name = "AutoLenis Partner Network"
 
-  async requestQuotes(input: QuoteRequestInput): Promise<ProviderQuoteResponse[]> {
+  async requestQuotes(_input: QuoteRequestInput): Promise<ProviderQuoteResponse[]> {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 800))
 

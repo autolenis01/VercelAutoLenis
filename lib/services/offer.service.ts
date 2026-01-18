@@ -240,6 +240,15 @@ export class OfferService {
     if (feeBreakdown.add_ons) {
       for (let i = 0; i < feeBreakdown.add_ons.length; i++) {
         const addon = feeBreakdown.add_ons[i]
+        if (!addon) {
+          errors.push({
+            code: "INVALID_FINANCING_OPTION",
+            message: "Add-on entry is missing",
+            field: `fee_breakdown.add_ons[${i}]`,
+            severity: "error",
+          })
+          continue
+        }
         if (addon.amount_cents < 0) {
           errors.push({
             code: "NEGATIVE_FEE",
@@ -295,6 +304,16 @@ export class OfferService {
 
     for (let i = 0; i < options.length; i++) {
       const opt = options[i]
+
+      if (!opt) {
+        errors.push({
+          code: "INVALID_FINANCING_OPTION",
+          message: `Financing option ${i + 1} is missing`,
+          field: `financing_options[${i}]`,
+          severity: "error",
+        })
+        continue
+      }
 
       if (!opt.lender_name || opt.lender_name.trim() === "") {
         errors.push({
@@ -642,7 +661,7 @@ export class OfferService {
     const dealerMap = new Map(dealers.map((d: any) => [d.id, d]))
 
     return offers.map((offer: any) => {
-      const dealer = offer.dealer_id ? dealerMap.get(offer.dealer_id) : null
+      const dealer = offer.dealer_id ? (dealerMap.get(offer.dealer_id) as any) : null
       return {
         id: offer.id,
         dealerId: offer.dealer_id,

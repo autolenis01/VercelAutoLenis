@@ -206,7 +206,7 @@ export class SEOService {
   }
 
   // Calculate and update SEO health score
-  async calculateHealthScore(pageKey: string, pageContent?: string): Promise<SEOHealth | null> {
+  async calculateHealthScore(pageKey: string, _pageContent?: string): Promise<SEOHealth | null> {
     const seoData = await this.getPageSEO(pageKey)
     const keywords = await this.getPageKeywords(pageKey)
 
