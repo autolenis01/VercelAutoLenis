@@ -148,28 +148,37 @@ function findRedirect(
 }
 
 /**
- * Detect redirect loops
+ * Detect redirect loops with per-request tracking
  */
-const redirectHistory = new Map<string, number>()
-const MAX_REDIRECT_CHAIN = 5
-
-function hasRedirectLoop(path: string): boolean {
-  const count = redirectHistory.get(path) || 0
+function hasRedirectLoop(path: string, requestId: string): boolean {
+  const key = `${requestId}:${path}`
+  const count = redirectHistory.get(key) || 0
+  
   if (count >= MAX_REDIRECT_CHAIN) {
+    // Clean up this request's history
+    for (const [k] of redirectHistory) {
+      if (k.startsWith(`${requestId}:`)) {
+        redirectHistory.delete(k)
+      }
+    }
     return true
   }
-  redirectHistory.set(path, count + 1)
-
-  // Clear old entries after some time to prevent memory leaks
+  
+  redirectHistory.set(key, count + 1)
+  
+  // Clean up this request's history after 1 minute to prevent memory leaks
   setTimeout(() => {
-    redirectHistory.delete(path)
-  }, 60000) // 1 minute
+    redirectHistory.delete(key)
+  }, 60000)
 
   return false
 }
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+  
+  // Generate unique request ID for loop tracking
+  const requestId = crypto.randomUUID()
 
   // Check for SEO redirects first (before any other logic)
   // Skip for static files, API routes, and special Next.js paths
@@ -180,8 +189,8 @@ export async function proxy(request: NextRequest) {
     !pathname.includes(".") // Files with extensions
   ) {
     try {
-      // Check for redirect loops
-      if (!hasRedirectLoop(pathname)) {
+      // Check for redirect loops with per-request tracking
+      if (!hasRedirectLoop(pathname, requestId)) {
         // Get redirects from cache or database
         const redirects = await getRedirects(request)
 
