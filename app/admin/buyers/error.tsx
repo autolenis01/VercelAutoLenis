@@ -1,10 +1,11 @@
 "use client"
 
+import Link from "next/link"
 import { useEffect } from "react"
+import { AlertCircle } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertCircle } from "lucide-react"
-import Link from "next/link"
 
 export default function Error({
   error,
@@ -18,16 +19,14 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="max-w-md w-full">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
             <AlertCircle className="h-6 w-6 text-destructive" />
           </div>
           <CardTitle>Something went wrong</CardTitle>
-          <CardDescription>
-            We encountered an error while loading this page. Please try again.
-          </CardDescription>
+          <CardDescription>We couldn&apos;t load buyers. Please try again.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           <Button onClick={reset} className="w-full">

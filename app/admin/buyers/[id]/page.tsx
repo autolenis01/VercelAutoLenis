@@ -1,502 +1,349 @@
 "use client"
 
 import { use } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, User, CreditCard, Gavel, Car, DollarSign, Users } from "lucide-react"
-import useSWR from "swr"
 import Link from "next/link"
+import useSWR from "swr"
+import { BadgeCheck, FileText, UserRound } from "lucide-react"
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+import { ActivityTimeline } from "@/components/dashboard/activity-timeline"
+import { DetailShell } from "@/components/dashboard/detail-shell"
+import { EmptyState } from "@/components/dashboard/empty-state"
+import { ErrorState } from "@/components/dashboard/error-state"
+import { KeyValueGrid } from "@/components/dashboard/key-value-grid"
+import { LoadingSkeleton } from "@/components/dashboard/loading-skeleton"
+import { PageHeader } from "@/components/dashboard/page-header"
+import { StatusPill } from "@/components/dashboard/status-pill"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
-export default function AdminBuyerDetailPage({ params }: { params: Promise<{ id: string }> }) {
+type BuyerRecord = {
+  id?: string
+  firstName?: string
+  lastName?: string
+  name?: string
+  email?: string
+  phone?: string
+  status?: string
+  onboardingStep?: string
+  createdAt?: string
+  lastActive?: string
+  requests?: { id: string; type?: string; status?: string; createdAt?: string }[]
+  documents?: { id: string; name?: string; uploadedAt?: string }[]
+  payments?: { id: string; amount?: number; status?: string; createdAt?: string }[]
+  activity?: { id: string; title: string; description?: string; timestamp: string; type?: string }[]
+}
+
+const fetcher = async (url: string) => {
+  const res = await fetch(url)
+  const payload = await res.json().catch(() => ({}))
+  return { payload, status: res.status }
+}
+
+const formatDate = (value?: string) => {
+  if (!value) return "Not available"
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return "Not available"
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
+}
+
+const displayName = (buyer?: BuyerRecord) => {
+  if (!buyer) return "Not available"
+  if (buyer.name) return buyer.name
+  if (buyer.firstName || buyer.lastName) return [buyer.firstName, buyer.lastName].filter(Boolean).join(" ")
+  return "Not available"
+}
+
+export default function BuyerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  const { data, error, isLoading } = useSWR(`/api/admin/buyers/${id}`, fetcher)
+  const { data, error, isLoading, mutate } = useSWR(`/api/admin/buyers/${id}`, fetcher)
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    })
-  }
+  const payload = (data?.payload as { buyer?: BuyerRecord }) || {}
+  const buyer = payload.buyer || (payload as BuyerRecord | undefined)
+  const statusCode = data?.status
+  const unauthorized = statusCode === 401 || statusCode === 403
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount)
-  }
+  const summary = buyer
+    ? [
+        { label: "ID", value: buyer.id || "Not available" },
+        { label: "Full name", value: displayName(buyer) },
+        { label: "Email", value: buyer.email || "Not available" },
+        { label: "Phone", value: buyer.phone || "Not available" },
+        {
+          label: "Status",
+          value: buyer.status ? (
+            <StatusPill status={(buyer.status.toLowerCase() as any) || "pending"} />
+          ) : (
+            <Badge variant="outline">Not available</Badge>
+          ),
+        },
+        { label: "Onboarding step", value: buyer.onboardingStep || "Not available" },
+        { label: "Created", value: formatDate(buyer.createdAt) },
+        { label: "Last active", value: formatDate(buyer.lastActive) },
+      ]
+    : []
 
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/buyers">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
-          <div className="h-8 w-48 bg-gray-200 animate-pulse rounded" />
-        </div>
-        <div className="grid gap-6 lg:grid-cols-3">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="pt-6">
-                <div className="h-24 bg-gray-100 rounded" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <PageHeader
+          title="Buyer details"
+          breadcrumb={[
+            { label: "Admin", href: "/admin/dashboard" },
+            { label: "Buyers", href: "/admin/buyers" },
+            { label: "Loading" },
+          ]}
+        />
+        <LoadingSkeleton variant="detail" />
       </div>
     )
   }
 
-  if (error || !data) {
+  if (unauthorized) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/buyers">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold">Buyer Not Found</h1>
-        </div>
-        <p className="text-gray-500">The buyer you are looking for does not exist.</p>
+        <PageHeader
+          title="Buyer details"
+          breadcrumb={[
+            { label: "Admin", href: "/admin/dashboard" },
+            { label: "Buyers", href: "/admin/buyers" },
+            { label: "Access" },
+          ]}
+        />
+        <ErrorState message="Admin access required. Please sign in with an admin account." onRetry={mutate} />
       </div>
     )
   }
 
-  const buyer = data.buyer
-  const profile = buyer?.buyer?.profile
-  const preQual = buyer?.buyer?.preQualification
-  const auctions = buyer?.buyer?.auctions || []
-  const deals = buyer?.buyer?.selectedDeals || []
-  const affiliate = buyer?.affiliate
+  if (error || !buyer) {
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title="Buyer details"
+          breadcrumb={[
+            { label: "Admin", href: "/admin/dashboard" },
+            { label: "Buyers", href: "/admin/buyers" },
+            { label: "Not found" },
+          ]}
+        />
+        <Card>
+          <CardContent className="flex flex-col items-start gap-4 py-10">
+            <div>
+              <h3 className="text-xl font-semibold">Record not found</h3>
+              <p className="text-muted-foreground">We couldn&apos;t find this buyer.</p>
+            </div>
+            <Button asChild>
+              <Link href="/admin/buyers">Back to list</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  const requests = buyer.requests || []
+  const documents = buyer.documents || []
+  const payments = buyer.payments || []
+  const activity =
+    ((buyer.activity || []).map((item) => {
+      const timestamp = item.timestamp ? new Date(item.timestamp) : new Date()
+      if (Number.isNaN(timestamp.getTime())) return null
+      return {
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        timestamp,
+        type: (item.type as any) || "default",
+      }
+    }) as any[]).filter(Boolean) || []
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/buyers">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {profile?.firstName || buyer?.first_name || "Unknown"} {profile?.lastName || buyer?.last_name || ""}
-            </h1>
-            <p className="text-gray-500">{buyer?.email}</p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50 bg-transparent">
-            Disable Account
+      <PageHeader
+        title={displayName(buyer)}
+        subtitle={buyer.email || "Buyer details"}
+        breadcrumb={[
+          { label: "Admin", href: "/admin/dashboard" },
+          { label: "Buyers", href: "/admin/buyers" },
+          { label: buyer.id || "Details" },
+        ]}
+        primaryAction={
+          <Button variant="outline" asChild>
+            <Link href="/admin/buyers">Back to list</Link>
           </Button>
-          <Button variant="outline">Reset Password</Button>
-        </div>
-      </div>
+        }
+      />
 
-      {/* Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <CreditCard className="h-8 w-8 text-[#2D1B69]" />
-              <div>
-                <p className="text-sm text-gray-500">Pre-Qual Status</p>
-                <p className="text-lg font-semibold">
-                  {preQual ? (
-                    <span className="text-green-600">{formatCurrency(preQual.maxOtd || 0)} Max OTD</span>
-                  ) : (
-                    <span className="text-gray-400">Not Pre-Qualified</span>
-                  )}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Gavel className="h-8 w-8 text-[#00D9FF]" />
-              <div>
-                <p className="text-sm text-gray-500">Auctions</p>
-                <p className="text-lg font-semibold">{auctions.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Car className="h-8 w-8 text-[#7ED321]" />
-              <div>
-                <p className="text-sm text-gray-500">Deals</p>
-                <p className="text-lg font-semibold">{deals.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Users className="h-8 w-8 text-purple-500" />
-              <div>
-                <p className="text-sm text-gray-500">Affiliate</p>
-                <p className="text-lg font-semibold">
-                  {affiliate ? (
-                    <span className="text-green-600">Active</span>
-                  ) : (
-                    <span className="text-gray-400">No</span>
-                  )}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Tabs */}
-      <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="prequal">Pre-Qualification</TabsTrigger>
-          <TabsTrigger value="auctions">Auctions</TabsTrigger>
-          <TabsTrigger value="deals">Deals</TabsTrigger>
-          <TabsTrigger value="payments">Payments</TabsTrigger>
-          {affiliate && <TabsTrigger value="affiliate">Affiliate</TabsTrigger>}
-        </TabsList>
-
-        <TabsContent value="profile">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Profile Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-2">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Contact Information</h4>
-                  <dl className="space-y-3">
-                    <div>
-                      <dt className="text-sm text-gray-500">Email</dt>
-                      <dd className="font-medium">{buyer?.email || "-"}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Phone</dt>
-                      <dd className="font-medium">{profile?.phone || buyer?.phone || "-"}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Address</dt>
-                      <dd className="font-medium">
-                        {profile?.address || profile?.address_line1 || "-"}
-                        {profile?.city && `, ${profile.city}`}
-                        {profile?.state && `, ${profile.state}`}
-                        {profile?.zip || profile?.postalCode || ""}
-                      </dd>
-                    </div>
-                  </dl>
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Account Details</h4>
-                  <dl className="space-y-3">
-                    <div>
-                      <dt className="text-sm text-gray-500">Role</dt>
-                      <dd className="font-medium">{buyer?.role || "BUYER"}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Member Since</dt>
-                      <dd className="font-medium">{formatDate(buyer?.createdAt)}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Employment</dt>
-                      <dd className="font-medium">{profile?.employmentStatus || profile?.employer || "-"}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Housing</dt>
-                      <dd className="font-medium">{profile?.housingStatus || "-"}</dd>
-                    </div>
-                  </dl>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="prequal">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
-                Pre-Qualification Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {preQual ? (
-                <div className="grid gap-6 md:grid-cols-2">
-                  <dl className="space-y-3">
-                    <div>
-                      <dt className="text-sm text-gray-500">Max OTD Amount</dt>
-                      <dd className="text-xl font-bold text-green-600">
-                        {formatCurrency(preQual.maxOtd || (preQual.max_otd_amount_cents || 0) / 100)}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Credit Tier</dt>
-                      <dd className="font-medium">{preQual.creditTier || "-"}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">DTI Ratio</dt>
-                      <dd className="font-medium">{preQual.dti ? `${(preQual.dti * 100).toFixed(1)}%` : "-"}</dd>
-                    </div>
-                  </dl>
-                  <dl className="space-y-3">
-                    <div>
-                      <dt className="text-sm text-gray-500">Monthly Payment Range</dt>
-                      <dd className="font-medium">
-                        {formatCurrency(preQual.estimatedMonthlyMin || 0)} -{" "}
-                        {formatCurrency(preQual.estimatedMonthlyMax || 0)}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Soft Pull Date</dt>
-                      <dd className="font-medium">{preQual.softPullDate ? formatDate(preQual.softPullDate) : "-"}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Expires</dt>
-                      <dd className="font-medium">{preQual.expiresAt ? formatDate(preQual.expiresAt) : "-"}</dd>
-                    </div>
-                  </dl>
-                </div>
-              ) : (
-                <p className="text-gray-500">This buyer has not completed pre-qualification.</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="auctions">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Gavel className="h-5 w-5" />
-                Auctions ({auctions.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {auctions.length > 0 ? (
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Offers</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {auctions.map((auction: any) => (
-                      <tr key={auction.id}>
-                        <td className="px-4 py-3 text-sm font-mono">{auction.id.slice(0, 8)}...</td>
-                        <td className="px-4 py-3">
-                          <span
-                            className={`px-2 py-1 text-xs rounded-full ${
-                              auction.status === "ACTIVE"
-                                ? "bg-green-100 text-green-800"
-                                : auction.status === "CLOSED"
-                                  ? "bg-gray-100 text-gray-800"
-                                  : "bg-yellow-100 text-yellow-800"
-                            }`}
-                          >
-                            {auction.status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm">{auction.offers?.length || 0}</td>
-                        <td className="px-4 py-3 text-sm text-gray-500">{formatDate(auction.createdAt)}</td>
-                        <td className="px-4 py-3">
-                          <Link
-                            href={`/admin/auctions/${auction.id}`}
-                            className="text-[#2D1B69] hover:underline text-sm"
-                          >
-                            View
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p className="text-gray-500">No auctions found for this buyer.</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="deals">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Car className="h-5 w-5" />
-                Deals ({deals.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {deals.length > 0 ? (
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Vehicle</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Dealer</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">OTD</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {deals.map((deal: any) => (
-                      <tr key={deal.id}>
-                        <td className="px-4 py-3 text-sm">
-                          {deal.inventoryItem?.vehicle
-                            ? `${deal.inventoryItem.vehicle.year} ${deal.inventoryItem.vehicle.make} ${deal.inventoryItem.vehicle.model}`
-                            : "Unknown"}
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          {deal.dealer?.name || deal.dealer?.businessName || "Unknown"}
-                        </td>
-                        <td className="px-4 py-3 text-sm font-medium">
-                          {formatCurrency(deal.cashOtd || (deal.totalOtdAmountCents || 0) / 100)}
-                        </td>
-                        <td className="px-4 py-3">
-                          <span
-                            className={`px-2 py-1 text-xs rounded-full ${
-                              deal.status === "COMPLETED"
-                                ? "bg-green-100 text-green-800"
-                                : deal.status === "CANCELLED"
-                                  ? "bg-red-100 text-red-800"
-                                  : "bg-yellow-100 text-yellow-800"
-                            }`}
-                          >
-                            {deal.status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-500">{formatDate(deal.createdAt)}</td>
-                        <td className="px-4 py-3">
-                          <Link href={`/admin/deals/${deal.id}`} className="text-[#2D1B69] hover:underline text-sm">
-                            View
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p className="text-gray-500">No deals found for this buyer.</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="payments">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" />
-                Payments
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {deals.map((deal: any) => (
-                  <div key={deal.id} className="border rounded-lg p-4">
-                    <h4 className="font-medium mb-2">Deal: {deal.id.slice(0, 8)}...</h4>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div>
-                        <p className="text-sm text-gray-500">Deposit</p>
-                        <p className="font-medium">
-                          {deal.deposit ? (
-                            <span className={deal.deposit.status === "PAID" ? "text-green-600" : "text-yellow-600"}>
-                              {formatCurrency(deal.deposit.amount || 99)} - {deal.deposit.status}
-                            </span>
-                          ) : (
-                            <span className="text-gray-400">Not paid</span>
-                          )}
-                        </p>
+      <DetailShell
+        summaryTitle="Overview"
+        summary={<KeyValueGrid items={summary} columns={1} />}
+        defaultTab="overview"
+        tabs={[
+          {
+            value: "overview",
+            label: "Overview",
+            content: (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <UserRound className="h-5 w-5" />
+                    Profile & Contact
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-6 md:grid-cols-2">
+                  <KeyValueGrid
+                    items={[
+                      { label: "Full name", value: displayName(buyer) },
+                      { label: "Email", value: buyer.email || "Not available" },
+                      { label: "Phone", value: buyer.phone || "Not available" },
+                      { label: "Status", value: buyer.status || "Not available" },
+                      { label: "Onboarding step", value: buyer.onboardingStep || "Not available" },
+                      { label: "Created", value: formatDate(buyer.createdAt) },
+                    ]}
+                    columns={2}
+                  />
+                </CardContent>
+              </Card>
+            ),
+          },
+          {
+            value: "requests",
+            label: "Requests",
+            content: requests.length ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Requests</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ID</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Created</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {requests.map((request) => (
+                        <TableRow key={request.id}>
+                          <TableCell className="font-mono text-sm">{request.id}</TableCell>
+                          <TableCell>{request.type || "Not available"}</TableCell>
+                          <TableCell>
+                            <Badge variant="secondary" className="capitalize">
+                              {request.status || "pending"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">{formatDate(request.createdAt)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            ) : (
+              <EmptyState
+                icon={FileText}
+                title="No requests"
+                description="This buyer has not submitted any requests."
+              />
+            ),
+          },
+          {
+            value: "documents",
+            label: "Documents",
+            content: documents.length ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Documents ({documents.length})</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {documents.map((doc) => (
+                    <div key={doc.id} className="flex items-center justify-between rounded-lg border px-4 py-3">
+                      <div className="space-y-1">
+                        <p className="font-medium">{doc.name || "Document"}</p>
+                        <p className="text-sm text-muted-foreground">Uploaded {formatDate(doc.uploadedAt)}</p>
                       </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Service Fee</p>
-                        <p className="font-medium">
-                          {deal.serviceFee ? (
-                            <span className={deal.serviceFee.status === "PAID" ? "text-green-600" : "text-yellow-600"}>
-                              {formatCurrency(deal.serviceFee.amount || (deal.serviceFee.baseFeeCents || 0) / 100)} -{" "}
-                              {deal.serviceFee.status}
-                            </span>
-                          ) : (
-                            <span className="text-gray-400">Not paid</span>
-                          )}
-                        </p>
-                      </div>
+                      <Badge variant="outline">View</Badge>
                     </div>
-                  </div>
-                ))}
-                {deals.length === 0 && <p className="text-gray-500">No payment records found.</p>}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {affiliate && (
-          <TabsContent value="affiliate">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Affiliate Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-6 md:grid-cols-2">
-                  <dl className="space-y-3">
-                    <div>
-                      <dt className="text-sm text-gray-500">Referral Code</dt>
-                      <dd className="font-mono font-medium">
-                        {affiliate.referralCode || affiliate.refCode || affiliate.ref_code}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Total Referrals</dt>
-                      <dd className="font-medium">{affiliate.referrals?.length || 0}</dd>
-                    </div>
-                  </dl>
-                  <dl className="space-y-3">
-                    <div>
-                      <dt className="text-sm text-gray-500">Total Earnings</dt>
-                      <dd className="text-xl font-bold text-green-600">
-                        {formatCurrency(affiliate.totalEarnings || 0)}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-500">Pending Earnings</dt>
-                      <dd className="font-medium">{formatCurrency(affiliate.pendingEarnings || 0)}</dd>
-                    </div>
-                  </dl>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        )}
-      </Tabs>
+                  ))}
+                </CardContent>
+              </Card>
+            ) : (
+              <EmptyState
+                icon={FileText}
+                title="No documents"
+                description="No documents have been uploaded for this buyer."
+              />
+            ),
+          },
+          {
+            value: "payments",
+            label: "Payments",
+            content: payments.length ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Payments</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ID</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {payments.map((payment) => (
+                        <TableRow key={payment.id}>
+                          <TableCell className="font-mono text-sm">{payment.id}</TableCell>
+                          <TableCell className="font-medium">
+                            ${((payment.amount as number) || 0).toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            <StatusPill status={(payment.status?.toLowerCase() as any) || "pending"} />
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">{formatDate(payment.createdAt)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            ) : (
+              <EmptyState icon={BadgeCheck} title="No payments" description="No payment records available." />
+            ),
+          },
+          {
+            value: "activity",
+            label: "Activity",
+            content: (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Activity timeline</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ActivityTimeline items={activity} />
+                </CardContent>
+              </Card>
+            ),
+          },
+        ]}
+      />
     </div>
   )
 }

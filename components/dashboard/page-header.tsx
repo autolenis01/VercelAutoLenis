@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import React, { ReactNode } from "react"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 
 interface BreadcrumbItemType {

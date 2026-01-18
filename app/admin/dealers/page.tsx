@@ -1,244 +1,299 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Building2, ChevronLeft, ChevronRight, Star } from "lucide-react"
-import useSWR, { mutate } from "swr"
+import { useMemo, useState } from "react"
 import Link from "next/link"
+import useSWR from "swr"
+import { ArrowLeft, Building2, ChevronLeft, ChevronRight, Eye, Filter, Search } from "lucide-react"
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+import { EmptyState } from "@/components/dashboard/empty-state"
+import { ErrorState } from "@/components/dashboard/error-state"
+import { LoadingSkeleton } from "@/components/dashboard/loading-skeleton"
+import { PageHeader } from "@/components/dashboard/page-header"
+import { StatusPill } from "@/components/dashboard/status-pill"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
+type DealerRecord = {
+  id?: string
+  name?: string
+  businessName?: string
+  email?: string
+  status?: string
+  approvalStatus?: string
+  inventoryCount?: number
+  createdAt?: string
+}
+
+type DealersResponse = {
+  dealers?: DealerRecord[]
+  data?: DealerRecord[]
+  total?: number
+  totalPages?: number
+  page?: number
+}
+
+const fetcher = async (url: string) => {
+  const res = await fetch(url)
+  const payload = await res.json().catch(() => ({}))
+  return { payload, status: res.status }
+}
+
+const formatDate = (value?: string) => {
+  if (!value) return "Not available"
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return "Not available"
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
+}
+
+const dealerName = (dealer: DealerRecord) => dealer.name || dealer.businessName || "Not available"
 
 export default function AdminDealersPage() {
   const [search, setSearch] = useState("")
+  const [submittedSearch, setSubmittedSearch] = useState("")
   const [status, setStatus] = useState("all")
   const [page, setPage] = useState(1)
-  const [searchQuery, setSearchQuery] = useState("")
+  const [pageSize, setPageSize] = useState(10)
 
-  const { data, error, isLoading } = useSWR(
-    `/api/admin/dealers?page=${page}&status=${status}${searchQuery ? `&search=${searchQuery}` : ""}`,
-    fetcher,
-    { refreshInterval: 30000 },
-  )
+  const query = useMemo(() => {
+    const params = new URLSearchParams()
+    params.set("page", page.toString())
+    params.set("pageSize", pageSize.toString())
+    if (submittedSearch) params.set("q", submittedSearch)
+    if (status !== "all") params.set("status", status)
+    return params.toString()
+  }, [page, pageSize, status, submittedSearch])
+
+  const { data, error, isLoading, mutate } = useSWR(`/api/admin/dealers?${query}`, fetcher, {
+    revalidateOnFocus: false,
+  })
+
+  const payload: DealersResponse = (data?.payload as DealersResponse) || {}
+  const statusCode = data?.status
+  const dealers = payload.dealers || payload.data || []
+  const totalPages = payload.totalPages || Math.max(1, Math.ceil((payload.total || dealers.length || 1) / pageSize))
+  const currentPage = payload.page || page
+  const totalCount = payload.total ?? dealers.length ?? 0
 
   const handleSearch = () => {
-    setSearchQuery(search)
+    setSubmittedSearch(search.trim())
     setPage(1)
+    void mutate()
   }
 
-  const handleAction = async (action: string, dealerId: string, reason?: string) => {
-    try {
-      await fetch("/api/admin/dealers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, dealerId, reason }),
-      })
-      mutate(`/api/admin/dealers?page=${page}&status=${status}${searchQuery ? `&search=${searchQuery}` : ""}`)
-    } catch (error) {}
-  }
-
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    })
-  }
+  const unauthorized = statusCode === 401 || statusCode === 403
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dealers & Inventory</h1>
-          <p className="text-gray-500">Manage dealer accounts and inventory</p>
-        </div>
-      </div>
+      <PageHeader
+        title="Dealers"
+        subtitle="Review dealer onboarding and activity"
+        breadcrumb={[
+          { label: "Admin", href: "/admin/dashboard" },
+          { label: "Dealers" },
+        ]}
+        primaryAction={
+          <Button variant="outline" asChild>
+            <Link href="/admin/dashboard">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to dashboard
+            </Link>
+          </Button>
+        }
+      />
 
-      {/* Search & Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search by name or email..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                className="pl-10"
-              />
-            </div>
-            <Select
-              value={status}
-              onValueChange={(v) => {
-                setStatus(v)
+      <Card className="border-muted">
+        <CardHeader className="space-y-1">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            Search & Filters
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-3 md:grid-cols-[1fr_220px_160px_auto]">
+          <Input
+            placeholder="Search dealers by name or email"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            onKeyDown={(event) => event.key === "Enter" && handleSearch()}
+            className="h-11"
+          />
+          <Select
+            value={status}
+            onValueChange={(value) => {
+              setStatus(value)
+              setPage(1)
+            }}
+          >
+            <SelectTrigger className="h-11">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="suspended">Suspended</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={String(pageSize)}
+            onValueChange={(value) => {
+              setPageSize(Number(value))
+              setPage(1)
+            }}
+          >
+            <SelectTrigger className="h-11">
+              <SelectValue placeholder="Page size" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10">10 per page</SelectItem>
+              <SelectItem value="25">25 per page</SelectItem>
+              <SelectItem value="50">50 per page</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="flex gap-2">
+            <Button onClick={handleSearch} className="h-11 w-full md:w-auto">
+              <Search className="mr-2 h-4 w-4" />
+              Search
+            </Button>
+            <Button
+              variant="outline"
+              className="h-11 w-full md:w-auto"
+              onClick={() => {
+                setSearch("")
+                setSubmittedSearch("")
+                setStatus("all")
                 setPage(1)
               }}
             >
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Dealers</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-                <SelectItem value="pending">Pending Verification</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button onClick={handleSearch} className="bg-[#2D1B69] hover:bg-[#2D1B69]/90">
-              Search
+              <Filter className="mr-2 h-4 w-4" />
+              Reset
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Building2 className="h-8 w-8 text-[#2D1B69]" />
-              <div>
-                <p className="text-2xl font-bold">{data?.total || 0}</p>
-                <p className="text-sm text-gray-500">Total Dealers</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Table */}
-      <Card>
+      <Card className="border-muted shadow-sm">
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="p-8 text-center">
-              <p className="text-gray-500">Loading dealers...</p>
+            <div className="p-6">
+              <LoadingSkeleton variant="table" />
+            </div>
+          ) : unauthorized ? (
+            <div className="p-8">
+              <ErrorState message="Admin access required. Please sign in with an admin account." onRetry={mutate} />
             </div>
           ) : error ? (
-            <div className="p-8 text-center">
-              <p className="text-red-500">Failed to load dealers</p>
+            <div className="p-8">
+              <ErrorState onRetry={mutate} />
+            </div>
+          ) : dealers.length === 0 ? (
+            <div className="p-6">
+              <EmptyState
+                icon={Building2}
+                title="No dealers yet"
+                description="Review dealer applications or invite dealers to onboard."
+                primaryCta={{ label: "Review Dealer Applications", onClick: () => void 0 }}
+              />
             </div>
           ) : (
             <>
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dealer</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Score</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Inventory</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Offers</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Win Rate</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {data?.dealers?.length > 0 ? (
-                    data.dealers.map((dealer: any) => (
-                      <tr key={dealer.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <p className="font-medium text-gray-900">{dealer.name}</p>
-                          <p className="text-xs text-gray-500">{dealer.email}</p>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {dealer.city}, {dealer.state}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {dealer.verified && dealer.active ? (
-                            <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                              Active
-                            </span>
-                          ) : !dealer.verified ? (
-                            <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
-                              Pending
-                            </span>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="min-w-[180px]">Dealer / Company</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Inventory Count</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {dealers.map((dealer) => {
+                    const statusLabel = dealer.status || dealer.approvalStatus || "pending"
+                    const normalizedStatus = statusLabel.toLowerCase()
+                    const statusPill =
+                      normalizedStatus === "approved"
+                        ? "approved"
+                        : normalizedStatus === "pending"
+                          ? "pending"
+                          : normalizedStatus === "suspended"
+                            ? "rejected"
+                            : null
+                    return (
+                      <TableRow key={dealer.id || dealerName(dealer)}>
+                        <TableCell className="font-medium">{dealerName(dealer)}</TableCell>
+                        <TableCell className="text-muted-foreground">{dealer.email || "Not available"}</TableCell>
+                        <TableCell>
+                          {statusPill ? (
+                            <StatusPill status={statusPill as any} />
                           ) : (
-                            <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">
-                              Inactive
-                            </span>
+                            <Badge variant="secondary" className="capitalize">
+                              {statusLabel}
+                            </Badge>
                           )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                            <span className="font-medium">{dealer.integrityScore?.toFixed(1) || "N/A"}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{dealer.inventoryCount}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{dealer.offersCount}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                          {dealer.winRate}%
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {formatDate(dealer.createdAt)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            {!dealer.verified && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-green-600 border-green-600 hover:bg-green-50 bg-transparent"
-                                onClick={() => handleAction("approve", dealer.id)}
-                              >
-                                Approve
-                              </Button>
-                            )}
-                            {dealer.active && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-red-600 border-red-600 hover:bg-red-50 bg-transparent"
-                                onClick={() => handleAction("suspend", dealer.id, "Admin action")}
-                              >
-                                Suspend
-                              </Button>
-                            )}
-                            <Link
-                              href={`/admin/dealers/${dealer.id}`}
-                              className="text-[#2D1B69] hover:underline text-sm font-medium"
-                            >
-                              Details
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{dealer.inventoryCount ?? "Not available"}</TableCell>
+                        <TableCell className="text-muted-foreground">{formatDate(dealer.createdAt)}</TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="sm" asChild>
+                            <Link href={`/admin/dealers/${dealer.id || ""}`}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              View
                             </Link>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
-                        No dealers found
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
 
-              {/* Pagination */}
-              {data?.totalPages > 1 && (
-                <div className="flex items-center justify-between px-6 py-4 border-t">
-                  <p className="text-sm text-gray-500">
-                    Page {data.page} of {data.totalPages} ({data.total} total)
-                  </p>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page === 1}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPage(page + 1)}
-                      disabled={page >= data.totalPages}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
+              <div className="flex flex-col gap-3 border-t px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="text-sm text-muted-foreground">
+                  Page {currentPage} of {totalPages} • {totalCount} total dealers
                 </div>
-              )}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                    disabled={currentPage <= 1}
+                  >
+                    <ChevronLeft className="mr-1 h-4 w-4" />
+                    Prev
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage >= totalPages}
+                  >
+                    Next
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </>
           )}
         </CardContent>

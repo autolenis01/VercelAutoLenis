@@ -5,14 +5,14 @@ export default function Loading() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Dealers"
-        subtitle="Review dealer onboarding and activity"
+        title="Buyer details"
         breadcrumb={[
           { label: "Admin", href: "/admin/dashboard" },
-          { label: "Dealers" },
+          { label: "Buyers", href: "/admin/buyers" },
+          { label: "Loading" },
         ]}
       />
-      <LoadingSkeleton variant="table" />
+      <LoadingSkeleton variant="detail" />
     </div>
   )
 }
