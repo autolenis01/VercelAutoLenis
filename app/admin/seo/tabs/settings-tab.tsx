@@ -69,17 +69,24 @@ export function SettingsTab() {
   const onSubmit = async (data: SettingsFormData) => {
     setIsLoading(true)
     try {
-      const response = await fetch("/api/admin/seo/settings", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
+      // Update each setting individually
+      const settingsToUpdate = Object.entries(data)
+      
+      for (const [key, value] of settingsToUpdate) {
+        const response = await fetch("/api/admin/seo/settings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key, value }),
+        })
 
-      if (!response.ok) throw new Error("Failed to update settings")
+        if (!response.ok) {
+          throw new Error(`Failed to update ${key}`)
+        }
+      }
 
       toast.success("Settings updated successfully")
     } catch (error) {
-      toast.error("Failed to update settings")
+      toast.error(error instanceof Error ? error.message : "Failed to update settings")
       console.error(error)
     } finally {
       setIsLoading(false)

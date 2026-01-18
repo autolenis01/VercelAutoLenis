@@ -85,7 +85,7 @@ export function RedirectsTab() {
     if (!confirm("Are you sure you want to delete this redirect?")) return
 
     try {
-      const response = await fetch(`/api/admin/seo/redirects/${id}`, {
+      const response = await fetch(`/api/admin/seo/redirects?id=${id}`, {
         method: "DELETE",
       })
 
@@ -102,12 +102,8 @@ export function RedirectsTab() {
   const onSubmit = async (data: SEORedirectInput) => {
     setIsSubmitting(true)
     try {
-      const url = isCreating
-        ? "/api/admin/seo/redirects"
-        : `/api/admin/seo/redirects/${editingRedirect?.id}`
-
-      const response = await fetch(url, {
-        method: isCreating ? "POST" : "PUT",
+      const response = await fetch("/api/admin/seo/redirects", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
