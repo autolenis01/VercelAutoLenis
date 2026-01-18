@@ -177,7 +177,7 @@ export class BestPriceService {
 
     // 4. Enhance offers with inventory, vehicle, and calculated fields
     const enhancedOffers: EnhancedOffer[] = await Promise.all(
-      offers.map(async (offer) => {
+      offers.map(async (offer: any) => {
         const inventoryItem = await prisma.inventoryItem.findUnique({
           where: { id: offer.inventoryItemId },
           include: { vehicle: true, dealer: true },
@@ -227,6 +227,7 @@ export class BestPriceService {
 
     for (let i = 0; i < bestCashResults.length; i++) {
       const result = bestCashResults[i]
+      if (!result) continue
       const snapshot = this.buildSnapshot(result, "BEST_CASH", i + 1)
 
       createdOptions.push(
@@ -259,6 +260,7 @@ export class BestPriceService {
 
     for (let i = 0; i < bestMonthlyResults.length; i++) {
       const result = bestMonthlyResults[i]
+      if (!result) continue
       const snapshot = this.buildSnapshot(result, "BEST_MONTHLY", i + 1)
 
       createdOptions.push(
@@ -291,6 +293,7 @@ export class BestPriceService {
 
     for (let i = 0; i < balancedResults.length; i++) {
       const result = balancedResults[i]
+      if (!result) continue
       const snapshot = this.buildSnapshot(result, "BALANCED", i + 1)
 
       createdOptions.push(
@@ -421,7 +424,7 @@ export class BestPriceService {
       // Get best financing option for display
       const bestFinancing =
         offer.financingOptions.length > 0
-          ? offer.financingOptions.reduce((best: any, curr) =>
+          ? offer.financingOptions.reduce((best: any, curr: any) =>
               this.getMonthlyPaymentCents(curr) < this.getMonthlyPaymentCents(best) ? curr : best,
             )
           : null
@@ -528,9 +531,9 @@ export class BestPriceService {
           const term = this.getTermMonths(f)
           return term >= 60 && term <= 72
         })
-        .sort((a, b) => this.getMonthlyPaymentCents(a) - this.getMonthlyPaymentCents(b))[0]
+        .sort((a: any, b: any) => this.getMonthlyPaymentCents(a) - this.getMonthlyPaymentCents(b))[0]
       const anyOption = offer.financingOptions.sort(
-        (a, b) => this.getMonthlyPaymentCents(a) - this.getMonthlyPaymentCents(b),
+        (a: any, b: any) => this.getMonthlyPaymentCents(a) - this.getMonthlyPaymentCents(b),
       )[0]
       const chosenOption = promoted || standardTerm || anyOption
 
@@ -664,7 +667,6 @@ export class BestPriceService {
     }
 
     for (const option of options) {
-      const typeKey = option.type.toLowerCase().replace("_", "_") as keyof typeof grouped
       const mappedKey =
         option.type === "BEST_CASH" ? "best_cash" : option.type === "BEST_MONTHLY" ? "best_monthly" : "balanced"
 

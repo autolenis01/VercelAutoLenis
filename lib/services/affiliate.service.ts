@@ -848,9 +848,13 @@ export class AffiliateService {
       throw new Error("No earned commissions available for payout")
     }
 
-    const totalCents = earnedCommissions.reduce((sum: any, c) => sum + (c.amount_cents || 0), 0)
+    type EarnedCommission = { amount_cents?: number | null }
+    const totalCents = earnedCommissions.reduce(
+      (sum: number, c: EarnedCommission) => sum + (c?.amount_cents ?? 0),
+      0,
+    )
 
-    const payout = await prisma.$transaction(async (tx) => {
+    const payout = await prisma.$transaction(async (tx: any) => {
       const newPayout = await tx.payout.create({
         data: {
           affiliateId,
@@ -895,7 +899,7 @@ export class AffiliateService {
 
     if (!payout) throw new Error("Payout not found")
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       await tx.payout.update({
         where: { id: payoutId },
         data: {

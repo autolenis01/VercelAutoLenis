@@ -39,9 +39,13 @@ export const buyerService = {
       }
 
       // Flatten the email from the user relation
+      const userEmail =
+        (profile as any)?.user?.email ||
+        (Array.isArray((profile as any)?.user) ? (profile as any).user[0]?.email : null) ||
+        null
       const flattenedProfile = {
         ...profile,
-        email: profile.user?.email || null,
+        email: userEmail,
         user: undefined, // Remove the nested user object
       }
 
@@ -143,7 +147,7 @@ export const buyerService = {
       const upcomingPickups = pickups.filter((p: any) => p.status === "SCHEDULED").length
 
       // Get recent activity
-      const recentActivity = await getRecentActivity(userId, buyerId)
+      const recentActivity = await getRecentActivity(buyerId)
 
       return {
         profile: flattenedProfile,
@@ -288,7 +292,7 @@ function getDefaultDashboardData() {
   }
 }
 
-async function getRecentActivity(userId: string, buyerId: string) {
+async function getRecentActivity(buyerId: string) {
   const activities: Array<{
     type: string
     title: string

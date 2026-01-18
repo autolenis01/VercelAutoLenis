@@ -3,10 +3,10 @@
 
 import { logger } from "@/lib/logger"
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY
-const FROM_EMAIL = process.env.FROM_EMAIL || "noreply@autolenis.com"
-const FROM_NAME = process.env.FROM_NAME || "AutoLenis"
+const RESEND_API_KEY = process.env["RESEND_API_KEY"]
+const SENDGRID_API_KEY = process.env["SENDGRID_API_KEY"]
+const FROM_EMAIL = process.env["FROM_EMAIL"] || "noreply@autolenis.com"
+const FROM_NAME = process.env["FROM_NAME"] || "AutoLenis"
 const APP_URL = process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"
 
 interface EmailOptions {
