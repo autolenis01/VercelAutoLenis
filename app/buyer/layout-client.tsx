@@ -23,6 +23,9 @@ import {
   Car,
   Shield,
   Home,
+  HandCoins,
+  DollarSign,
+  MessageSquare,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -38,6 +41,9 @@ const iconMap: Record<string, any> = {
   Car,
   Shield,
   Home,
+  HandCoins,
+  DollarSign,
+  MessageSquare,
 }
 
 interface NavItem {
