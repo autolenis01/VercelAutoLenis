@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server"
 import { getSessionUser, clearSession } from "@/lib/auth-server"
 
+function buildClearCookieHeader(): string {
+  const isSecure = process.env.NODE_ENV === "production"
+  return `session=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax${isSecure ? "; Secure" : ""}`
+}
+
 export async function POST() {
   try {
     const user = await getSessionUser()
@@ -18,7 +23,7 @@ export async function POST() {
       {
         // Clear the session cookie in the response
         headers: {
-          "Set-Cookie": "session=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax",
+          "Set-Cookie": buildClearCookieHeader(),
         },
       },
     )
@@ -33,7 +38,7 @@ export async function POST() {
       },
       {
         headers: {
-          "Set-Cookie": "session=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax",
+          "Set-Cookie": buildClearCookieHeader(),
         },
       },
     )
