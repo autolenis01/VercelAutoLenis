@@ -66,7 +66,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ auc
           valid_offers: validOfferCount || 0,
           best_price_options_count: options.length,
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         options: options.map((opt: any) => ({
           id: opt.id,
           type: opt.type,

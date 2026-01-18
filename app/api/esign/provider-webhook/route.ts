@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { esignService } from "@/lib/services/esign.service"
 
-const WEBHOOK_SECRET = process.env.ESIGN_WEBHOOK_SECRET || "dev-secret"
+const WEBHOOK_SECRET = process.env["ESIGN_WEBHOOK_SECRET"] || "dev-secret"
 
 export async function POST(req: NextRequest) {
   try {

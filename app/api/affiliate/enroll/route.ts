@@ -10,9 +10,9 @@ export async function POST(_req: NextRequest) {
     }
 
     // Create affiliate record for the user
-    const affiliate = await affiliateService.createAffiliate(user.id, user.first_name || "", user.last_name || "")
+    const affiliate = await affiliateService.createAffiliate(user.id, "", "")
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://autolenis.com"
+    const baseUrl = process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"
 
     return NextResponse.json({
       success: true,
