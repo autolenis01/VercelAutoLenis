@@ -34,7 +34,7 @@ export default function Error({
             Try again
           </Button>
           <Button variant="outline" asChild className="w-full">
-            <Link href="/buyer/dashboard">Go to Dashboard</Link>
+            <Link href="/">Go to Home</Link>
           </Button>
         </CardContent>
       </Card>
