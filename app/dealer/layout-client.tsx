@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { Building2, Calendar, FileText, LayoutDashboard, Package, Settings, LogOut, Menu, X } from "lucide-react"
+import { Building2, Calendar, FileText, LayoutDashboard, Package, Settings, LogOut, Menu, X, Users, HandCoins, MessageSquare } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const iconMap: Record<string, any> = {
@@ -16,6 +16,9 @@ const iconMap: Record<string, any> = {
   FileText,
   Calendar,
   Settings,
+  Users,
+  HandCoins,
+  MessageSquare,
 }
 
 interface NavItem {
