@@ -26,7 +26,24 @@ ${urls
       },
     })
   } catch (error) {
-    console.error("[v0] Error generating sitemap:", error)
-    return new NextResponse("Error generating sitemap", { status: 500 })
+    // Don't fail builds - return minimal valid sitemap
+    console.error("[SEO] Error in sitemap route (returning minimal fallback):", error)
+    const baseUrl = process.env["NEXT_PUBLIC_APP_URL"] || "https://autolenis.com"
+    const fallbackSitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${baseUrl}</loc>
+    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>`
+
+    return new NextResponse(fallbackSitemap, {
+      headers: {
+        "Content-Type": "application/xml",
+        "Cache-Control": "public, max-age=600, s-maxage=600",
+      },
+    })
   }
 }
