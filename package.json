@@ -5,10 +5,10 @@
   "scripts": {
     "analyze": "ANALYZE=true next build",
     "build": "prisma generate && next build",
-    "check:unused": "bun run scripts/check-unused-imports.ts",
-    "db:migrate": "bun run scripts/migrations/run-migrations.ts",
+    "check:unused": "pnpm exec tsx scripts/check-unused-imports.ts",
+    "db:migrate": "pnpm exec tsx scripts/migrations/run-migrations.ts",
     "db:push": "prisma db push",
-    "db:setup": "bun run scripts/setup-database.mjs",
+    "db:setup": "node scripts/setup-database.mjs",
     "db:studio": "prisma studio",
     "dev": "next dev",
     "postinstall": "node scripts/postinstall.js",
