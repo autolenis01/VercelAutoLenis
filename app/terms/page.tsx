@@ -1,5 +1,15 @@
 import Link from "next/link"
 import { FileText, AlertCircle } from "lucide-react"
+import type { Metadata } from "next"
+import { resolveMetadata } from "@/lib/seo/resolve-metadata"
+
+export async function generateMetadata(): Promise<Metadata> {
+  return resolveMetadata({
+    pageKey: "terms",
+    fallbackTitle: "Terms of Service",
+    fallbackDescription: "Understanding your agreement with AutoLenis. Read our terms of service.",
+  })
+}
 
 export default function TermsPage() {
   return (

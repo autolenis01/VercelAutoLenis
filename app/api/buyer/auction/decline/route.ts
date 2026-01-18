@@ -28,14 +28,16 @@ export async function POST(request: Request) {
     // Decline the offer and get updated options
     const updatedOptions = await BestPriceService.declineOffer(body.auctionId, body.offerId, buyer.id)
 
+    // Check if updatedOptions is an array
+    const hasMoreOptions = Array.isArray(updatedOptions) && updatedOptions.length > 0
+
     return NextResponse.json({
       success: true,
       data: {
         options: updatedOptions,
-        message:
-          updatedOptions.length > 0
-            ? "Offer declined. Here are your updated options."
-            : "You've reviewed all available offers.",
+        message: hasMoreOptions
+          ? "Offer declined. Here are your updated options."
+          : "You've reviewed all available offers.",
       },
     })
   } catch (error: any) {

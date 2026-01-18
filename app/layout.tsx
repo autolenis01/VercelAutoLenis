@@ -1,8 +1,21 @@
 import type React from "react"
 import type { Metadata } from "next"
+import localFont from "next/font/local"
 import "./globals.css"
 import { SkipLink } from "@/components/skip-link"
 import "@/lib/monitoring"
+
+const geistSans = localFont({
+  src: "./fonts/GeistVF.woff",
+  variable: "--font-geist-sans",
+  weight: "100 900",
+})
+
+const geistMono = localFont({
+  src: "./fonts/GeistMonoVF.woff",
+  variable: "--font-geist-mono",
+  weight: "100 900",
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://autolenis.com"),
