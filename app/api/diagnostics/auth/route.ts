@@ -12,7 +12,7 @@ export async function GET() {
     
     // Get environment information
     const nodeEnv = process.env.NODE_ENV || "unknown"
-    const vercelEnv = process.env.VERCEL_ENV || "unknown"
+    const vercelEnv = process.env["VERCEL_ENV"] || "unknown"
     
     // Get request information
     const host = headersList.get("host") || "unknown"
@@ -20,8 +20,8 @@ export async function GET() {
     const userAgent = headersList.get("user-agent") || "unknown"
     
     // Check for JWT_SECRET presence (boolean only, never the value)
-    const hasJwtSecret = !!process.env.JWT_SECRET
-    const jwtSecretLength = process.env.JWT_SECRET?.length || 0
+    const hasJwtSecret = !!process.env["JWT_SECRET"]
+    const jwtSecretLength = process.env["JWT_SECRET"]?.length || 0
     
     // Get cookie names (not values)
     const cookieNames = cookieStore.getAll().map(cookie => cookie.name)

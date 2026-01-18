@@ -440,6 +440,11 @@ export class ESignService {
 
     return { success: true, message: "Envelope voided" }
   }
+
+  // Get envelope status stub
+  async getEnvelopeStatus(envelopeId: string) {
+    return { id: envelopeId, status: "pending", message: "Method stub - to be implemented" }
+  }
 }
 
 export const esignService = new ESignService()

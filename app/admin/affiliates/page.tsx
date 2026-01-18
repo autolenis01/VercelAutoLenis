@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import useSWR from "swr"
+import Link from "next/link"
 
 export const dynamic = "force-dynamic"
 
@@ -109,8 +110,12 @@ export default function AdminAffiliatesPage() {
                     ${(affiliate.pendingEarnings || 0).toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                    <button className="text-green-600 hover:text-green-800">Pay Out</button>
-                    <button className="text-brand-purple hover:text-brand-purple/80">View Tree</button>
+                    <Link
+                      href={`/admin/affiliates/${affiliate.id}`}
+                      className="text-[#2D1B69] hover:underline font-medium"
+                    >
+                      View Details
+                    </Link>
                   </td>
                 </tr>
               ))}

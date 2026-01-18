@@ -343,6 +343,91 @@ export class EmailService {
       `,
     })
   }
+
+  // Stub methods for missing email templates (to be implemented)
+  async sendWelcomeEmail(_to: string, _firstName: string, _role: string): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    return { success: true, messageId: `stub-welcome-${Date.now()}` }
+  }
+
+  async sendAuctionStartedEmail(
+    _to: string,
+    _buyerName: string,
+    _vehicleName: string,
+    _auctionId: string,
+    _endsAt: Date,
+    _dealerCount: number,
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    return { success: true, messageId: `stub-auction-started-${Date.now()}` }
+  }
+
+  async sendNewOfferEmail(
+    _to: string,
+    _buyerName: string,
+    _vehicleName: string,
+    _auctionId: string,
+    _offerCount: number,
+    _lowestPriceCents: number,
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    return { success: true, messageId: `stub-new-offer-${Date.now()}` }
+  }
+
+  async sendAuctionWonEmail(
+    _to: string,
+    _dealerName: string,
+    _vehicleName: string,
+    _buyerName: string,
+    _winningPriceCents: number,
+    _auctionId: string,
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    return { success: true, messageId: `stub-auction-won-${Date.now()}` }
+  }
+
+  async sendContractShieldEmail(
+    _to: string,
+    _recipientName: string,
+    _status: string,
+    _vehicleName: string,
+    _dealId: string,
+    _issueCount: number,
+    _isDealer: boolean,
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    return { success: true, messageId: `stub-contract-shield-${Date.now()}` }
+  }
+
+  async sendDealCompleteEmail(
+    _to: string,
+    _buyerName: string,
+    _vehicleName: string,
+    _dealerName: string,
+    _totalPriceCents: number,
+    _savingsCents: number,
+    _pickupDate: Date,
+    _pickupLocation: string,
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    return { success: true, messageId: `stub-deal-complete-${Date.now()}` }
+  }
+
+  async sendPaymentConfirmationEmail(
+    _to: string,
+    _buyerName: string,
+    _paymentType: string,
+    _amountCents: number,
+    _transactionId: string,
+    _vehicleName: string,
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    return { success: true, messageId: `stub-payment-confirmation-${Date.now()}` }
+  }
+
+  async sendReferralCommissionEmail(
+    _to: string,
+    _affiliateName: string,
+    _referredBuyerName: string,
+    _commissionCents: number,
+    _tier: string,
+    _totalEarningsCents: number,
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    return { success: true, messageId: `stub-referral-commission-${Date.now()}` }
+  }
 }
 
 // Export singleton instance
