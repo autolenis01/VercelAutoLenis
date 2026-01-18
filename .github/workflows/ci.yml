@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -39,6 +41,13 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Lint changed files
+        run: pnpm lint:changed
+
+      - name: Lint
+        run: pnpm lint
+        continue-on-error: true # TODO: enforce lint after cleanup
 
       - name: Verify Prisma schema is valid
         run: |
