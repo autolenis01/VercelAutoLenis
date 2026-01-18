@@ -10,18 +10,47 @@ const refExists = (ref) =>
 const fetchBranch = (branch) =>
   run('git', ['fetch', 'origin', branch, '--depth=1'], { stdio: 'ignore' }).status === 0;
 
+const loadEventPayload = () => {
+  const eventPath = process.env.GITHUB_EVENT_PATH;
+  if (!eventPath) {
+    return undefined;
+  }
+  try {
+    return JSON.parse(fs.readFileSync(eventPath, 'utf8'));
+  } catch {
+    return undefined;
+  }
+};
+
+const eventPayload = loadEventPayload();
+const eventName = process.env.GITHUB_EVENT_NAME;
+
 let baseRef;
 
-if (process.env.GITHUB_BASE_REF) {
-  const baseBranch = process.env.GITHUB_BASE_REF;
-  const originRef = `origin/${baseBranch}`;
-  if (!refExists(originRef)) {
-    if (!fetchBranch(baseBranch)) {
-      console.warn(`Failed to fetch ${originRef}; skipping lint:changed.`);
-      process.exit(0);
+if (eventName === 'pull_request' || eventName === 'pull_request_target') {
+  const baseSha = process.env.GITHUB_BASE_SHA || eventPayload?.pull_request?.base?.sha;
+  if (baseSha) {
+    baseRef = baseSha;
+  } else {
+    const baseBranch = process.env.GITHUB_BASE_REF || eventPayload?.pull_request?.base?.ref;
+    if (baseBranch) {
+      const originRef = `origin/${baseBranch}`;
+      if (!refExists(originRef)) {
+        if (!fetchBranch(baseBranch)) {
+          console.warn(`Failed to fetch ${originRef}; skipping lint:changed.`);
+          process.exit(0);
+        }
+      }
+      baseRef = refExists(originRef) ? originRef : undefined;
     }
   }
-  baseRef = refExists(originRef) ? originRef : undefined;
+} else if (eventName === 'push') {
+  const beforeSha = process.env.GITHUB_BEFORE || eventPayload?.before;
+  if (beforeSha && !/^0+$/.test(beforeSha)) {
+    baseRef = beforeSha;
+  } else if (refExists('HEAD~1')) {
+    baseRef = 'HEAD~1';
+  }
 } else {
   if (!refExists('origin/main')) {
     if (!fetchBranch('main')) {
@@ -37,7 +66,9 @@ if (!baseRef) {
   process.exit(0);
 }
 
-const diffResult = run('git', ['diff', '--name-only', '--diff-filter=ACMRT', `${baseRef}...HEAD`]);
+console.log(`lint:changed base ref: ${baseRef}`);
+
+const diffResult = run('git', ['diff', '--name-only', `${baseRef}...HEAD`]);
 
 if (diffResult.status !== 0) {
   process.stderr.write(diffResult.stderr || 'Failed to determine changed files.\n');
@@ -53,9 +84,12 @@ const files = diffResult.stdout
   .filter((file) => fs.existsSync(file));
 
 if (files.length === 0) {
+  console.log('lint:changed files: 0');
   console.log('No changed files to lint');
   process.exit(0);
 }
+
+console.log(`lint:changed files: ${files.length}`);
 
 const lintResult = run('pnpm', ['exec', 'eslint', ...files], { stdio: 'inherit' });
 process.exit(lintResult.status ?? 1);
