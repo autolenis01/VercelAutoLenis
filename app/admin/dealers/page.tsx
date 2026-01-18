@@ -256,8 +256,11 @@ export default function AdminDealersPage() {
                         <TableCell className="text-muted-foreground">{dealer.inventoryCount ?? "Not available"}</TableCell>
                         <TableCell className="text-muted-foreground">{formatDate(dealer.createdAt)}</TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" asChild>
-                            <Link href={`/admin/dealers/${dealer.id || ""}`}>
+                          <Button variant="ghost" size="sm" asChild disabled={!dealer.id}>
+                            <Link
+                              href={dealer.id ? `/admin/dealers/${dealer.id}` : "#"}
+                              className={!dealer.id ? "pointer-events-none opacity-60" : undefined}
+                            >
                               <Eye className="mr-2 h-4 w-4" />
                               View
                             </Link>

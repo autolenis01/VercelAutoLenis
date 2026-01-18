@@ -259,8 +259,11 @@ export default function AdminBuyersPage() {
                       <TableCell className="text-muted-foreground">{formatDate(buyer.createdAt)}</TableCell>
                       <TableCell className="text-muted-foreground">{formatDate(buyer.lastActive)}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/admin/buyers/${buyer.id || ""}`}>
+                        <Button variant="ghost" size="sm" asChild disabled={!buyer.id}>
+                          <Link
+                            href={buyer.id ? `/admin/buyers/${buyer.id}` : "#"}
+                            className={!buyer.id ? "pointer-events-none opacity-60" : undefined}
+                          >
                             <Eye className="mr-2 h-4 w-4" />
                             View
                           </Link>

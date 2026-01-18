@@ -312,7 +312,7 @@ export default function BuyerDetailPage({ params }: { params: Promise<{ id: stri
                         <TableRow key={payment.id}>
                           <TableCell className="font-mono text-sm">{payment.id}</TableCell>
                           <TableCell className="font-medium">
-                            ${((payment.amount as number) || 0).toLocaleString()}
+                            ${Number(payment.amount ?? 0).toLocaleString()}
                           </TableCell>
                           <TableCell>
                             <StatusPill status={(payment.status?.toLowerCase() as any) || "pending"} />

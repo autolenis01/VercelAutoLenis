@@ -260,7 +260,7 @@ export default function AdminAffiliatesPage() {
                         <TableCell className="text-muted-foreground">{affiliate.clicks ?? 0}</TableCell>
                         <TableCell className="text-muted-foreground">{affiliate.referrals ?? 0}</TableCell>
                         <TableCell className="font-medium">
-                          ${(affiliate.totalCommissions ?? affiliate.commissions ?? 0).toLocaleString()}
+                          ${Number(affiliate.totalCommissions ?? affiliate.commissions ?? 0).toLocaleString()}
                         </TableCell>
                         <TableCell>
                           {statusPill ? (
@@ -272,8 +272,11 @@ export default function AdminAffiliatesPage() {
                           )}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" asChild>
-                            <Link href={`/admin/affiliates/${affiliate.id || ""}`}>
+                          <Button variant="ghost" size="sm" asChild disabled={!affiliate.id}>
+                            <Link
+                              href={affiliate.id ? `/admin/affiliates/${affiliate.id}` : "#"}
+                              className={!affiliate.id ? "pointer-events-none opacity-60" : undefined}
+                            >
                               <Eye className="mr-2 h-4 w-4" />
                               View
                             </Link>

@@ -102,7 +102,8 @@ export default function AffiliateDetailPage({ params }: { params: Promise<{ id: 
               <div>Referrals: {affiliate.metrics?.referrals ?? affiliate.referrals ?? 0}</div>
               <div>Conversions: {affiliate.metrics?.conversions ?? affiliate.conversions ?? 0}</div>
               <div>
-                Total commissions: ${(affiliate.metrics?.totalCommissions ?? affiliate.totalCommissions ?? 0).toLocaleString()}
+                Total commissions: $
+                {Number(affiliate.metrics?.totalCommissions ?? affiliate.totalCommissions ?? 0).toLocaleString()}
               </div>
             </div>
           ),
@@ -333,7 +334,7 @@ export default function AffiliateDetailPage({ params }: { params: Promise<{ id: 
                           <TableCell className="font-mono text-sm">{commission.id}</TableCell>
                           <TableCell>{commission.type || "Referral"}</TableCell>
                           <TableCell className="font-medium">
-                            ${(commission.amount || 0).toLocaleString()}
+                            ${Number(commission.amount ?? 0).toLocaleString()}
                           </TableCell>
                           <TableCell>
                             <StatusPill status={(commission.status?.toLowerCase() as any) || "pending"} />
@@ -374,7 +375,9 @@ export default function AffiliateDetailPage({ params }: { params: Promise<{ id: 
                       {payouts.map((payout) => (
                         <TableRow key={payout.id}>
                           <TableCell className="font-mono text-sm">{payout.id}</TableCell>
-                          <TableCell className="font-medium">${(payout.amount || 0).toLocaleString()}</TableCell>
+                          <TableCell className="font-medium">
+                            ${Number(payout.amount ?? 0).toLocaleString()}
+                          </TableCell>
                           <TableCell>
                             <StatusPill status={(payout.status?.toLowerCase() as any) || "pending"} />
                           </TableCell>

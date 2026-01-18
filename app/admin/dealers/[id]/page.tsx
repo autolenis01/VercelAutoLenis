@@ -349,7 +349,9 @@ export default function DealerDetailPage({ params }: { params: Promise<{ id: str
                             <TableRow key={offer.id}>
                               <TableCell className="font-mono text-sm">{offer.id}</TableCell>
                               <TableCell className="font-mono text-sm">{offer.auctionId || "Not available"}</TableCell>
-                              <TableCell className="font-medium">${((offer.amount as number) || 0).toLocaleString()}</TableCell>
+                              <TableCell className="font-medium">
+                                ${Number(offer.amount ?? 0).toLocaleString()}
+                              </TableCell>
                               <TableCell>
                                 <StatusPill status={(offer.status?.toLowerCase() as any) || "pending"} />
                               </TableCell>
