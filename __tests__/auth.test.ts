@@ -6,12 +6,10 @@ const TEST_VALID_USER = {
   email: "valid@example.com",
   password: "ValidPassword123!",
 }
+const MAX_SIGNIN_ATTEMPTS = 5
 
 describe("Authentication Service", () => {
-  let authService: AuthService
-
   beforeAll(() => {
-    authService = new AuthService()
     const signinAttempts: Record<string, number> = {}
 
     // Lightweight fetch mock to simulate API validation and rate limits without a running server
@@ -45,7 +43,7 @@ describe("Authentication Service", () => {
         const attempts = (signinAttempts[body.email] || 0) + 1
         signinAttempts[body.email] = attempts
 
-        if (attempts > 5) {
+        if (attempts > MAX_SIGNIN_ATTEMPTS) {
           return new Response(JSON.stringify({ success: false, error: "Too many requests" }), { status: 429 })
         }
 
@@ -63,7 +61,7 @@ describe("Authentication Service", () => {
   describe("Password Hashing", () => {
     it("should hash password correctly", async () => {
       const password = "TestPassword123!"
-      const hash = await authService.hashPassword(password)
+      const hash = await AuthService.hashPassword(password)
 
       expect(hash).toBeTruthy()
       expect(hash).not.toBe(password)
@@ -72,8 +70,8 @@ describe("Authentication Service", () => {
 
     it("should verify correct password", async () => {
       const password = "TestPassword123!"
-      const hash = await authService.hashPassword(password)
-      const isValid = await authService.verifyPassword(password, hash)
+      const hash = await AuthService.hashPassword(password)
+      const isValid = await AuthService.verifyPassword(password, hash)
 
       expect(isValid).toBe(true)
     })
@@ -81,8 +79,8 @@ describe("Authentication Service", () => {
     it("should reject incorrect password", async () => {
       const password = "TestPassword123!"
       const wrongPassword = "WrongPassword123!"
-      const hash = await authService.hashPassword(password)
-      const isValid = await authService.verifyPassword(wrongPassword, hash)
+      const hash = await AuthService.hashPassword(password)
+      const isValid = await AuthService.verifyPassword(wrongPassword, hash)
 
       expect(isValid).toBe(false)
     })
@@ -114,7 +112,7 @@ describe("Authentication Service", () => {
       const email = "test@example.com"
       const role = "BUYER"
 
-      const token = await authService.generateToken({ userId, email, role })
+      const token = await AuthService.generateToken({ userId, email, role })
 
       expect(token).toBeTruthy()
       expect(typeof token).toBe("string")

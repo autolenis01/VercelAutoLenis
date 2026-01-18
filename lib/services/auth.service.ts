@@ -272,21 +272,24 @@ export class AuthService {
     return "AL" + Math.random().toString(36).substring(2, 10).toUpperCase()
   }
 
-  async hashPassword(password: string) {
-    if (!password) {
+  static async hashPassword(password: string) {
+    if (typeof password !== "string" || password.length === 0) {
       throw new Error("Password is required for hashing")
     }
     return hashPasswordUtil(password)
   }
 
-  async verifyPassword(password: string, hashedPassword: string) {
-    if (!password || !hashedPassword) {
+  static async verifyPassword(password: string, hashedPassword: string) {
+    if (typeof password !== "string" || password.length === 0) {
+      throw new Error("Password and hash are required for verification")
+    }
+    if (typeof hashedPassword !== "string" || hashedPassword.length === 0) {
       throw new Error("Password and hash are required for verification")
     }
     return verifyPasswordUtil(password, hashedPassword)
   }
 
-  async generateToken(input: { userId: string; email: string; role: string; is_affiliate?: boolean }) {
+  static async generateToken(input: { userId: string; email: string; role: string; is_affiliate?: boolean }) {
     if (!input?.userId || !input.email || !input.role) {
       throw new Error("userId, email, and role are required to generate a token")
     }
