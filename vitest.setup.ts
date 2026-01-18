@@ -8,8 +8,8 @@ afterEach(() => {
 })
 
 // Mock environment variables
-process.env.JWT_SECRET = "test-secret-key"
-process.env.NEXT_PUBLIC_APP_URL = "http://localhost:3000"
+process.env["JWT_SECRET"] = "test-secret-key"
+process.env["NEXT_PUBLIC_APP_URL"] = "http://localhost:3000"
 
 // Mock Next.js modules
 vi.mock("next/navigation", () => ({

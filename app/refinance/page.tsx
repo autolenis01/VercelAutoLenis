@@ -7,6 +7,7 @@ import Link from "next/link"
 import { PublicNav } from "@/components/layout/public-nav"
 import { PublicFooter } from "@/components/layout/public-footer"
 import { Button } from "@/components/ui/button"
+import { getOpenRoadRefiUrl } from "@/lib/constants/refinance"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -659,10 +660,6 @@ export default function RefinancePage() {
     setTimeout(() => setIsRedirecting(false), 1000)
   }
 
-  const scrollToForm = () => {
-    document.getElementById("refinance-form")?.scrollIntoView({ behavior: "smooth" })
-  }
-
   // Result Screen
   if (result) {
     return (
@@ -771,31 +768,33 @@ export default function RefinancePage() {
 
                 <div>
                   <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-balance">
-                    Lower Your{" "}
+                    Refinance Your{" "}
                     <span className="bg-gradient-to-r from-[#7ED321] via-[#00D9FF] to-[#0066FF] bg-clip-text text-transparent">
-                      Car Payment
+                      Auto Loan
                     </span>
                   </h1>
                 </div>
 
                 <p className="text-base sm:text-lg md:text-xl text-white/80 text-balance max-w-xl mx-auto lg:mx-0">
-                  You may be paying more than you should. In minutes, see if refinancing could reduce your payment and
-                  increase your savings—without impacting your credit score.
+                  Lower your monthly payment and save money. Get matched with trusted lending partners in minutes—no
+                  credit score impact.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
-                  <Button
-                    onClick={scrollToForm}
+                  <Link
+                    href={getOpenRoadRefiUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 rounded-lg bg-gradient-to-r from-[#7ED321] to-[#00D9FF] text-[#2D1B69] font-semibold hover:opacity-90 transition-opacity"
                   >
-                    Check Eligibility
-                    <ArrowRight className="w-5 h-5" />
-                  </Button>
+                    Apply for Refinance
+                    <ExternalLink className="w-5 h-5" />
+                  </Link>
                   <Link
                     href="/how-it-works"
                     className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 rounded-lg border-2 border-white/30 text-white font-semibold hover:bg-white/10 transition-colors"
                   >
-                    How It Works
+                    Learn How It Works
                   </Link>
                 </div>
               </div>
@@ -839,12 +838,14 @@ export default function RefinancePage() {
                     </div>
                   </div>
 
-                  <Button
-                    onClick={scrollToForm}
+                  <Link
+                    href={getOpenRoadRefiUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="block w-full py-3 sm:py-4 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#7ED321] to-[#00D9FF] text-[#2D1B69] font-semibold text-base sm:text-lg text-center hover:opacity-90 transition-opacity"
                   >
-                    Start Now
-                  </Button>
+                    Apply for Refinance
+                  </Link>
                 </div>
 
                 {/* Stats */}

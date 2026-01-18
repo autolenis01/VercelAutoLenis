@@ -2,7 +2,26 @@ import "server-only"
 
 import Stripe from "stripe"
 
-export const stripe = new Stripe(process.env["STRIPE_SECRET_KEY"]!)
+// Lazy initialization to avoid build-time requirement
+let stripeInstance: Stripe | null = null
+
+function getStripe(): Stripe {
+  if (!stripeInstance) {
+    const apiKey = process.env["STRIPE_SECRET_KEY"]
+    if (!apiKey) {
+      throw new Error("STRIPE_SECRET_KEY is not configured. Please add it to your environment variables.")
+    }
+    stripeInstance = new Stripe(apiKey)
+  }
+  return stripeInstance
+}
+
+// Export stripe getter for backward compatibility
+export const stripe = new Proxy({} as Stripe, {
+  get(_target, prop) {
+    return getStripe()[prop as keyof Stripe]
+  },
+})
 
 // Helper to get Stripe publishable key for client
 export const getStripePublishableKey = () => {
@@ -75,7 +94,7 @@ export async function createServiceFeeCheckoutSession(params: {
 
 // Verify webhook signature
 export function constructWebhookEvent(payload: string | Buffer, signature: string) {
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  const webhookSecret = process.env["STRIPE_WEBHOOK_SECRET"]
 
   if (!webhookSecret) {
     throw new Error("STRIPE_WEBHOOK_SECRET is not configured")
