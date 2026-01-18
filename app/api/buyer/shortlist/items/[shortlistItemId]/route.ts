@@ -8,7 +8,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ s
   try {
     const session = await requireAuth(["BUYER"])
     const { shortlistItemId } = await params
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data: buyer, error: buyerError } = await supabase
       .from("BuyerProfile")
@@ -68,7 +68,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ sh
     const session = await requireAuth(["BUYER"])
     const { shortlistItemId } = await params
     const body = await request.json()
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data: buyer, error: buyerError } = await supabase
       .from("BuyerProfile")

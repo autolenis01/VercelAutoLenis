@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic"
 export async function GET() {
   try {
     const session = await requireAuth(["BUYER"])
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data: buyer, error: buyerError } = await supabase
       .from("BuyerProfile")

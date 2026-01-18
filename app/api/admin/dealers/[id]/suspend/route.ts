@@ -12,7 +12,7 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
     }
 
     const { id } = await params
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data: dealer, error: dealerError } = await supabase
       .from("Dealer")
