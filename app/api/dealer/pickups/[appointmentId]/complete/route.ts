@@ -10,7 +10,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ ap
     }
 
     const { appointmentId } = await params
-    const result = await pickupService.completePickup(appointmentId, user.id)
+    const result = await pickupService.completePickup(appointmentId, user.userId)
 
     return NextResponse.json({ success: true, ...result })
   } catch (error: any) {
