@@ -37,15 +37,29 @@ export async function setSessionCookie(token: string) {
 
   logger.debug("Setting session cookie")
 
-  cookieStore.set("session", token, {
+  // Determine if we're in a secure context (https)
+  // In Vercel, both preview and production use https
+  const isSecure = process.env.NODE_ENV === "production"
+  
+  // In production (not preview), we can set domain for autolenis.com
+  // In preview, we use host-only cookies (no domain attribute)
+  const isProduction = process.env.VERCEL_ENV === "production"
+  
+  const cookieOptions: any = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isSecure,
     sameSite: "lax",
     maxAge: 60 * 60 * 24 * 7, // 7 days
     path: "/",
-  })
+  }
+  
+  // Only set domain in true production if needed for subdomain sharing
+  // For now, we'll use host-only cookies for better cross-domain compatibility
+  // If domain is needed in future: cookieOptions.domain = ".autolenis.com"
+  
+  cookieStore.set("session", token, cookieOptions)
 
-  logger.debug("Session cookie set successfully")
+  logger.debug("Session cookie set successfully", { isSecure, isProduction })
 }
 
 export async function clearSession() {
