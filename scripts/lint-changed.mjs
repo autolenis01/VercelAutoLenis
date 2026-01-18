@@ -7,6 +7,8 @@ const run = (command, args, options = {}) =>
 
 const refExists = (ref) =>
   run('git', ['rev-parse', '--verify', ref], { stdio: 'ignore' }).status === 0;
+const fetchBranch = (branch) =>
+  run('git', ['fetch', 'origin', branch, '--depth=1'], { stdio: 'ignore' }).status === 0;
 
 let baseRef;
 
@@ -14,12 +16,18 @@ if (process.env.GITHUB_BASE_REF) {
   const baseBranch = process.env.GITHUB_BASE_REF;
   const originRef = `origin/${baseBranch}`;
   if (!refExists(originRef)) {
-    run('git', ['fetch', 'origin', baseBranch, '--depth=1'], { stdio: 'ignore' });
+    if (!fetchBranch(baseBranch)) {
+      console.warn(`Failed to fetch ${originRef}; skipping lint:changed.`);
+      process.exit(0);
+    }
   }
   baseRef = refExists(originRef) ? originRef : undefined;
 } else {
   if (!refExists('origin/main')) {
-    run('git', ['fetch', 'origin', 'main', '--depth=1'], { stdio: 'ignore' });
+    if (!fetchBranch('main')) {
+      console.warn('Failed to fetch origin/main; skipping lint:changed.');
+      process.exit(0);
+    }
   }
   baseRef = refExists('origin/main') ? 'origin/main' : refExists('main') ? 'main' : undefined;
 }
