@@ -1,14 +1,33 @@
 import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
 
 const run = (command, args, options = {}) =>
   spawnSync(command, args, { encoding: 'utf8', ...options });
 
-const hasOriginMain =
-  run('git', ['rev-parse', '--verify', 'origin/main'], { stdio: 'ignore' }).status === 0;
-const hasMain = run('git', ['rev-parse', '--verify', 'main'], { stdio: 'ignore' }).status === 0;
+const refExists = (ref) =>
+  run('git', ['rev-parse', '--verify', ref], { stdio: 'ignore' }).status === 0;
 
-const baseRef = hasOriginMain ? 'origin/main' : hasMain ? 'main' : 'HEAD~1';
+let baseRef;
+
+if (process.env.GITHUB_BASE_REF) {
+  const baseBranch = process.env.GITHUB_BASE_REF;
+  const originRef = `origin/${baseBranch}`;
+  if (!refExists(originRef)) {
+    run('git', ['fetch', 'origin', baseBranch, '--depth=1'], { stdio: 'ignore' });
+  }
+  baseRef = refExists(originRef) ? originRef : undefined;
+} else {
+  if (!refExists('origin/main')) {
+    run('git', ['fetch', 'origin', 'main', '--depth=1'], { stdio: 'ignore' });
+  }
+  baseRef = refExists('origin/main') ? 'origin/main' : refExists('main') ? 'main' : undefined;
+}
+
+if (!baseRef) {
+  console.warn('No base ref found for lint:changed; skipping.');
+  process.exit(0);
+}
 
 const diffResult = run('git', ['diff', '--name-only', '--diff-filter=ACMRT', `${baseRef}...HEAD`]);
 
@@ -22,7 +41,8 @@ const files = diffResult.stdout
   .split(/\r?\n/)
   .map((line) => line.trim())
   .filter(Boolean)
-  .filter((file) => extensions.has(path.extname(file)));
+  .filter((file) => extensions.has(path.extname(file)))
+  .filter((file) => fs.existsSync(file));
 
 if (files.length === 0) {
   console.log('No changed files to lint');
