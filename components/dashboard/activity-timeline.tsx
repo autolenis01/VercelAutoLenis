@@ -1,13 +1,15 @@
 import { formatDistanceToNow } from "date-fns"
 import { cn } from "@/lib/utils"
 
+import { ReactNode } from "react"
+
 export interface TimelineItem {
   id: string
   title: string
   description?: string
   timestamp: Date
   type?: "default" | "success" | "warning" | "error"
-  icon?: React.ReactNode
+  icon?: ReactNode
 }
 
 interface ActivityTimelineProps {

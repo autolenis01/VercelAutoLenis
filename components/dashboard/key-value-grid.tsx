@@ -1,8 +1,8 @@
-import type React from "react"
+import { ReactNode } from "react"
 
 interface KeyValueItem {
   label: string
-  value: React.ReactNode
+  value: ReactNode
 }
 
 interface KeyValueGridProps {

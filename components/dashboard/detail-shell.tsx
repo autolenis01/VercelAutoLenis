@@ -1,14 +1,14 @@
-import type React from "react"
+import { ReactNode } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface DetailShellProps {
   summaryTitle: string
-  summary: React.ReactNode
+  summary: ReactNode
   tabs: Array<{
     value: string
     label: string
-    content: React.ReactNode
+    content: ReactNode
   }>
   defaultTab?: string
 }

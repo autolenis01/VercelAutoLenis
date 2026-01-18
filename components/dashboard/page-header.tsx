@@ -1,4 +1,4 @@
-import type React from "react"
+import { ReactNode } from "react"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 
 interface BreadcrumbItemType {
@@ -9,8 +9,8 @@ interface BreadcrumbItemType {
 interface PageHeaderProps {
   title: string
   subtitle?: string
-  primaryAction?: React.ReactNode
-  secondaryActions?: React.ReactNode[]
+  primaryAction?: ReactNode
+  secondaryActions?: ReactNode[]
   breadcrumb?: BreadcrumbItemType[]
 }
 
