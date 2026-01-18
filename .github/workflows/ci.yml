@@ -30,20 +30,20 @@ jobs:
         run: pnpm install --frozen-lockfile
         env:
           # Prisma generate runs in postinstall with placeholder URL fallback
-          POSTGRES_PRISMA_URL: ""
+          POSTGRES_PRISMA_URL: postgresql://user:password@localhost:5432/placeholder?schema=public
 
       - name: Verify Prisma schema is valid
         run: |
           echo "Validating Prisma schema..."
           pnpm prisma validate
         env:
-          POSTGRES_PRISMA_URL: "******localhost:5432/placeholder?schema=public"
+          POSTGRES_PRISMA_URL: postgresql://user:password@localhost:5432/placeholder?schema=public
 
       - name: Build application
         run: pnpm build
         env:
           # Prisma generate already ran in postinstall
-          POSTGRES_PRISMA_URL: ""
+          POSTGRES_PRISMA_URL: postgresql://user:password@localhost:5432/placeholder?schema=public
 
       - name: Verify security patches
         run: |
