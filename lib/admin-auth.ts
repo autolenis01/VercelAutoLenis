@@ -295,10 +295,9 @@ function generateTotpCode(secret: string, time: number): string {
 }
 
 export async function generateQrCodeDataUrl(uri: string): Promise<string> {
-  // Use a QR code generation service or library
-  // For now, return a placeholder URL that can be used with a QR code service
-  const encoded = encodeURIComponent(uri)
-  return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encoded}`
+  // Use local QR code generation to avoid external API calls that may be blocked by firewalls
+  const QRCode = await import('qrcode')
+  return QRCode.toDataURL(uri, { width: 200, margin: 1 })
 }
 
 export async function logAdminAction(action: string, details: Record<string, any>): Promise<void> {
