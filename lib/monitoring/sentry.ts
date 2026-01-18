@@ -3,6 +3,12 @@
  * Configures Sentry for error tracking and performance monitoring
  */
 
+// Singleton guard for idempotent initialization
+declare global {
+  // eslint-disable-next-line no-var
+  var __monitoringInitialized: boolean | undefined
+}
+
 interface SentryConfig {
   dsn?: string
   environment: string
@@ -14,10 +20,11 @@ class ErrorMonitoring {
   private config: SentryConfig
 
   constructor() {
+    const deployEnv = process.env["VERCEL_ENV"] ?? process.env["NODE_ENV"] ?? "development"
     this.config = {
       dsn: process.env["NEXT_PUBLIC_SENTRY_DSN"],
-      environment: process.env["NODE_ENV"] || "development",
-      enabled: !!process.env["NEXT_PUBLIC_SENTRY_DSN"] && process.env["NODE_ENV"] === "production",
+      environment: deployEnv,
+      enabled: !!process.env["NEXT_PUBLIC_SENTRY_DSN"] && deployEnv === "production",
       tracesSampleRate: 0.1, // 10% of transactions
     }
   }
@@ -72,5 +79,8 @@ class ErrorMonitoring {
 
 export const errorMonitoring = new ErrorMonitoring()
 
-// Initialize on import
-errorMonitoring.initialize()
+// Initialize once per process using global guard
+if (!globalThis.__monitoringInitialized) {
+  errorMonitoring.initialize()
+  globalThis.__monitoringInitialized = true
+}
