@@ -40,6 +40,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Lint changed files
+        run: pnpm lint:changed
+
       - name: Lint
         run: pnpm lint
         continue-on-error: true # TODO: enforce lint after cleanup
