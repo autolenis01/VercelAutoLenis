@@ -371,10 +371,10 @@ export class AffiliateService {
     }
 
     const baseFee = payment.base_fee_cents || payment.baseFeeCents || 49500
-    const commissions = []
+    const commissions: any[] = []
 
     // Use transaction for atomicity
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       for (const referral of referrals) {
         const rate = this.COMMISSION_RATES[referral.level as 1 | 2 | 3 | 4 | 5] || 0
         const amountCents = Math.floor(baseFee * rate)
@@ -490,7 +490,7 @@ export class AffiliateService {
     })
 
     for (const commission of commissions) {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: any) => {
         await tx.commission.update({
           where: { id: commission.id },
           data: {
@@ -597,8 +597,6 @@ export class AffiliateService {
         _count: true,
       }),
     ])
-
-    const links = this.getAffiliateLinks(affiliate)
 
     return {
       affiliate: {
@@ -776,7 +774,7 @@ export class AffiliateService {
         level3: levelCounts.find((l: any) => l.level === 3)?._count || 0,
         level4: levelCounts.find((l: any) => l.level === 4)?._count || 0,
         level5: levelCounts.find((l: any) => l.level === 5)?._count || 0,
-        total: levelCounts.reduce((sum: any, l) => sum + l._count, 0),
+        total: levelCounts.reduce((sum: any, l: any) => sum + (l?._count || 0), 0),
       },
       commissions: {
         pending: {

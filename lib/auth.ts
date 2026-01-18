@@ -2,7 +2,7 @@ import { SignJWT, jwtVerify } from "jose"
 import type { UserRole } from "./types"
 import { logger } from "./logger"
 
-const jwtSecretString = process.env.JWT_SECRET
+const jwtSecretString = process.env["JWT_SECRET"]
 if (!jwtSecretString && process.env["NODE_ENV"] === "production") {
   logger.error("JWT_SECRET is not configured in production!")
 }
@@ -48,7 +48,7 @@ export async function createSession(user: {
 export async function verifySession(token: string): Promise<SessionUser> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET)
-    return payload as SessionUser
+    return payload as unknown as SessionUser
   } catch (error: any) {
     logger.error("Session verification failed", { error: error.message })
     throw error

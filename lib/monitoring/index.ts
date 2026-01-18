@@ -14,7 +14,7 @@ export class MonitoringService {
     // Log startup
     logger.info("Application monitoring initialized", {
       environment: process.env["NODE_ENV"],
-      version: process.env.NEXT_PUBLIC_APP_VERSION || "unknown",
+      version: process.env["NEXT_PUBLIC_APP_VERSION"] || "unknown",
     })
 
     // Set up global error handlers
@@ -48,6 +48,7 @@ export class MonitoringService {
         const lcpObserver = new PerformanceObserver((list) => {
           const entries = list.getEntries()
           const lastEntry = entries[entries.length - 1]
+          if (!lastEntry) return
           const lcpValue = lastEntry.startTime
 
           // Convert to seconds for readability

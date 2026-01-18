@@ -20,16 +20,8 @@ function base64UrlDecode(str: string): Uint8Array {
   return bytes
 }
 
-function base64UrlEncode(bytes: Uint8Array): string {
-  let binary = ""
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i])
-  }
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
-}
-
 async function getKey(): Promise<CryptoKey> {
-  const secret = process.env.JWT_SECRET || "your-secret-key-change-in-production"
+  const secret = process.env["JWT_SECRET"] || "your-secret-key-change-in-production"
   const encoder = new TextEncoder()
   return await crypto.subtle.importKey("raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, [
     "sign",
@@ -44,6 +36,9 @@ export async function verifySessionEdge(token: string): Promise<SessionUser> {
   }
 
   const [headerB64, payloadB64, signatureB64] = parts
+  if (!headerB64 || !payloadB64 || !signatureB64) {
+    throw new Error("Invalid token parts")
+  }
 
   // Verify signature
   const key = await getKey()
@@ -51,7 +46,8 @@ export async function verifySessionEdge(token: string): Promise<SessionUser> {
   const data = encoder.encode(`${headerB64}.${payloadB64}`)
   const signature = base64UrlDecode(signatureB64)
 
-  const isValid = await crypto.subtle.verify("HMAC", key, signature, data)
+  const signatureBuffer = signature.buffer.slice(0) as ArrayBuffer
+  const isValid = await crypto.subtle.verify("HMAC", key, signatureBuffer, data)
   if (!isValid) {
     throw new Error("Invalid signature")
   }
