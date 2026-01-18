@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getSessionUser } from "@/lib/auth-server"
 import { supabase, isDatabaseConfigured } from "@/lib/db"
 
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user) {
