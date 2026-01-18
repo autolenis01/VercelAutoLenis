@@ -30,23 +30,33 @@ const envSchema = z.object({
   INTERNAL_API_KEY: z.string().optional(),
 })
 
-// Validate environment variables
-const parseEnv = () => {
+// Validate environment variables LAZILY
+let _cachedEnv: z.infer<typeof envSchema> | null = null
+
+function parseEnv() {
+  if (_cachedEnv) return _cachedEnv
+
   try {
-    return envSchema.parse(process.env)
+    _cachedEnv = envSchema.parse(process.env)
+    return _cachedEnv
   } catch (error) {
     if (error instanceof z.ZodError) {
       const missingVars = error.errors.map((e) => `  - ${e.path.join(".")}: ${e.message}`).join("\n")
-      throw new Error(
-        `\n\n❌ Invalid environment variables:\n\n${missingVars}\n\nPlease check your .env file and ensure all required variables are set.\n`,
+      console.error(
+        `\n\n❌ Invalid environment variables:\n\n${missingVars}\n\nPlease check your .env file.\n`,
       )
     }
     throw error
   }
 }
 
-// Export validated env
-export const env = parseEnv()
+// Export validated env — LAZY GETTER
+export const env = new Proxy({} as z.infer<typeof envSchema>, {
+  get(_, prop) {
+    const validated = parseEnv()
+    return validated[prop as keyof typeof validated]
+  },
+})
 
 // Export type for TypeScript autocomplete
 export type Env = z.infer<typeof envSchema>
