@@ -25,7 +25,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "pnpm"
 
       - name: Enable Corepack + pnpm
         run: |
@@ -35,7 +34,7 @@ jobs:
 
       - name: Debug Prisma URL protocol (safe)
         run: |
-          node -e "const v=process.env.POSTGRES_PRISMA_URL||''; console.log('POSTGRES_PRISMA_URL protocol ok:', /^postgres(ql)?:\\/\\//.test(v));"
+          node -e "const v=process.env.POSTGRES_PRISMA_URL||''; console.log('POSTGRES_PRISMA_URL protocol ok:', /^postgres(ql)?:\/\//.test(v));"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
