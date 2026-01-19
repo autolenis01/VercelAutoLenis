@@ -1,17 +1,67 @@
 import { describe, it, expect, beforeAll } from "vitest"
 import { AuthService } from "@/lib/services/auth.service"
+import { signInSchema, signUpSchema } from "@/lib/validators/auth"
+
+const TEST_VALID_USER = {
+  email: "valid@example.com",
+  password: "ValidPassword123!",
+}
+const MAX_SIGNIN_ATTEMPTS = 5
 
 describe("Authentication Service", () => {
-  let authService: AuthService
-
   beforeAll(() => {
-    authService = new AuthService()
+    const signinAttempts: Record<string, number> = {}
+
+    // Lightweight fetch mock to simulate API validation and rate limits without a running server
+    global.fetch = (async (input, init) => {
+      const url = typeof input === "string" ? input : input.toString()
+      const parseBody = () => {
+        try {
+          return init?.body ? JSON.parse(init.body.toString()) : {}
+        } catch {
+          return {}
+        }
+      }
+
+      if (url.endsWith("/api/auth/signup")) {
+        const body = parseBody()
+        const parsed = signUpSchema.safeParse(body)
+        if (!parsed.success) {
+          return new Response(JSON.stringify({ success: false, error: "Invalid request" }), { status: 400 })
+        }
+
+        return new Response(JSON.stringify({ success: true }), { status: 201 })
+      }
+
+      if (url.endsWith("/api/auth/signin")) {
+        const body = parseBody()
+        const parsed = signInSchema.safeParse(body)
+        if (!parsed.success) {
+          return new Response(JSON.stringify({ success: false, error: "Invalid request" }), { status: 400 })
+        }
+
+        const attempts = (signinAttempts[body.email] || 0) + 1
+        signinAttempts[body.email] = attempts
+
+        if (attempts > MAX_SIGNIN_ATTEMPTS) {
+          return new Response(JSON.stringify({ success: false, error: "Too many requests" }), { status: 429 })
+        }
+
+        if (body.email !== TEST_VALID_USER.email || body.password !== TEST_VALID_USER.password) {
+          return new Response(JSON.stringify({ success: false, error: "Invalid credentials" }), { status: 401 })
+        }
+
+        return new Response(JSON.stringify({ success: true }), { status: 200 })
+      }
+
+      return new Response("Not Found", { status: 404 })
+    }) as any
   })
 
   describe("Password Hashing", () => {
     it("should hash password correctly", async () => {
       const password = "TestPassword123!"
-      const hash = await authService.hashPassword(password)
+      const hash = await AuthService.hashPassword(password)
 
       expect(hash).toBeTruthy()
       expect(hash).not.toBe(password)
@@ -20,8 +70,8 @@ describe("Authentication Service", () => {
 
     it("should verify correct password", async () => {
       const password = "TestPassword123!"
-      const hash = await authService.hashPassword(password)
-      const isValid = await authService.verifyPassword(password, hash)
+      const hash = await AuthService.hashPassword(password)
+      const isValid = await AuthService.verifyPassword(password, hash)
 
       expect(isValid).toBe(true)
     })
@@ -29,8 +79,8 @@ describe("Authentication Service", () => {
     it("should reject incorrect password", async () => {
       const password = "TestPassword123!"
       const wrongPassword = "WrongPassword123!"
-      const hash = await authService.hashPassword(password)
-      const isValid = await authService.verifyPassword(wrongPassword, hash)
+      const hash = await AuthService.hashPassword(password)
+      const isValid = await AuthService.verifyPassword(wrongPassword, hash)
 
       expect(isValid).toBe(false)
     })
@@ -62,7 +112,7 @@ describe("Authentication Service", () => {
       const email = "test@example.com"
       const role = "BUYER"
 
-      const token = await authService.generateToken({ userId, email, role })
+      const token = await AuthService.generateToken({ userId, email, role })
 
       expect(token).toBeTruthy()
       expect(typeof token).toBe("string")
