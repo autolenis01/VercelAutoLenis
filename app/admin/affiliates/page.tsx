@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import Loading from "./loading"
 
@@ -75,7 +74,6 @@ interface Payout {
 }
 
 export default function AdminAffiliatesPage() {
-  const searchParams = useSearchParams()
   const [affiliates, setAffiliates] = useState<Affiliate[]>([])
   const [stats, setStats] = useState<AffiliateStats | null>(null)
   const [pendingPayouts, setPendingPayouts] = useState<Payout[]>([])
@@ -196,7 +194,7 @@ export default function AdminAffiliatesPage() {
       SUSPENDED: { variant: "destructive", icon: <Ban className="h-3 w-3 mr-1" /> },
       INACTIVE: { variant: "outline", icon: <XCircle className="h-3 w-3 mr-1" /> },
     }
-    const config = variants[status] || variants.PENDING
+    const config = (variants[status] ?? variants["PENDING"]) as { variant: "default" | "secondary" | "destructive" | "outline"; icon: React.ReactNode }
     return (
       <Badge variant={config.variant} className="flex items-center w-fit">
         {config.icon}
@@ -674,8 +672,4 @@ export default function AdminAffiliatesPage() {
       )}
     </Suspense>
   )
-}
-
-function Loading() {
-  return null
 }

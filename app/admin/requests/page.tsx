@@ -2,16 +2,15 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, Car, Clock, CheckCircle, XCircle, Eye, RefreshCw } from "lucide-react"
+import { Search, Car, Clock, CheckCircle, Eye, RefreshCw } from "lucide-react"
 import { formatDate } from "@/lib/utils/format"
 import { PageHeader } from "@/components/dashboard/page-header"
-import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import Loading from "./loading"
 
@@ -38,8 +37,6 @@ export default function AdminRequestsPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
-  const searchParams = useSearchParams()
-
   useEffect(() => {
     fetchRequests()
   }, [statusFilter])
@@ -83,7 +80,7 @@ export default function AdminRequestsPage() {
       <div className="p-6 space-y-6">
         <PageHeader
           title="Vehicle Requests"
-          description="Manage all buyer vehicle requests and auction matching"
+          subtitle="Manage all buyer vehicle requests and auction matching"
         />
 
         {/* Stats */}

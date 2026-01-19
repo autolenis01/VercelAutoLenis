@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -29,12 +29,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, DollarSign, Clock, CheckCircle, XCircle, Send, RefreshCw, Search } from "lucide-react"
 import Link from "next/link"
 import useSWR from "swr"
 import { useSearchParams } from "next/navigation"
-import { Suspense } from "react"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -59,8 +58,6 @@ interface Payout {
   }
 }
 
-const Loading = () => null;
-
 export default function AdminPayoutsPage() {
   const searchParams = useSearchParams();
   const [statusFilter, setStatusFilter] = useState<string>(searchParams.get("status") || "PENDING")
@@ -79,6 +76,7 @@ export default function AdminPayoutsPage() {
     { refreshInterval: 30000 }
   )
 
+  const hasError = Boolean(error)
   const payouts: Payout[] = data?.payouts || []
   const stats = data?.stats || { pending: 0, completed: 0, totalPending: 0, totalPaid: 0 }
 
@@ -166,6 +164,12 @@ export default function AdminPayoutsPage() {
           Refresh
         </Button>
       </div>
+
+      {hasError && (
+        <div className="rounded-md border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+          Failed to load payouts. Please retry.
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -414,11 +418,3 @@ export default function AdminPayoutsPage() {
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
-
-export function generateStaticParams() {
-  return [
-    { status: "PENDING" },
-    { status: "COMPLETED" },
-    { status: "all" },
-  ];
-}

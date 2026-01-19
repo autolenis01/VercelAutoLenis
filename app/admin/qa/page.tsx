@@ -43,7 +43,6 @@ interface RouteCheck {
 export default function AdminQAPage() {
   const [healthChecks, setHealthChecks] = useState<HealthCheck[]>([])
   const [routeChecks, setRouteChecks] = useState<RouteCheck[]>([])
-  const [loading, setLoading] = useState(true)
   const [runningChecks, setRunningChecks] = useState(false)
 
   useEffect(() => {
@@ -57,7 +56,6 @@ export default function AdminQAPage() {
       runRouteChecks(),
     ])
     setRunningChecks(false)
-    setLoading(false)
   }
 
   async function runHealthChecks() {
@@ -219,14 +217,21 @@ export default function AdminQAPage() {
     <div className="p-6 space-y-6">
       <PageHeader
         title="QA Verification"
-        description="System health checks and route verification dashboard"
-        icon={<Shield className="h-6 w-6" />}
-        actions={
-          <Button onClick={runAllChecks} disabled={runningChecks}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${runningChecks ? "animate-spin" : ""}`} />
-            Run All Checks
-          </Button>
-        }
+        subtitle="System health checks and route verification dashboard"
+        primaryAction={{
+          label: "Run All Checks",
+          onClick: runAllChecks,
+          icon: <RefreshCw className={`h-4 w-4 mr-2 ${runningChecks ? "animate-spin" : ""}`} />,
+          variant: "outline",
+        }}
+        secondaryActions={[
+          {
+            label: "Security",
+            href: "#security",
+            icon: <Shield className="h-4 w-4 mr-2" />,
+            variant: "ghost",
+          },
+        ]}
       />
 
       {/* Overall Health */}
