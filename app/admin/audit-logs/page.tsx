@@ -10,7 +10,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, Shield, RefreshCw, User, Clock, AlertTriangle, CheckCircle, Info } from "lucide-react"
 import { formatDate } from "@/lib/utils/format"
 import { PageHeader } from "@/components/dashboard/page-header"
-import { useSearchParams } from "next/navigation"
 import Loading from "./loading"
 
 interface AuditLog {
@@ -36,7 +35,6 @@ export default function AdminAuditLogsPage() {
   const [search, setSearch] = useState("")
   const [actionFilter, setActionFilter] = useState("all")
   const [entityFilter, setEntityFilter] = useState("all")
-  const searchParams = useSearchParams()
 
   useEffect(() => {
     fetchLogs()
@@ -96,8 +94,7 @@ export default function AdminAuditLogsPage() {
       <div className="p-6 space-y-6">
         <PageHeader
           title="Audit Logs"
-          description="Track all administrative actions and system events"
-          icon={<Shield className="h-6 w-6" />}
+          subtitle="Track all administrative actions and system events"
         />
 
         {/* Stats */}

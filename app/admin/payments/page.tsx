@@ -29,6 +29,7 @@ export default function AdminPaymentsPage() {
   const { data, error, isLoading, mutate } = useSWR("/api/admin/payments", fetcher, {
     refreshInterval: 30000,
   })
+  const hasError = Boolean(error)
   const [searchTerm, setSearchTerm] = useState("")
   const [refundDialog, setRefundDialog] = useState<{
     open: boolean
@@ -160,6 +161,12 @@ export default function AdminPaymentsPage() {
           Refresh
         </Button>
       </div>
+
+      {hasError && (
+        <div className="rounded-md border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+          Failed to load payments. Please retry.
+        </div>
+      )}
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">

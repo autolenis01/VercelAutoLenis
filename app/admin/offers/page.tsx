@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, DollarSign, Clock, CheckCircle, XCircle, Eye, RefreshCw, TrendingUp } from "lucide-react"
+import { Search, DollarSign, Clock, CheckCircle, Eye, RefreshCw, TrendingUp } from "lucide-react"
 import { formatCurrency, formatDate } from "@/lib/utils/format"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { useSearchParams } from "next/navigation"
@@ -84,7 +84,7 @@ export default function AdminOffersPage() {
     <div className="p-6 space-y-6">
       <PageHeader
         title="Dealer Offers"
-        description="Review and manage all dealer offers on auctions"
+        subtitle="Review and manage all dealer offers on auctions"
       />
 
       {/* Stats */}

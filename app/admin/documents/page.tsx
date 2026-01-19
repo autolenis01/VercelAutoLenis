@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, FileText, Clock, CheckCircle, XCircle, Eye, RefreshCw, Download, AlertTriangle } from "lucide-react"
+import { Search, FileText, Clock, CheckCircle, Eye, RefreshCw, Download, AlertTriangle } from "lucide-react"
 import { formatDate } from "@/lib/utils/format"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { useSearchParams } from "next/navigation"
@@ -98,7 +98,7 @@ export default function AdminDocumentsPage() {
       <div className="p-6 space-y-6">
         <PageHeader
           title="Documents"
-          description="Review and manage all uploaded documents"
+          subtitle="Review and manage all uploaded documents"
         />
 
         {/* Stats */}

@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, User, DollarSign, Users, MousePointer, Calendar, ExternalLink, Copy, CheckCircle } from "lucide-react"
+import { ArrowLeft, DollarSign, Users, Calendar, Copy, CheckCircle } from "lucide-react"
 import { formatCurrency, formatDate } from "@/lib/utils/format"
 
 interface AffiliateDetail {
@@ -56,7 +56,7 @@ interface Commission {
 export default function AdminAffiliateDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const affiliateId = params.affiliateId as string
+  const affiliateId = params["affiliateId"] as string
   
   const [affiliate, setAffiliate] = useState<AffiliateDetail | null>(null)
   const [referrals, setReferrals] = useState<Referral[]>([])

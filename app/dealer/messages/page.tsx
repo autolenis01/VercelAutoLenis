@@ -8,8 +8,6 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { MessageSquare, Search, Send } from "lucide-react"
 import { useSearchParams } from "next/navigation"
-import { Suspense } from "react"
-import Loading from "./loading"
 
 export default function DealerMessagesPage() {
   // Mock data - empty state by default
@@ -88,8 +86,4 @@ export default function DealerMessagesPage() {
       )}
     </div>
   )
-}
-
-export function Loading() {
-  return null
 }

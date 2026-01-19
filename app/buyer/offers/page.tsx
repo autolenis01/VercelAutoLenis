@@ -13,13 +13,8 @@ import { Gavel, Search, Building2, DollarSign, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import useSWR from "swr"
 import { useSearchParams } from "next/navigation"
-import { Suspense } from "react"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
-
-function Loading() {
-  return null
-}
 
 export default function BuyerOffersPage() {
   const searchParams = useSearchParams()
@@ -109,7 +104,3 @@ export default function BuyerOffersPage() {
 export const dynamic = "force-dynamic"
 export const dynamicParams = true
 export const revalidate = 0
-
-export function generateStaticParams() {
-  return []
-}
